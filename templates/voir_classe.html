@@ -3,1064 +3,491 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Classe {{ classe.nom }}</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>{{ classe.nom }} — EduBulletin</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <style>
         :root {
-            --primary-color: #6366f1;
-            --primary-dark: #4f46e5;
-            --secondary-color: #8b5cf6;
-            --success-color: #10b981;
-            --warning-color: #f59e0b;
-            --danger-color: #ef4444;
-            --info-color: #06b6d4;
-            --dark-color: #1f2937;
-            --light-bg: #f8fafc;
-            --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            --card-shadow-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-            --glass-bg: rgba(255, 255, 255, 0.9);
-            --glass-border: rgba(255, 255, 255, 0.2);
+            --ink: #0d1117; --cream: #f5f0e8; --gold: #c9a84c;
+            --gold-light: #e8d5a3; --rust: #c4622d; --mist: #e8edf2;
+            --text-muted: #6b7685; --border: #e8edf2;
+            --success-color: #1a6b3c;
         }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'DM Sans',sans-serif; background:var(--cream); min-height:100vh; position:relative; overflow-x:hidden; }
+        .bg-decor { position:fixed; inset:0; z-index:0; pointer-events:none; }
+        .bg-decor::before { content:''; position:absolute; top:-200px; right:-200px; width:600px; height:600px; background:radial-gradient(circle,rgba(201,168,76,0.1) 0%,transparent 70%); border-radius:50%; }
+        .bg-decor::after  { content:''; position:absolute; bottom:-150px; left:-150px; width:500px; height:500px; background:radial-gradient(circle,rgba(196,98,45,0.07) 0%,transparent 70%); border-radius:50%; }
+        .grid-dots { position:fixed; inset:0; z-index:0; background-image:radial-gradient(circle,#c9a84c18 1px,transparent 1px); background-size:32px 32px; }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        /* Navbar */
+        .navbar { position:sticky; top:0; z-index:100; background:rgba(245,240,232,0.92); backdrop-filter:blur(16px); border-bottom:1px solid rgba(201,168,76,0.2); padding:0 40px; height:64px; display:flex; align-items:center; justify-content:space-between; }
+        .nav-brand { display:flex; align-items:center; gap:10px; font-family:'DM Serif Display',serif; font-size:1.3rem; color:var(--ink); text-decoration:none; }
+        .nav-brand .brand-icon { width:36px; height:36px; background:var(--ink); border-radius:10px; display:flex; align-items:center; justify-content:center; color:var(--gold); font-size:1rem; }
+        .nav-right { display:flex; align-items:center; gap:10px; }
+        .btn-nav { display:flex; align-items:center; gap:8px; padding:8px 18px; background:transparent; border:1.5px solid var(--border); border-radius:50px; font-size:0.85rem; font-weight:600; color:var(--text-muted); text-decoration:none; transition:all 0.2s; }
+        .btn-nav:hover { border-color:var(--ink); color:var(--ink); }
+        .btn-nav.logout:hover { border-color:var(--rust); color:var(--rust); }
 
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            position: relative;
-        }
+        /* Content */
+        .page-content { position:relative; z-index:1; padding:40px; max-width:1200px; margin:0 auto; }
 
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: url('data:image/svg+xml,<svg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><g fill="none" fill-rule="evenodd"><g fill="%23ffffff" fill-opacity="0.05"><circle cx="30" cy="30" r="1"/></g></g></svg>');
-            z-index: -1;
-        }
+        /* Flash */
+        .flash-msg { padding:14px 18px; border-radius:14px; font-size:0.88rem; margin-bottom:16px; display:flex; align-items:center; gap:10px; animation:slideDown 0.4s ease; }
+        @keyframes slideDown { from{opacity:0;transform:translateY(-10px)} to{opacity:1;transform:translateY(0)} }
+        .flash-success { background:rgba(39,174,96,0.08); border:1px solid rgba(39,174,96,0.2); color:var(--success-color); }
+        .flash-error   { background:rgba(196,98,45,0.08); border:1px solid rgba(196,98,45,0.2); color:var(--rust); }
+        .flash-warning { background:rgba(201,168,76,0.1); border:1px solid rgba(201,168,76,0.3); color:#7a5c10; }
+        .flash-close   { margin-left:auto; background:none; border:none; cursor:pointer; color:inherit; opacity:0.6; }
 
-        /* Navigation moderne */
-        .navbar {
-            background: var(--glass-bg) !important;
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--glass-border);
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
-        }
+        /* Hero */
+        .hero { background:var(--ink); border-radius:24px; padding:48px; margin-bottom:32px; position:relative; overflow:hidden; animation:fadeUp 0.6s ease both; }
+        .hero::before { content:''; position:absolute; top:-100px; right:-100px; width:400px; height:400px; background:radial-gradient(circle,rgba(201,168,76,0.08) 0%,transparent 70%); border-radius:50%; }
+        .hero::after  { content:''; position:absolute; bottom:-60px; left:-60px; width:250px; height:250px; background:radial-gradient(circle,rgba(196,98,45,0.06) 0%,transparent 70%); border-radius:50%; }
+        .hero-inner   { position:relative; z-index:1; }
+        .hero-label { display:inline-flex; align-items:center; gap:8px; background:rgba(201,168,76,0.12); border:1px solid rgba(201,168,76,0.25); color:var(--gold); padding:6px 14px; border-radius:50px; font-size:0.75rem; font-weight:600; letter-spacing:0.5px; text-transform:uppercase; margin-bottom:16px; }
+        .hero h1 { font-family:'DM Serif Display',serif; font-size:2.6rem; color:#e8edf2; line-height:1.15; margin-bottom:8px; }
+        .hero h1 em { font-style:italic; color:var(--gold-light); }
+        .hero-sub { color:#4a5568; font-size:0.92rem; margin-bottom:28px; }
+        .hero-stats { display:flex; gap:16px; flex-wrap:wrap; }
+        .hero-stat { background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.08); border-radius:14px; padding:14px 20px; display:flex; align-items:center; gap:10px; }
+        .hero-stat-icon { width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:1rem; }
+        .hero-stat-icon.blue   { background:rgba(99,102,241,0.2); color:#818cf8; }
+        .hero-stat-icon.green  { background:rgba(39,174,96,0.2); color:#4ade80; }
+        .hero-stat-icon.gold   { background:rgba(201,168,76,0.15); color:var(--gold); }
+        .hero-stat-num  { font-size:1.4rem; font-weight:800; color:#e8edf2; line-height:1; }
+        .hero-stat-label { font-size:0.72rem; color:#4a5568; font-weight:500; }
 
-        .navbar-brand {
-            font-weight: 700;
-            font-size: 1.5rem;
-            color: var(--primary-color) !important;
-            transition: transform 0.3s ease;
-        }
+        /* Actions rapides */
+        .section-title { font-family:'DM Serif Display',serif; font-size:1.3rem; color:var(--ink); margin-bottom:16px; }
+        .actions-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:32px; }
 
-        .navbar-brand:hover {
-            transform: scale(1.05);
-        }
+        .action-card { background:white; border:1.5px solid var(--border); border-radius:20px; padding:24px 16px; text-align:center; text-decoration:none; color:var(--ink); transition:all 0.25s; display:flex; flex-direction:column; align-items:center; gap:10px; animation:fadeUp 0.6s ease both; cursor:pointer; position:relative; }
+        .action-card:hover { border-color:var(--gold); box-shadow:0 12px 32px rgba(13,17,23,0.08); transform:translateY(-4px); color:var(--ink); }
+        .action-icon { width:52px; height:52px; border-radius:16px; display:flex; align-items:center; justify-content:center; font-size:1.4rem; transition:transform 0.25s; }
+        .action-card:hover .action-icon { transform:scale(1.1); }
+        .action-icon.ink    { background:var(--ink); color:var(--gold); }
+        .action-icon.green  { background:rgba(39,174,96,0.1); color:var(--success-color); }
+        .action-icon.gold   { background:rgba(201,168,76,0.12); color:#7a5c10; }
+        .action-icon.blue   { background:rgba(99,102,241,0.1); color:#4f46e5; }
+        .action-label { font-weight:700; font-size:0.9rem; }
+        .action-sub   { font-size:0.75rem; color:var(--text-muted); }
 
-        .nav-link {
-            color: var(--dark-color) !important;
-            font-weight: 500;
-            padding: 0.5rem 1rem !important;
-            border-radius: 0.5rem;
-            transition: all 0.3s ease;
-        }
+        /* Dropdown bulletins */
+        .dropdown-wrapper { position:relative; }
+        .bulletin-dropdown { display:none; position:absolute; top:calc(100% + 8px); left:0; right:0; background:white; border:1.5px solid var(--border); border-radius:16px; box-shadow:0 20px 48px rgba(13,17,23,0.12); z-index:200; overflow:hidden; min-width:260px; }
+        .bulletin-dropdown.open { display:block; animation:popIn 0.25s cubic-bezier(0.22,1,0.36,1); }
+        @keyframes popIn { from{opacity:0;transform:scale(0.95) translateY(-8px)} to{opacity:1;transform:scale(1) translateY(0)} }
+        .dropdown-item-custom { display:flex; align-items:flex-start; gap:12px; padding:14px 16px; cursor:pointer; transition:background 0.15s; border:none; background:none; width:100%; text-align:left; }
+        .dropdown-item-custom:not(:last-child) { border-bottom:1px solid var(--mist); }
+        .dropdown-item-custom:hover { background:rgba(201,168,76,0.05); }
+        .dropdown-item-icon { width:34px; height:34px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:0.9rem; flex-shrink:0; }
+        .dropdown-item-icon.gold  { background:rgba(201,168,76,0.12); color:#7a5c10; }
+        .dropdown-item-icon.blue  { background:rgba(99,102,241,0.1); color:#4f46e5; }
+        .dropdown-item-icon.grey  { background:var(--mist); color:var(--text-muted); }
+        .dropdown-item-text strong { font-size:0.85rem; color:var(--ink); display:block; margin-bottom:2px; }
+        .dropdown-item-text small  { font-size:0.75rem; color:var(--text-muted); }
 
-        .nav-link:hover {
-            background: rgba(99, 102, 241, 0.1);
-            color: var(--primary-color) !important;
-        }
+        /* Two-col layout */
+        .two-col { display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-bottom:32px; }
 
-        /* Container principal */
-        .container {
-            margin-top: 2rem;
-        }
+        /* List card */
+        .list-card { background:white; border:1px solid var(--border); border-radius:24px; overflow:hidden; animation:fadeUp 0.6s ease 0.2s both; }
+        .list-card-header { padding:20px 24px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+        .list-card-title { font-family:'DM Serif Display',serif; font-size:1.1rem; color:var(--ink); display:flex; align-items:center; gap:10px; }
+        .count-pill { background:var(--ink); color:var(--gold); padding:3px 11px; border-radius:50px; font-family:'DM Sans',sans-serif; font-size:0.72rem; font-weight:700; }
 
-        /* Cards modernes */
-        .card {
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border);
-            border-radius: 1rem;
-            box-shadow: var(--card-shadow);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            overflow: hidden;
-        }
+        .student-list { padding:12px; }
+        .student-item { display:flex; align-items:center; gap:14px; padding:12px; border-radius:14px; transition:all 0.2s; }
+        .student-item:hover { background:rgba(201,168,76,0.04); transform:translateX(4px); }
+        .student-avatar { width:42px; height:42px; background:var(--ink); border-radius:12px; display:flex; align-items:center; justify-content:center; color:var(--gold); font-family:'DM Serif Display',serif; font-size:0.95rem; font-weight:700; flex-shrink:0; }
+        .student-info { flex:1; min-width:0; }
+        .student-name { font-weight:700; font-size:0.9rem; color:var(--ink); }
+        .student-meta { font-size:0.75rem; color:var(--text-muted); display:flex; align-items:center; gap:10px; margin-top:2px; }
+        .student-mat-badge { background:rgba(201,168,76,0.1); color:#7a5c10; border-radius:6px; padding:1px 7px; font-size:0.7rem; font-weight:700; }
+        .btn-bulletin { width:32px; height:32px; border-radius:9px; border:1.5px solid var(--border); background:transparent; color:var(--text-muted); display:flex; align-items:center; justify-content:center; font-size:0.8rem; cursor:pointer; transition:all 0.2s; text-decoration:none; flex-shrink:0; }
+        .btn-bulletin:hover { background:var(--ink); border-color:var(--ink); color:var(--gold); }
 
-        .card:hover {
-            box-shadow: var(--card-shadow-hover);
-            transform: translateY(-2px);
-        }
+        .matiere-item { display:flex; align-items:center; gap:14px; padding:12px; border-radius:14px; transition:all 0.2s; }
+        .matiere-item:hover { background:rgba(201,168,76,0.04); transform:translateX(4px); }
+        .matiere-icon { width:38px; height:38px; background:rgba(39,174,96,0.1); border-radius:11px; display:flex; align-items:center; justify-content:center; color:var(--success-color); font-size:0.9rem; flex-shrink:0; }
+        .matiere-name { flex:1; font-weight:600; font-size:0.9rem; color:var(--ink); }
+        .matiere-active { background:rgba(39,174,96,0.08); color:var(--success-color); border-radius:50px; padding:3px 10px; font-size:0.72rem; font-weight:700; }
 
-        .card-header {
-            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
-            border-bottom: 1px solid rgba(99, 102, 241, 0.2);
-            padding: 1.5rem;
-            border-radius: 1rem 1rem 0 0;
-        }
+        /* Empty state */
+        .empty-state { padding:48px 24px; text-align:center; }
+        .empty-icon { width:72px; height:72px; background:var(--mist); border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 16px; font-size:1.8rem; color:#c8d0da; }
+        .empty-state h4 { font-family:'DM Serif Display',serif; font-size:1.2rem; color:var(--ink); margin-bottom:8px; }
+        .empty-state p { color:var(--text-muted); font-size:0.85rem; margin-bottom:20px; }
+        .btn-empty { display:inline-flex; align-items:center; gap:8px; background:var(--ink); color:var(--cream); padding:11px 22px; border-radius:12px; text-decoration:none; font-size:0.88rem; font-weight:700; transition:all 0.2s; }
+        .btn-empty:hover { background:#1a2332; color:var(--cream); transform:translateY(-2px); }
 
-        .card-header h5 {
-            color: var(--dark-color);
-            font-weight: 600;
-            margin: 0;
-            display: flex;
-            align-items: center;
-        }
+        /* Stats section */
+        .stats-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; animation:fadeUp 0.6s ease 0.3s both; }
+        .stat-card { background:white; border:1px solid var(--border); border-radius:20px; padding:28px 24px; text-align:center; transition:all 0.3s; position:relative; overflow:hidden; }
+        .stat-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:var(--ink); }
+        .stat-card:hover { border-color:var(--gold); transform:translateY(-4px); box-shadow:0 16px 40px rgba(13,17,23,0.07); }
+        .stat-card.ready::before  { background:linear-gradient(90deg,var(--success-color),#4ade80); }
+        .stat-card.warn::before   { background:linear-gradient(90deg,var(--gold),#f59e0b); }
+        .stat-icon { width:52px; height:52px; border-radius:16px; display:flex; align-items:center; justify-content:center; font-size:1.3rem; margin:0 auto 16px; }
+        .stat-icon.blue  { background:rgba(99,102,241,0.1); color:#4f46e5; }
+        .stat-icon.green { background:rgba(39,174,96,0.1); color:var(--success-color); }
+        .stat-icon.gold  { background:rgba(201,168,76,0.1); color:#7a5c10; }
+        .stat-num   { font-family:'DM Serif Display',serif; font-size:2.4rem; color:var(--ink); line-height:1; margin-bottom:6px; }
+        .stat-label { font-size:0.82rem; color:var(--text-muted); font-weight:500; }
+        .stat-ready-icon { font-size:2rem; }
+        .stat-ready-icon.ok   { color:var(--success-color); }
+        .stat-ready-icon.warn { color:var(--gold); }
 
-        .card-header h5 i {
-            color: var(--primary-color);
-        }
-
-        .card-body {
-            padding: 1.5rem;
-        }
-
-        /* Hero card */
-        .hero-card .card-body {
-            background: linear-gradient(135deg, rgba(99, 102, 241, 0.95) 0%, rgba(139, 92, 246, 0.95) 100%);
-            color: white;
-            text-align: center;
-            padding: 3rem 2rem;
-        }
-
-        .hero-card h2 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-            animation: fadeInUp 0.8s ease;
-        }
-
-        .hero-card p {
-            font-size: 1.2rem;
-            opacity: 0.9;
-            animation: fadeInUp 0.8s ease 0.2s both;
-            margin-bottom: 2rem;
-        }
-
-        /* Badges modernes */
-        .badge {
-            padding: 0.7rem 1.2rem;
-            border-radius: 0.6rem;
-            font-weight: 600;
-            font-size: 0.9rem;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .badge.bg-info {
-            background: linear-gradient(135deg, var(--info-color), #0891b2) !important;
-        }
-
-        .badge.bg-success {
-            background: linear-gradient(135deg, var(--success-color), #059669) !important;
-        }
-
-        .badge.bg-primary {
-            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark)) !important;
-        }
-
-        /* Boutons modernes */
-        .btn {
-            border-radius: 0.75rem;
-            font-weight: 500;
-            font-size: 0.95rem;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            position: relative;
-            overflow: hidden;
-            border: none;
-        }
-
-        .btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: left 0.5s ease;
-        }
-
-        .btn:hover::before {
-            left: 100%;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
-        }
-
-        .btn-success {
-            background: linear-gradient(135deg, var(--success-color), #059669);
-        }
-
-        .btn-warning {
-            background: linear-gradient(135deg, var(--warning-color), #d97706);
-        }
-
-        .btn-info {
-            background: linear-gradient(135deg, var(--info-color), #0891b2);
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
-        }
-
-        .btn-outline-info {
-            border: 2px solid var(--info-color);
-            color: var(--info-color);
-            background: transparent;
-        }
-
-        .btn-outline-info:hover {
-            background: var(--info-color);
-            border-color: var(--info-color);
-            color: white;
-        }
-
-        /* Dropdown moderne */
-        .dropdown-menu {
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border);
-            border-radius: 1rem;
-            box-shadow: var(--card-shadow-hover);
-            padding: 0.5rem;
-            margin-top: 0.5rem;
-        }
-
-        .dropdown-item {
-            border-radius: 0.5rem;
-            padding: 0.8rem 1rem;
-            transition: all 0.3s ease;
-            border: none;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-        }
-
-        .dropdown-item:hover {
-            background: rgba(99, 102, 241, 0.1);
-            transform: translateX(3px);
-        }
-
-        .dropdown-divider {
-            margin: 0.5rem 0;
-            border-top: 1px solid rgba(99, 102, 241, 0.2);
-        }
-
-        /* List group moderne */
-        .list-group-item {
-            border: none;
-            border-radius: 0.75rem !important;
-            margin-bottom: 0.5rem;
-            background: rgba(248, 250, 252, 0.8);
-            backdrop-filter: blur(10px);
-            transition: all 0.3s ease;
-        }
-
-        .list-group-item:hover {
-            background: rgba(99, 102, 241, 0.05);
-            transform: translateX(5px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .list-group-flush .list-group-item {
-            border-radius: 0.75rem !important;
-        }
-
-        /* Stats cards */
-        .stats-card {
-            background: white;
-            border: none;
-            border-radius: 1rem;
-            padding: 2rem;
-            text-align: center;
-            box-shadow: var(--card-shadow);
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-            height: 100%;
-        }
-
-        .stats-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 4px;
-            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
-        }
-
-        .stats-card:hover {
-            transform: translateY(-5px);
-            box-shadow: var(--card-shadow-hover);
-        }
-
-        .stats-card h3 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-        }
-
-        .stats-card.primary h3 { color: var(--primary-color); }
-        .stats-card.success h3 { color: var(--success-color); }
-        .stats-card.warning h3 { color: var(--warning-color); }
-        .stats-card.info h3 { color: var(--info-color); }
-
-        /* Empty states */
-        .empty-state {
-            text-align: center;
-            padding: 3rem 2rem;
-            color: #64748b;
-        }
-
-        .empty-state i {
-            font-size: 3rem;
-            color: #d1d5db;
-            margin-bottom: 1rem;
-        }
-
-        .empty-state h6 {
-            color: var(--dark-color);
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-        }
+        /* Toast */
+        .toast-box { position:fixed; bottom:28px; right:28px; z-index:999; display:flex; flex-direction:column; gap:10px; }
+        .toast-msg { background:white; border:1px solid var(--border); border-radius:14px; padding:14px 18px; display:flex; align-items:center; gap:12px; box-shadow:0 12px 32px rgba(13,17,23,0.1); animation:slideUp 0.4s ease; font-size:0.88rem; max-width:340px; }
+        @keyframes slideUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+        .toast-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+        .toast-success .toast-dot { background:var(--success-color); }
+        .toast-warning .toast-dot { background:var(--gold); }
+        .toast-error .toast-dot   { background:var(--rust); }
 
         /* Loading overlay */
-        .loading-overlay {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            color: white;
-            padding: 2rem 3rem;
-            border-radius: 1rem;
-            box-shadow: var(--card-shadow-hover);
-            z-index: 9999;
-            text-align: center;
-            backdrop-filter: blur(20px);
+        .loading-overlay { display:none; position:fixed; inset:0; z-index:900; background:rgba(13,17,23,0.6); backdrop-filter:blur(4px); align-items:center; justify-content:center; }
+        .loading-overlay.active { display:flex; }
+        .loading-box { background:white; border-radius:24px; padding:36px 48px; text-align:center; box-shadow:0 32px 80px rgba(0,0,0,0.2); }
+        .spinner { width:48px; height:48px; border:3px solid var(--mist); border-top-color:var(--gold); border-radius:50%; animation:spin 0.8s linear infinite; margin:0 auto 16px; }
+        @keyframes spin { to{transform:rotate(360deg)} }
+        .loading-text { font-weight:700; color:var(--ink); font-size:0.95rem; }
+        .loading-sub  { color:var(--text-muted); font-size:0.82rem; margin-top:4px; }
+
+        @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+
+        @media(max-width:1000px) {
+            .actions-grid { grid-template-columns:repeat(2,1fr); }
+            .two-col      { grid-template-columns:1fr; }
+            .stats-grid   { grid-template-columns:1fr 1fr; }
         }
-
-        .loading-overlay .spinner-border {
-            width: 2rem;
-            height: 2rem;
+        @media(max-width:600px) {
+            .navbar { padding:0 20px; }
+            .page-content { padding:20px 16px; }
+            .hero { padding:28px 24px; }
+            .hero h1 { font-size:1.8rem; }
+            .actions-grid { grid-template-columns:1fr 1fr; }
+            .stats-grid   { grid-template-columns:1fr; }
         }
-
-        /* Animations */
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes slideInLeft {
-            from {
-                opacity: 0;
-                transform: translateX(-30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        @keyframes pulse {
-            0%, 100% {
-                transform: scale(1);
-            }
-            50% {
-                transform: scale(1.05);
-            }
-        }
-
-        .animate-fade-in {
-            animation: fadeInUp 0.6s ease;
-        }
-
-        .animate-slide-in {
-            animation: slideInLeft 0.6s ease;
-        }
-
-        .animate-pulse {
-            animation: pulse 2s infinite;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .hero-card h2 {
-                font-size: 2rem;
-            }
-            
-            .hero-card p {
-                font-size: 1rem;
-            }
-            
-            .container {
-                margin-top: 1rem;
-            }
-
-            .badge {
-                font-size: 0.8rem;
-                padding: 0.5rem 0.8rem;
-                margin: 0.2rem;
-            }
-
-            .stats-card {
-                padding: 1.5rem;
-                margin-bottom: 1rem;
-            }
-
-            .card-body {
-                padding: 1rem;
-            }
-        }
-
-        /* Alert moderne */
-        .alert {
-            border: none;
-            border-radius: 0.75rem;
-            padding: 1rem 1.5rem;
-            font-weight: 500;
-            border-left: 4px solid;
-            backdrop-filter: blur(10px);
-            animation: fadeInUp 0.6s ease;
-        }
-
-        .alert-success {
-            background: rgba(16, 185, 129, 0.1);
-            color: #065f46;
-            border-left-color: var(--success-color);
-        }
-
-        .alert-danger {
-            background: rgba(239, 68, 68, 0.1);
-            color: #991b1b;
-            border-left-color: var(--danger-color);
-        }
-
-        .alert-warning {
-            background: rgba(245, 158, 11, 0.1);
-            color: #92400e;
-            border-left-color: var(--warning-color);
-        }
-
-        /* Animation d'entrée */
-        .row > div {
-            animation: fadeInUp 0.6s ease;
-        }
-
-        .row > div:nth-child(1) { animation-delay: 0.1s; }
-        .row > div:nth-child(2) { animation-delay: 0.2s; }
-        .row > div:nth-child(3) { animation-delay: 0.3s; }
-        .row > div:nth-child(4) { animation-delay: 0.4s; }
-
-        /* Status indicators */
-        .status-ready {
-            color: var(--success-color);
-            animation: pulse 2s infinite;
-        }
-
-        .status-incomplete {
-            color: var(--warning-color);
-        }
-
-        /* Corrige les dropdowns dans les cartes avec overflow:hidden */
-        .card {
-            overflow: visible !important; /* Temporairement pour les dropdowns */
-        }
-
-/* Ou mieux : cibler uniquement les cartes qui contiennent des dropdowns */
-       .card:has(.dropdown) {
-           overflow: visible !important;
-    }
     </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg">
-        <div class="container">
-            <a class="navbar-brand" href="{{ url_for('main.dashboard') }}">
-                <i class="fas fa-graduation-cap me-2"></i>Bulletin Scolaire
-            </a>
-            <div class="navbar-nav ms-auto">
-                <a class="nav-link" href="{{ url_for('main.dashboard') }}">
-                    <i class="fas fa-arrow-left me-1"></i>Dashboard
-                </a>
-                <a class="nav-link" href="{{ url_for('auth.logout') }}">
-                    <i class="fas fa-sign-out-alt me-1"></i>Déconnexion
-                </a>
-            </div>
+<div class="bg-decor"></div>
+<div class="grid-dots"></div>
+
+<!-- Navbar -->
+<nav class="navbar">
+    <a href="{{ url_for('main.dashboard') }}" class="nav-brand">
+        <span class="brand-icon"><i class="bi bi-mortarboard-fill"></i></span>
+        EduBulletin
+    </a>
+    <div class="nav-right">
+        <a href="{{ url_for('main.dashboard') }}" class="btn-nav">
+            <i class="bi bi-speedometer2"></i> Dashboard
+        </a>
+        <a href="{{ url_for('auth.logout') }}" class="btn-nav logout">
+            <i class="bi bi-box-arrow-right"></i> Déconnexion
+        </a>
+    </div>
+</nav>
+
+<div class="page-content">
+
+    <!-- Flash -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}{% for category, msg in messages %}
+        <div class="flash-msg flash-{{ 'error' if category=='error' else 'success' if category=='success' else 'warning' }}">
+            <i class="bi bi-{{ 'exclamation-circle' if category=='error' else 'check-circle' if category=='success' else 'exclamation-triangle' }}"></i>
+            {{ msg }}
+            <button class="flash-close" onclick="this.parentElement.remove()"><i class="bi bi-x"></i></button>
         </div>
-    </nav>
+        {% endfor %}{% endif %}
+    {% endwith %}
 
-    <div class="container mt-4">
-        <!-- Messages Flash -->
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ 'danger' if category == 'error' else 'success' if category == 'success' else 'warning' }} alert-dismissible fade show" role="alert">
-                        <i class="fas fa-{{ 'check-circle' if category == 'success' else 'exclamation-triangle' if category == 'warning' else 'times-circle' }} me-2"></i>
-                        {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
-
-        <!-- En-tête -->
-        <div class="row mb-4">
-            <div class="col-12">
-                <div class="card hero-card">
-                    <div class="card-body text-center">
-                        <i class="fas fa-chalkboard-teacher fa-3x mb-3" style="opacity: 0.8;"></i>
-                        <h2>{{ classe.nom }}</h2>
-                        <p class="text-muted">Année scolaire : {{ classe.annee_scolaire }}</p>
-                        <div class="row justify-content-center">
-                            <div class="col-md-6 col-lg-4 mb-2">
-                                <span class="badge bg-info fs-6">
-                                    <i class="fas fa-users me-1"></i>
-                                    {{ nb_eleves if nb_eleves is defined else eleves|length }} élève(s)
-                                </span>
-                            </div>
-                            <div class="col-md-6 col-lg-4 mb-2">
-                                <span class="badge bg-success fs-6">
-                                    <i class="fas fa-book me-1"></i>
-                                    {{ nb_matieres if nb_matieres is defined else matieres|length }} matière(s)
-                                </span>
-                            </div>
-                        </div>
+    <!-- Hero -->
+    <div class="hero">
+        <div class="hero-inner">
+            <div class="hero-label"><i class="bi bi-building"></i> Fiche de classe</div>
+            <h1>{{ classe.nom }}<br><em>{{ classe.annee_scolaire }}</em></h1>
+            <p class="hero-sub">Gérez les élèves, matières et notes de cette classe.</p>
+            <div class="hero-stats">
+                <div class="hero-stat">
+                    <div class="hero-stat-icon blue"><i class="bi bi-people-fill"></i></div>
+                    <div>
+                        <div class="hero-stat-num">{{ eleves|length }}</div>
+                        <div class="hero-stat-label">élève(s)</div>
                     </div>
                 </div>
-            </div>
-        </div>
-
-        <!-- Actions rapides -->
-        <div class="row mb-4">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-header">
-                        <h5><i class="fas fa-bolt me-2"></i>Actions rapides</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="row g-3">
-                            <div class="col-lg-3 col-md-6">
-                                <a href="{{ url_for('eleve.add_eleve', classe_id=classe.id) }}" 
-                                   class="btn btn-primary w-100 h-100 d-flex flex-column justify-content-center">
-                                    <i class="fas fa-user-plus mb-1" style="font-size: 1.5rem;"></i>
-                                    <span>Gérer élèves</span>
-                                </a>
-                            </div>
-                            <div class="col-lg-3 col-md-6">
-                                <a href="{{ url_for('matiere.add_matiere', classe_id=classe.id) }}" 
-                                   class="btn btn-success w-100 h-100 d-flex flex-column justify-content-center">
-                                    <i class="fas fa-book-plus mb-1" style="font-size: 1.5rem;"></i>
-                                    <span>Gérer matières</span>
-                                </a>
-                            </div>
-                            <div class="col-lg-3 col-md-6">
-                                <a href="{{ url_for('notes.saisir_notes', classe_id=classe.id) }}" 
-                                   class="btn btn-warning w-100 h-100 d-flex flex-column justify-content-center">
-                                    <i class="fas fa-edit mb-1" style="font-size: 1.5rem;"></i>
-                                    <span>Saisir notes</span>
-                                </a>
-                            </div>
-                            <div class="col-lg-3 col-md-6">
-    <div class="dropdown h-100">
-        <button class="btn btn-info w-100 h-100 dropdown-toggle d-flex flex-column justify-content-center"
-                type="button"
-                data-bs-toggle="dropdown"
-                data-bs-boundary="viewport"
-                data-bs-reference="parent"
-                aria-expanded="false">
-            <i class="fas fa-print mb-1" style="font-size: 1.5rem;"></i>
-            <span>Bulletins</span>
-        </button>
-        <ul class="dropdown-menu w-100 shadow" 
-            style="z-index: 1050; position: absolute; overflow: visible;">
-            <li>
-                <a class="dropdown-item" href="#" onclick="telechargerBulletinsClasses(); return false;">
-                    <div class="d-flex align-items-center mb-1">
-                        <i class="fas fa-trophy me-2 text-warning"></i>
-                        <strong>Télécharger par classement</strong>
-                    </div>
-                    <small class="text-muted">ZIP ordonné du 1er au dernier</small>
-                </a>
-            </li>
-            <li>
-                <a class="dropdown-item" href="#" onclick="telechargerBulletinsAlpha(); return false;">
-                    <div class="d-flex align-items-center mb-1">
-                        <i class="fas fa-sort-alpha-down me-2 text-info"></i>
-                        <span>Télécharger par ordre alphabétique</span>
-                    </div>
-                    <small class="text-muted">ZIP ordonné A→Z</small>
-                </a>
-            </li>
-            <li><hr class="dropdown-divider my-1"></li>
-            <li>
-                <a class="dropdown-item" href="#" onclick="imprimerTousBulletins(); return false;">
-                    <div class="d-flex align-items-center mb-1">
-                        <i class="fas fa-external-link-alt me-2 text-secondary"></i>
-                        <span>Ouvrir pour impression</span>
-                    </div>
-                    <small class="text-muted">Prévisualisation HTML</small>
-                </a>
-            </li>
-        </ul>
-    </div>                             
-</div>
-                        </div>
+                <div class="hero-stat">
+                    <div class="hero-stat-icon green"><i class="bi bi-book-fill"></i></div>
+                    <div>
+                        <div class="hero-stat-num">{{ matieres|length }}</div>
+                        <div class="hero-stat-label">matière(s)</div>
                     </div>
                 </div>
-            </div>
-        </div>
-
-        <div class="row">
-            <!-- Liste des élèves -->
-            <div class="col-lg-6 mb-4">
-                <div class="card">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5><i class="fas fa-users me-2"></i>Élèves</h5>
-                        <span class="badge bg-primary">{{ eleves|length }}</span>
-                    </div>
-                    <div class="card-body">
-                        {% if eleves %}
-                            <div class="list-group list-group-flush">
-                                {% for eleve in eleves %}
-                                <div class="list-group-item d-flex justify-content-between align-items-center" data-eleve-id="{{ eleve.id }}">
-                                    <div class="d-flex align-items-center">
-                                        <div class="me-3">
-                                            <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" 
-                                                 style="width: 40px; height: 40px; font-weight: 600;">
-                                                {{ eleve.prenom[0] }}{{ eleve.nom[0] }}
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <strong class="d-block">{{ eleve.prenom }} {{ eleve.nom }}</strong>
-                                            <small class="text-muted d-flex align-items-center gap-2">
-                                                {% if eleve.date_naissance %}
-                                                    <span><i class="fas fa-calendar me-1"></i>{{ eleve.date_naissance.strftime('%d/%m/%Y') }}</span>
-                                                {% endif %}
-                                                {% if eleve.sexe %}
-                                                    <span><i class="fas fa-{{ 'mars' if eleve.sexe == 'M' else 'venus' }} me-1"></i>{{ eleve.sexe }}</span>
-                                                {% endif %}
-                                            </small>
-                                        </div>
-                                    </div>
-                                    <div class="btn-group btn-group-sm">
-                                        <a href="{{ url_for('pdf.preview_bulletin', eleve_id=eleve.id) }}" 
-                                           class="btn btn-outline-info" target="_blank" title="Voir le bulletin">
-                                            <i class="fas fa-file-alt"></i>
-                                        </a>
-                                    </div>
-                                </div>
-                                {% endfor %}
-                            </div>
-                        {% else %}
-                            <div class="empty-state">
-                                <i class="fas fa-user-slash"></i>
-                                <h6>Aucun élève inscrit</h6>
-                                <p class="text-muted mb-3">Commencez par ajouter des élèves à cette classe</p>
-                                <a href="{{ url_for('eleve.add_eleve', classe_id=classe.id) }}" 
-                                   class="btn btn-primary">
-                                    <i class="fas fa-plus me-1"></i>Ajouter des élèves
-                                </a>
-                            </div>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-
-            <!-- Liste des matières -->
-            <div class="col-lg-6 mb-4">
-                <div class="card">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5><i class="fas fa-book me-2"></i>Matières</h5>
-                        <span class="badge bg-success">{{ matieres|length }}</span>
-                    </div>
-                    <div class="card-body">
-                        {% if matieres %}
-                            <div class="list-group list-group-flush">
-                                {% for matiere in matieres %}
-                                <div class="list-group-item d-flex justify-content-between align-items-center">
-                                    <div class="d-flex align-items-center">
-                                        <div class="me-3">
-                                            <div class="rounded-circle bg-success text-white d-flex align-items-center justify-content-center" 
-                                                 style="width: 35px; height: 35px;">
-                                                <i class="fas fa-book-open"></i>
-                                            </div>
-                                        </div>
-                                        <span class="fw-medium">{{ matiere.nom }}</span>
-                                    </div>
-                                    <span class="badge bg-success">Active</span>
-                                </div>
-                                {% endfor %}
-                            </div>
-                        {% else %}
-                            <div class="empty-state">
-                                <i class="fas fa-book-dead"></i>
-                                <h6>Aucune matière configurée</h6>
-                                <p class="text-muted mb-3">Ajoutez les matières enseignées dans cette classe</p>
-                                <a href="{{ url_for('matiere.add_matiere', classe_id=classe.id) }}" 
-                                   class="btn btn-success">
-                                    <i class="fas fa-plus me-1"></i>Ajouter des matières
-                                </a>
-                            </div>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Statut de la classe -->
-        <div class="row">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-header">
-                        <h5><i class="fas fa-chart-line me-2"></i>Statistiques de la classe</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-lg-4 col-md-6 mb-3">
-                                <div class="stats-card primary">
-                                    <div class="mb-3">
-                                        <i class="fas fa-users fa-2x text-primary"></i>
-                                    </div>
-                                    <h3>{{ eleves|length }}</h3>
-                                    <p class="mb-0 text-muted">Élèves inscrits</p>
-                                </div>
-                            </div>
-                            <div class="col-lg-4 col-md-6 mb-3">
-                                <div class="stats-card success">
-                                    <div class="mb-3">
-                                        <i class="fas fa-book fa-2x text-success"></i>
-                                    </div>
-                                    <h3>{{ matieres|length }}</h3>
-                                    <p class="mb-0 text-muted">Matières configurées</p>
-                                </div>
-                            </div>
-                            <div class="col-lg-4 col-md-12 mb-3">
-                                <div class="stats-card {% if eleves|length > 0 and matieres|length > 0 %}success{% else %}warning{% endif %}">
-                                    <div class="mb-3">
-                                        {% if eleves|length > 0 and matieres|length > 0 %}
-                                            <i class="fas fa-check-circle fa-2x text-success status-ready"></i>
-                                        {% else %}
-                                            <i class="fas fa-exclamation-circle fa-2x text-warning status-incomplete"></i>
-                                        {% endif %}
-                                    </div>
-                                    <h3>
-                                        {% if eleves|length > 0 and matieres|length > 0 %}
-                                            <i class="fas fa-check"></i>
-                                        {% else %}
-                                            <i class="fas fa-times"></i>
-                                        {% endif %}
-                                    </h3>
-                                    <p class="mb-0 text-muted">
-                                        {% if eleves|length > 0 and matieres|length > 0 %}
-                                            Prête pour les notes
-                                        {% else %}
-                                            Configuration incomplète
-                                        {% endif %}
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
+                <div class="hero-stat">
+                    <div class="hero-stat-icon gold"><i class="bi bi-patch-check-fill"></i></div>
+                    <div>
+                        <div class="hero-stat-num">{{ 'OK' if eleves|length > 0 and matieres|length > 0 else '—' }}</div>
+                        <div class="hero-stat-label">{{ 'prête' if eleves|length > 0 and matieres|length > 0 else 'incomplète' }}</div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+    <!-- Actions rapides -->
+    <div class="section-title">Actions rapides</div>
+    <div class="actions-grid">
+        <a href="{{ url_for('eleve.add_eleve', classe_id=classe.id) }}" class="action-card" style="animation-delay:0.05s">
+            <div class="action-icon ink"><i class="bi bi-person-plus-fill"></i></div>
+            <div class="action-label">Gérer les élèves</div>
+            <div class="action-sub">Ajouter, modifier, supprimer</div>
+        </a>
+        <a href="{{ url_for('matiere.add_matiere', classe_id=classe.id) }}" class="action-card" style="animation-delay:0.1s">
+            <div class="action-icon green"><i class="bi bi-journal-plus"></i></div>
+            <div class="action-label">Gérer les matières</div>
+            <div class="action-sub">Emploi du temps</div>
+        </a>
+        <a href="{{ url_for('notes.saisir_notes', classe_id=classe.id) }}" class="action-card" style="animation-delay:0.15s">
+            <div class="action-icon gold"><i class="bi bi-pencil-square"></i></div>
+            <div class="action-label">Saisir les notes</div>
+            <div class="action-sub">Par trimestre</div>
+        </a>
 
-    <script>
-        // Variables globales
-        const classeId = {{ classe.id }};
-        const nombreEleves = {{ eleves|length }};
-        const nombreMatieres = {{ matieres|length }};
-
-        // Fonction pour télécharger les bulletins par classement
-        function telechargerBulletinsClasses() {
-            if (nombreEleves === 0) {
-                showAlert('Aucun élève dans cette classe', 'warning');
-                return;
-            }
-            
-            if (nombreMatieres === 0) {
-                showAlert('Aucune matière configurée', 'warning');
-                return;
-            }
-
-            if (confirm(`TÉLÉCHARGER LES BULLETINS PAR CLASSEMENT ?\n\n${nombreEleves} bulletin(s) seront générés\nOrdre : 1er → Dernier (par moyenne générale)\nFormat : ZIP avec PDFs nommés par rang\n\nCette opération peut prendre quelques minutes...`)) {
-                const loadingMsg = showLoadingMessage('Génération des bulletins par classement...');
-                
-                window.location.href = `/bulletin/classe_classee/${classeId}`;
-                
-                setTimeout(() => {
-                    hideLoadingMessage(loadingMsg);
-                }, 3000);
-            }
-        }
-
-        // Fonction pour télécharger les bulletins par ordre alphabétique
-        function telechargerBulletinsAlpha() {
-            if (nombreEleves === 0) {
-                showAlert('Aucun élève dans cette classe', 'warning');
-                return;
-            }
-            
-            if (nombreMatieres === 0) {
-                showAlert('Aucune matière configurée', 'warning');
-                return;
-            }
-
-            if (confirm(`TÉLÉCHARGER LES BULLETINS ALPHABÉTIQUES ?\n\n${nombreEleves} bulletin(s) seront générés\nOrdre : A → Z (par nom de famille)\nFormat : ZIP avec PDFs\n\nCette opération peut prendre quelques minutes...`)) {
-                const loadingMsg = showLoadingMessage('Génération des bulletins alphabétiques...');
-                
-                window.location.href = `/bulletin/classe/${classeId}`;
-                
-                setTimeout(() => {
-                    hideLoadingMessage(loadingMsg);
-                }, 3000);
-            }
-        }
-
-        // Fonction pour impression HTML
-        function imprimerTousBulletins() {
-            const elevesElements = document.querySelectorAll('[data-eleve-id]');
-            
-            if (elevesElements.length === 0) {
-                showAlert('Aucun élève dans cette classe', 'warning');
-                return;
-            }
-            
-            if (confirm(`OUVRIR LES BULLETINS POUR IMPRESSION ?\n\n${elevesElements.length} onglet(s) s'ouvriront\nFormat : Prévisualisation HTML\nVous pourrez imprimer depuis votre navigateur\n\nAssurez-vous d'autoriser les popups`)) {
-                elevesElements.forEach((element, index) => {
-                    setTimeout(() => {
-                        const eleveId = element.getAttribute('data-eleve-id');
-                        const url = `/bulletin/preview/${eleveId}`;
-                        window.open(url, '_blank');
-                    }, index * 300);
-                });
-            }
-        }
-
-        // Fonction pour afficher des alertes modernes
-        function showAlert(message, type = 'info') {
-            const alertDiv = document.createElement('div');
-            alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
-            alertDiv.style.top = '100px';
-            alertDiv.style.right = '20px';
-            alertDiv.style.zIndex = '9999';
-            alertDiv.style.maxWidth = '400px';
-            
-            const icon = type === 'success' ? 'check-circle' : 
-                        type === 'warning' ? 'exclamation-triangle' : 
-                        type === 'danger' ? 'times-circle' : 'info-circle';
-            
-            alertDiv.innerHTML = `
-                <i class="fas fa-${icon} me-2"></i>
-                ${message}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            `;
-            
-            document.body.appendChild(alertDiv);
-            
-            setTimeout(() => {
-                if (alertDiv.parentNode) {
-                    alertDiv.parentNode.removeChild(alertDiv);
-                }
-            }, 5000);
-        }
-
-        // Fonction pour afficher le message de chargement
-        function showLoadingMessage(message) {
-            const loadingDiv = document.createElement('div');
-            loadingDiv.className = 'loading-overlay';
-            loadingDiv.innerHTML = `
-                <div class="d-flex align-items-center mb-3">
-                    <div class="spinner-border spinner-border-sm me-3" role="status">
-                        <span class="visually-hidden">Chargement...</span>
+        <!-- Bulletins dropdown -->
+        <div class="action-card dropdown-wrapper" style="animation-delay:0.2s" id="bulletinCard" onclick="toggleBulletinDropdown(event)">
+            <div class="action-icon blue"><i class="bi bi-printer-fill"></i></div>
+            <div class="action-label">Bulletins <i class="bi bi-chevron-down" style="font-size:0.7rem;"></i></div>
+            <div class="action-sub">Télécharger ou imprimer</div>
+            <div class="bulletin-dropdown" id="bulletinDropdown" onclick="event.stopPropagation()">
+                <button class="dropdown-item-custom" onclick="telechargerBulletinsClasses()">
+                    <div class="dropdown-item-icon gold"><i class="bi bi-trophy-fill"></i></div>
+                    <div class="dropdown-item-text">
+                        <strong>Par classement</strong>
+                        <small>ZIP — du 1er au dernier</small>
                     </div>
-                    <div>
-                        <strong>${message}</strong>
-                        <div><small>Veuillez patienter...</small></div>
+                </button>
+                <button class="dropdown-item-custom" onclick="telechargerBulletinsAlpha()">
+                    <div class="dropdown-item-icon blue"><i class="bi bi-sort-alpha-down"></i></div>
+                    <div class="dropdown-item-text">
+                        <strong>Par ordre alphabétique</strong>
+                        <small>ZIP — A → Z</small>
                     </div>
+                </button>
+                <button class="dropdown-item-custom" onclick="imprimerTousBulletins()">
+                    <div class="dropdown-item-icon grey"><i class="bi bi-box-arrow-up-right"></i></div>
+                    <div class="dropdown-item-text">
+                        <strong>Ouvrir pour impression</strong>
+                        <small>Prévisualisation HTML</small>
+                    </div>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Élèves + Matières -->
+    <div class="two-col">
+
+        <!-- Élèves -->
+        <div class="list-card">
+            <div class="list-card-header">
+                <div class="list-card-title">
+                    <i class="bi bi-people" style="color:var(--gold);"></i>
+                    Élèves
                 </div>
-                <div class="progress" style="height: 4px;">
-                    <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" 
-                         style="width: 100%; background: rgba(255, 255, 255, 0.3);"></div>
+                <span class="count-pill">{{ eleves|length }}</span>
+            </div>
+            {% if eleves %}
+            <div class="student-list">
+                {% for eleve in eleves %}
+                <div class="student-item" data-eleve-id="{{ eleve.id }}">
+                    <div class="student-avatar">{{ eleve.prenom[0] }}{{ eleve.nom[0] }}</div>
+                    <div class="student-info">
+                        <div class="student-name">{{ eleve.prenom }} {{ eleve.nom }}</div>
+                        <div class="student-meta">
+                            <span class="student-mat-badge">{{ eleve.matricule }}</span>
+                            {% if eleve.date_naissance %}
+                            <span><i class="bi bi-calendar3" style="font-size:0.65rem;"></i> {{ eleve.date_naissance.strftime('%d/%m/%Y') }}</span>
+                            {% endif %}
+                            {% if eleve.sexe %}
+                            <span><i class="bi bi-{{ 'gender-male' if eleve.sexe == 'M' else 'gender-female' }}" style="font-size:0.65rem;"></i> {{ eleve.sexe }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <a href="{{ url_for('pdf.preview_bulletin', eleve_id=eleve.id) }}" class="btn-bulletin" target="_blank" title="Voir bulletin">
+                        <i class="bi bi-file-earmark-text"></i>
+                    </a>
                 </div>
-            `;
-            document.body.appendChild(loadingDiv);
-            return loadingDiv;
-        }
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-icon"><i class="bi bi-person-x"></i></div>
+                <h4>Aucun élève inscrit</h4>
+                <p>Commencez par ajouter des élèves à cette classe.</p>
+                <a href="{{ url_for('eleve.add_eleve', classe_id=classe.id) }}" class="btn-empty">
+                    <i class="bi bi-plus-lg"></i> Ajouter des élèves
+                </a>
+            </div>
+            {% endif %}
+        </div>
 
-        // Fonction pour masquer le message de chargement
-        function hideLoadingMessage(loadingDiv) {
-            if (loadingDiv && loadingDiv.parentNode) {
-                loadingDiv.style.opacity = '0';
-                loadingDiv.style.transform = 'translate(-50%, -50%) scale(0.8)';
-                setTimeout(() => {
-                    if (loadingDiv.parentNode) {
-                        loadingDiv.parentNode.removeChild(loadingDiv);
-                    }
-                }, 300);
-            }
-        }
+        <!-- Matières -->
+        <div class="list-card">
+            <div class="list-card-header">
+                <div class="list-card-title">
+                    <i class="bi bi-book" style="color:var(--success-color);"></i>
+                    Matières
+                </div>
+                <span class="count-pill">{{ matieres|length }}</span>
+            </div>
+            {% if matieres %}
+            <div class="student-list">
+                {% for matiere in matieres %}
+                <div class="matiere-item">
+                    <div class="matiere-icon"><i class="bi bi-book-open"></i></div>
+                    <div class="matiere-name">{{ matiere.nom }}</div>
+                    <span class="matiere-active"><i class="bi bi-check-circle-fill" style="margin-left:3px;"></i> Active</span>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-icon"><i class="bi bi-book-half"></i></div>
+                <h4>Aucune matière configurée</h4>
+                <p>Ajoutez les matières enseignées dans cette classe.</p>
+                <a href="{{ url_for('matiere.add_matiere', classe_id=classe.id) }}" class="btn-empty">
+                    <i class="bi bi-plus-lg"></i> Ajouter des matières
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
 
-        // Initialisation au chargement
-        document.addEventListener('DOMContentLoaded', function() {
-            // Vérifier les prérequis et désactiver les options si nécessaire
-            if (nombreEleves === 0 || nombreMatieres === 0) {
-                const dropdown = document.querySelector('.dropdown-menu');
-                if (dropdown) {
-                    const items = dropdown.querySelectorAll('.dropdown-item');
-                    items.forEach((item, index) => {
-                        if (index < 2) { // Les deux premières options (téléchargements)
-                            item.classList.add('disabled');
-                            item.style.opacity = '0.6';
-                            item.onclick = function(e) {
-                                e.preventDefault();
-                                showAlert(nombreEleves === 0 ? 
-                                    'Ajoutez des élèves avant de générer les bulletins' : 
-                                    'Configurez des matières avant de générer les bulletins', 
-                                    'warning'
-                                );
-                            };
-                        }
-                    });
-                }
-            }
+    <!-- Stats -->
+    <div class="section-title">Statistiques</div>
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon blue"><i class="bi bi-people-fill"></i></div>
+            <div class="stat-num">{{ eleves|length }}</div>
+            <div class="stat-label">Élèves inscrits</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon green"><i class="bi bi-book-fill"></i></div>
+            <div class="stat-num">{{ matieres|length }}</div>
+            <div class="stat-label">Matières configurées</div>
+        </div>
+        <div class="stat-card {{ 'ready' if eleves|length > 0 and matieres|length > 0 else 'warn' }}">
+            <div class="stat-icon {{ 'green' if eleves|length > 0 and matieres|length > 0 else 'gold' }}">
+                <i class="bi bi-{{ 'check-circle-fill' if eleves|length > 0 and matieres|length > 0 else 'exclamation-circle-fill' }}"></i>
+            </div>
+            <div class="stat-ready-icon {{ 'ok' if eleves|length > 0 and matieres|length > 0 else 'warn' }}">
+                <i class="bi bi-{{ 'check2-circle' if eleves|length > 0 and matieres|length > 0 else 'hourglass-split' }}"></i>
+            </div>
+            <div class="stat-label" style="margin-top:8px;">
+                {{ 'Prête pour les notes' if eleves|length > 0 and matieres|length > 0 else 'Configuration incomplète' }}
+            </div>
+        </div>
+    </div>
 
-            // Animation des cartes
-            const cards = document.querySelectorAll('.card');
-            cards.forEach((card, index) => {
-                card.style.animationDelay = `${index * 0.1}s`;
-            });
+</div>
 
-            // Animation des éléments de liste au survol
-            const listItems = document.querySelectorAll('.list-group-item');
-            listItems.forEach(item => {
-                item.addEventListener('mouseenter', function() {
-                    this.style.transform = 'translateX(8px)';
-                    this.style.boxShadow = '0 8px 25px rgba(99, 102, 241, 0.15)';
-                });
-                
-                item.addEventListener('mouseleave', function() {
-                    this.style.transform = 'translateX(0)';
-                    this.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.1)';
-                });
-            });
+<!-- Loading overlay -->
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-box">
+        <div class="spinner"></div>
+        <div class="loading-text" id="loadingText">Génération en cours…</div>
+        <div class="loading-sub">Veuillez patienter</div>
+    </div>
+</div>
 
-            // Animation des boutons d'action
-            const actionButtons = document.querySelectorAll('.btn');
-            actionButtons.forEach(btn => {
-                btn.addEventListener('mouseenter', function() {
-                    if (!this.classList.contains('dropdown-toggle')) {
-                        this.style.transform = 'translateY(-3px) scale(1.02)';
-                    }
-                });
-                
-                btn.addEventListener('mouseleave', function() {
-                    if (!this.classList.contains('dropdown-toggle')) {
-                        this.style.transform = 'translateY(0) scale(1)';
-                    }
-                });
-            });
+<!-- Toast container -->
+<div class="toast-box" id="toastBox"></div>
 
-            // Animation des stats cards
-            const statsCards = document.querySelectorAll('.stats-card');
-            statsCards.forEach((card, index) => {
-                setTimeout(() => {
-                    card.style.opacity = '1';
-                    card.style.transform = 'translateY(0)';
-                }, index * 200);
-                
-                card.style.opacity = '0';
-                card.style.transform = 'translateY(20px)';
-                card.style.transition = 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
-            });
+<script>
+    const classeId      = {{ classe.id }};
+    const nombreEleves  = {{ eleves|length }};
+    const nombreMatieres = {{ matieres|length }};
 
-            // Effet de ripple sur les boutons
-            actionButtons.forEach(btn => {
-                btn.addEventListener('click', function(e) {
-                    const ripple = document.createElement('span');
-                    const rect = this.getBoundingClientRect();
-                    const size = Math.max(rect.width, rect.height);
-                    const x = e.clientX - rect.left - size / 2;
-                    const y = e.clientY - rect.top - size / 2;
-                    
-                    ripple.style.width = ripple.style.height = size + 'px';
-                    ripple.style.left = x + 'px';
-                    ripple.style.top = y + 'px';
-                    ripple.style.position = 'absolute';
-                    ripple.style.borderRadius = '50%';
-                    ripple.style.background = 'rgba(255, 255, 255, 0.5)';
-                    ripple.style.transform = 'scale(0)';
-                    ripple.style.animation = 'ripple 0.6s linear';
-                    ripple.style.pointerEvents = 'none';
-                    
-                    this.appendChild(ripple);
-                    
-                    setTimeout(() => {
-                        ripple.remove();
-                    }, 600);
-                });
-            });
+    // ── Dropdown bulletins ──
+    function toggleBulletinDropdown(e) {
+        const dd = document.getElementById('bulletinDropdown');
+        dd.classList.toggle('open');
+        e.stopPropagation();
+    }
+    document.addEventListener('click', () => {
+        document.getElementById('bulletinDropdown').classList.remove('open');
+    });
 
-            // Notification de bienvenue
-            setTimeout(() => {
-                if (nombreEleves > 0 && nombreMatieres > 0) {
-                    showAlert('Classe configurée et prête pour la saisie des notes !', 'success');
-                } else {
-                    const missing = [];
-                    if (nombreEleves === 0) missing.push('élèves');
-                    if (nombreMatieres === 0) missing.push('matières');
-                    showAlert(`Configuration incomplète : ajoutez des ${missing.join(' et des ')}`, 'warning');
-                }
-            }, 1000);
+    // ── Guard ──
+    function checkPrereqs() {
+        if(nombreEleves === 0) { showToast('Ajoutez des élèves avant de générer les bulletins', 'warning'); return false; }
+        if(nombreMatieres === 0) { showToast('Configurez des matières avant de générer les bulletins', 'warning'); return false; }
+        return true;
+    }
+
+    // ── Actions bulletins ──
+    function telechargerBulletinsClasses() {
+        if(!checkPrereqs()) return;
+        if(!confirm(`Télécharger ${nombreEleves} bulletin(s) par classement ?\nFormat ZIP — peut prendre quelques instants.`)) return;
+        showLoading('Génération par classement…');
+        window.location.href = `/bulletin/classe_classee/${classeId}`;
+        setTimeout(hideLoading, 4000);
+    }
+
+    function telechargerBulletinsAlpha() {
+        if(!checkPrereqs()) return;
+        if(!confirm(`Télécharger ${nombreEleves} bulletin(s) par ordre alphabétique ?\nFormat ZIP — peut prendre quelques instants.`)) return;
+        showLoading('Génération alphabétique…');
+        window.location.href = `/bulletin/classe/${classeId}`;
+        setTimeout(hideLoading, 4000);
+    }
+
+    function imprimerTousBulletins() {
+        if(!checkPrereqs()) return;
+        const elems = document.querySelectorAll('[data-eleve-id]');
+        if(!confirm(`Ouvrir ${elems.length} onglet(s) pour impression ?\nAutorisez les popups si nécessaire.`)) return;
+        elems.forEach((el, i) => {
+            setTimeout(() => window.open(`/bulletin/preview/${el.dataset.eleveId}`, '_blank'), i * 300);
         });
+    }
 
-        // CSS pour l'effet ripple
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes ripple {
-                to {
-                    transform: scale(4);
-                    opacity: 0;
-                }
-            }
-            
-            .btn {
-                position: relative;
-                overflow: hidden;
-            }
-        `;
-        document.head.appendChild(style);
-    </script>
+    // ── Loading ──
+    function showLoading(msg) {
+        document.getElementById('loadingText').textContent = msg || 'Génération en cours…';
+        document.getElementById('loadingOverlay').classList.add('active');
+    }
+    function hideLoading() {
+        document.getElementById('loadingOverlay').classList.remove('active');
+    }
 
+    // ── Toast ──
+    function showToast(msg, type = 'success') {
+        const box = document.getElementById('toastBox');
+        const t = document.createElement('div');
+        t.className = `toast-msg toast-${type}`;
+        t.innerHTML = `<span class="toast-dot"></span><span>${msg}</span>`;
+        box.appendChild(t);
+        setTimeout(() => t.remove(), 4000);
+    }
+
+    // ── Init toast ──
+    document.addEventListener('DOMContentLoaded', () => {
+        setTimeout(() => {
+            if(nombreEleves > 0 && nombreMatieres > 0) {
+                showToast('Classe configurée — prête pour la saisie des notes !', 'success');
+            } else {
+                const missing = [];
+                if(nombreEleves === 0) missing.push('élèves');
+                if(nombreMatieres === 0) missing.push('matières');
+                showToast(`Configuration incomplète — ajoutez des ${missing.join(' et des ')}`, 'warning');
+            }
+        }, 800);
+    });
+</script>
 </body>
 </html>
