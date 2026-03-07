@@ -2,338 +2,630 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Gestion des Classes</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- Bootstrap Icons -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion des Classes — EduBulletin</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-
-    <!-- Google Font: Poppins -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
     <style>
+        :root {
+            --ink: #0d1117;
+            --cream: #f5f0e8;
+            --gold: #c9a84c;
+            --gold-light: #e8d5a3;
+            --rust: #c4622d;
+            --mist: #e8edf2;
+            --white: #ffffff;
+            --text-muted: #6b7685;
+            --border: #e8edf2;
+            --success: #1a6b3c;
+            --success-bg: rgba(39,174,96,0.08);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
         body {
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            font-family: 'DM Sans', sans-serif;
+            background: var(--cream);
             min-height: 100vh;
-            padding: 40px 15px;
-            color: #333;
+            position: relative;
+            overflow-x: hidden;
         }
 
-        .glass-card {
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(18px);
-            -webkit-backdrop-filter: blur(18px);
-            border: 1px solid rgba(255, 255, 255, 0.18);
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            padding: 30px;
-            animation: fadeIn 0.7s ease;
+        .bg-decor {
+            position: fixed; inset: 0; z-index: 0; pointer-events: none;
+        }
+        .bg-decor::before {
+            content: '';
+            position: absolute; top: -200px; right: -200px;
+            width: 600px; height: 600px;
+            background: radial-gradient(circle, rgba(201,168,76,0.1) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+        .bg-decor::after {
+            content: '';
+            position: absolute; bottom: -150px; left: -150px;
+            width: 500px; height: 500px;
+            background: radial-gradient(circle, rgba(196,98,45,0.07) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+        .grid-dots {
+            position: fixed; inset: 0; z-index: 0;
+            background-image: radial-gradient(circle, #c9a84c18 1px, transparent 1px);
+            background-size: 32px 32px;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+        /* ── Navbar ── */
+        .navbar {
+            position: sticky; top: 0; z-index: 100;
+            background: rgba(245,240,232,0.92);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(201,168,76,0.2);
+            padding: 0 40px; height: 64px;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .nav-brand {
+            display: flex; align-items: center; gap: 10px;
+            font-family: 'DM Serif Display', serif;
+            font-size: 1.3rem; color: var(--ink); text-decoration: none;
+        }
+        .nav-brand .brand-icon {
+            width: 36px; height: 36px; background: var(--ink);
+            border-radius: 10px; display: flex; align-items: center;
+            justify-content: center; color: var(--gold); font-size: 1rem;
+        }
+        .nav-right { display: flex; align-items: center; gap: 12px; }
+
+        .btn-back {
+            display: flex; align-items: center; gap: 8px;
+            padding: 8px 18px; background: transparent;
+            border: 1.5px solid var(--border); border-radius: 50px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.85rem; font-weight: 600; color: var(--text-muted);
+            text-decoration: none; transition: all 0.2s;
+        }
+        .btn-back:hover { border-color: var(--ink); color: var(--ink); }
+
+        /* ── Page content ── */
+        .page-content {
+            position: relative; z-index: 1;
+            padding: 40px; max-width: 1100px; margin: 0 auto;
         }
 
-        h3, h4, .section-title {
-            color: #fff;
-            font-weight: 700;
-            text-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        /* ── Flash ── */
+        .flash-msg {
+            padding: 14px 18px; border-radius: 14px;
+            font-size: 0.88rem; margin-bottom: 16px;
+            display: flex; align-items: center; gap: 10px;
+            animation: slideDown 0.4s ease;
+        }
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .flash-success { background: var(--success-bg); border: 1px solid rgba(39,174,96,0.2); color: var(--success); }
+        .flash-error   { background: rgba(196,98,45,0.08); border: 1px solid rgba(196,98,45,0.2); color: var(--rust); }
+        .flash-warning { background: rgba(201,168,76,0.1); border: 1px solid rgba(201,168,76,0.3); color: #7a5c10; }
+        .flash-close   { margin-left: auto; background: none; border: none; cursor: pointer; color: inherit; opacity: 0.6; }
+
+        /* ── Formulaire card ── */
+        .form-card {
+            background: var(--ink); border-radius: 24px;
+            padding: 40px; margin-bottom: 32px;
+            position: relative; overflow: hidden;
+            animation: fadeUp 0.6s ease both;
+        }
+        .form-card::before {
+            content: '';
+            position: absolute; top: -80px; right: -80px;
+            width: 300px; height: 300px;
+            background: radial-gradient(circle, rgba(201,168,76,0.1) 0%, transparent 70%);
+            border-radius: 50%; pointer-events: none;
+        }
+        .form-card-label {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: rgba(201,168,76,0.12);
+            border: 1px solid rgba(201,168,76,0.25);
+            color: var(--gold); padding: 6px 14px; border-radius: 50px;
+            font-size: 0.75rem; font-weight: 600;
+            letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 20px;
+        }
+        .form-card h2 {
+            font-family: 'DM Serif Display', serif;
+            font-size: 1.6rem; color: #e8edf2; margin-bottom: 28px;
         }
 
-        .form-control {
-            border-radius: 12px;
-            padding: 0.5rem 1rem;
+        .form-row {
+            display: grid; grid-template-columns: 1fr 1fr auto;
+            gap: 16px; align-items: end;
         }
 
-        .btn-rounded {
-            border-radius: 50px;
-            font-weight: 600;
+        .field-group label {
+            display: block; font-size: 0.75rem; font-weight: 600;
+            color: #4a5568; text-transform: uppercase;
+            letter-spacing: 0.5px; margin-bottom: 8px;
+        }
+        .field-group input {
+            width: 100%;
+            background: rgba(255,255,255,0.06);
+            border: 1.5px solid rgba(255,255,255,0.1);
+            border-radius: 12px; padding: 13px 16px;
+            color: #e8edf2; font-family: 'DM Sans', sans-serif;
+            font-size: 0.92rem; outline: none; transition: all 0.2s;
+        }
+        .field-group input:focus {
+            border-color: rgba(201,168,76,0.5);
+            background: rgba(201,168,76,0.05);
+            box-shadow: 0 0 0 3px rgba(201,168,76,0.1);
+        }
+        .field-group input::placeholder { color: #3a4250; }
+
+        .btn-save {
+            display: flex; align-items: center; gap: 10px;
+            background: var(--gold); color: var(--ink);
+            padding: 13px 28px; border-radius: 12px; border: none;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.92rem; font-weight: 700;
+            cursor: pointer; transition: all 0.25s; white-space: nowrap;
+        }
+        .btn-save:hover {
+            background: var(--gold-light);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(201,168,76,0.3);
         }
 
-        .class-card {
-            background: #ffffff;
-            border: none;
-            border-radius: 18px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-            transition: all 0.3s ease;
+        /* ── Section header ── */
+        .section-header {
+            display: flex; align-items: center;
+            justify-content: space-between; margin-bottom: 24px;
         }
-
-        .class-card:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
-        }
-
-        .stat-box {
-            border-radius: 12px;
-            padding: 10px;
-            background: rgba(255, 255, 255, 0.9);
-            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-        }
-
         .section-title {
+            font-family: 'DM Serif Display', serif;
+            font-size: 1.6rem; color: var(--ink);
+        }
+        .count-badge {
+            background: var(--ink); color: var(--gold);
+            padding: 4px 12px; border-radius: 50px;
+            font-size: 0.78rem; font-weight: 600; margin-left: 10px;
+        }
+
+        /* ── Classes grid ── */
+        .classes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+            gap: 20px;
+        }
+
+        /* ── Classe card ── */
+        .classe-card {
+            background: white; border: 1px solid var(--border);
+            border-radius: 22px; padding: 28px;
+            transition: all 0.3s ease;
+            animation: fadeUp 0.5s ease both;
+        }
+        .classe-card:nth-child(1) { animation-delay: 0.05s; }
+        .classe-card:nth-child(2) { animation-delay: 0.1s; }
+        .classe-card:nth-child(3) { animation-delay: 0.15s; }
+        .classe-card:nth-child(4) { animation-delay: 0.2s; }
+        .classe-card:nth-child(5) { animation-delay: 0.25s; }
+        .classe-card:nth-child(6) { animation-delay: 0.3s; }
+
+        .classe-card:hover {
+            border-color: var(--gold);
+            box-shadow: 0 12px 32px rgba(13,17,23,0.08);
+            transform: translateY(-4px);
+        }
+
+        .classe-card-top {
+            display: flex; align-items: flex-start;
+            justify-content: space-between; margin-bottom: 16px;
+        }
+        .classe-icon {
+            width: 48px; height: 48px;
+            background: linear-gradient(135deg, var(--ink), #1a2332);
+            border-radius: 14px; display: flex;
+            align-items: center; justify-content: center;
+            color: var(--gold); font-size: 1.2rem;
+        }
+        .classe-year {
+            font-size: 0.75rem; color: var(--text-muted);
+            background: var(--mist); padding: 4px 10px;
+            border-radius: 50px; font-weight: 500;
+        }
+        .classe-name {
+            font-family: 'DM Serif Display', serif;
+            font-size: 1.4rem; color: var(--ink); margin-bottom: 16px;
+        }
+
+        /* Stats */
+        .stats-row {
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 10px; margin-bottom: 20px;
+        }
+        .stat-box {
+            background: var(--mist); border-radius: 12px;
+            padding: 12px; text-align: center;
+        }
+        .stat-num {
+            font-family: 'DM Serif Display', serif;
+            font-size: 1.5rem; color: var(--ink); line-height: 1;
+        }
+        .stat-label {
+            font-size: 0.73rem; color: var(--text-muted);
+            text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px;
+        }
+
+        /* Quick actions */
+        .quick-actions {
+            display: grid; grid-template-columns: 1fr 1fr 1fr;
+            gap: 8px; margin-bottom: 16px;
+        }
+        .quick-btn {
+            display: flex; flex-direction: column;
+            align-items: center; gap: 5px;
+            padding: 10px 8px; border-radius: 12px;
+            font-size: 0.73rem; font-weight: 600;
+            text-decoration: none; transition: all 0.2s;
+            border: 1.5px solid var(--border); color: var(--text-muted);
+        }
+        .quick-btn i { font-size: 1.1rem; }
+        .quick-btn:hover { transform: translateY(-2px); border-color: currentColor; }
+        .quick-btn.eleves  { color: #1a6b3c; }
+        .quick-btn.eleves:hover  { background: var(--success-bg); border-color: rgba(39,174,96,0.3); }
+        .quick-btn.matieres { color: #0e6e80; }
+        .quick-btn.matieres:hover { background: rgba(6,182,212,0.07); border-color: rgba(6,182,212,0.3); }
+        .quick-btn.notes    { color: #7a5c10; }
+        .quick-btn.notes:hover    { background: rgba(201,168,76,0.1); border-color: rgba(201,168,76,0.3); }
+
+        /* Actions bar */
+        .card-actions {
+            display: flex; gap: 8px; padding-top: 16px;
+            border-top: 1px solid var(--border);
+        }
+        .action-btn {
+            display: flex; align-items: center; gap: 6px;
+            padding: 8px 14px; border-radius: 10px;
+            font-size: 0.8rem; font-weight: 600;
+            text-decoration: none; border: none;
+            cursor: pointer; transition: all 0.2s;
+            font-family: 'DM Sans', sans-serif;
+        }
+        .action-btn.voir {
+            background: var(--mist); color: var(--ink); flex: 1;
+        }
+        .action-btn.voir:hover { background: var(--border); }
+        .action-btn.edit {
+            background: rgba(13,17,23,0.06); color: var(--ink);
+        }
+        .action-btn.edit:hover { background: var(--ink); color: var(--cream); }
+        .action-btn.del {
+            background: rgba(196,98,45,0.07); color: var(--rust);
+        }
+        .action-btn.del:hover { background: rgba(196,98,45,0.15); }
+
+        /* ── Empty state ── */
+        .empty-state {
+            background: white; border: 2px dashed var(--border);
+            border-radius: 24px; padding: 72px 40px; text-align: center;
+        }
+        .empty-icon {
+            width: 80px; height: 80px; background: var(--mist);
+            border-radius: 50%; display: flex; align-items: center;
+            justify-content: center; margin: 0 auto 24px;
+            font-size: 2rem; color: #c8d0da;
+        }
+        .empty-state h3 {
+            font-family: 'DM Serif Display', serif;
+            font-size: 1.5rem; color: var(--ink); margin-bottom: 8px;
+        }
+        .empty-state p {
+            color: var(--text-muted); font-size: 0.9rem; margin-bottom: 0;
+        }
+
+        /* ── Modals ── */
+        .modal-overlay {
+            display: none; position: fixed; inset: 0; z-index: 500;
+            background: rgba(13,17,23,0.5); backdrop-filter: blur(4px);
+            align-items: center; justify-content: center; padding: 24px;
+        }
+        .modal-overlay.open { display: flex; }
+
+        .modal-box {
+            background: white; border-radius: 24px;
+            padding: 36px; width: 100%; max-width: 460px;
+            box-shadow: 0 32px 80px rgba(0,0,0,0.2);
+            animation: popIn 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        @keyframes popIn {
+            from { opacity: 0; transform: scale(0.95) translateY(10px); }
+            to   { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .modal-title {
+            font-family: 'DM Serif Display', serif;
+            font-size: 1.4rem; color: var(--ink); margin-bottom: 6px;
+        }
+        .modal-sub { color: var(--text-muted); font-size: 0.85rem; margin-bottom: 28px; }
+
+        .modal-field { margin-bottom: 18px; }
+        .modal-field label {
+            display: block; font-size: 0.75rem; font-weight: 600;
+            color: var(--text-muted); text-transform: uppercase;
+            letter-spacing: 0.5px; margin-bottom: 8px;
+        }
+        .modal-field input {
+            width: 100%; background: var(--mist);
+            border: 1.5px solid var(--border); border-radius: 12px;
+            padding: 13px 16px; color: var(--ink);
+            font-family: 'DM Sans', sans-serif; font-size: 0.92rem;
+            outline: none; transition: all 0.2s;
+        }
+        .modal-field input:focus {
+            border-color: var(--gold); background: white;
+            box-shadow: 0 0 0 3px rgba(201,168,76,0.12);
+        }
+        .modal-footer-btns {
+            display: flex; gap: 10px; margin-top: 24px;
+        }
+        .btn-cancel {
+            flex: 1; padding: 13px;
+            background: var(--mist); border: none; border-radius: 12px;
+            font-family: 'DM Sans', sans-serif; font-size: 0.9rem;
+            font-weight: 600; color: var(--text-muted); cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-cancel:hover { background: var(--border); }
+        .btn-confirm {
+            flex: 2; padding: 13px;
+            background: var(--ink); border: none; border-radius: 12px;
+            font-family: 'DM Sans', sans-serif; font-size: 0.9rem;
+            font-weight: 600; color: var(--cream); cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-confirm:hover { background: #1a2332; transform: translateY(-1px); }
+        .btn-confirm.danger { background: var(--rust); }
+        .btn-confirm.danger:hover { background: #a0522d; }
+
+        .delete-warning {
+            background: rgba(196,98,45,0.07);
+            border: 1px solid rgba(196,98,45,0.2);
+            border-radius: 14px; padding: 16px;
             margin-bottom: 20px;
         }
+        .delete-warning p { color: var(--rust); font-size: 0.88rem; margin: 0; }
+        .delete-warning strong { color: var(--ink); font-size: 1rem; }
 
-        .back-btn {
-            border-radius: 30px;
-            font-weight: 500;
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to   { opacity: 1; transform: translateY(0); }
         }
 
-        .alert {
-            border-radius: 12px;
-            font-weight: 500;
-        }
-
-        .btn-sm {
-            border-radius: 8px;
-            font-size: 0.85rem;
-            padding: 0.25rem 0.5rem;
+        @media (max-width: 768px) {
+            .navbar { padding: 0 20px; }
+            .page-content { padding: 24px 16px; }
+            .form-row { grid-template-columns: 1fr; }
+            .classes-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
 
-<div class="container">
+<div class="bg-decor"></div>
+<div class="grid-dots"></div>
 
-    <!-- Header + Formulaire -->
-    <div class="glass-card mb-4">
-        <h3 class="mb-3">
-            <i class="bi bi-building me-2"></i>Gestion des Classes
-        </h3>
+<!-- ── Navbar ── -->
+<nav class="navbar">
+    <a href="{{ url_for('main.dashboard') }}" class="nav-brand">
+        <span class="brand-icon"><i class="bi bi-mortarboard-fill"></i></span>
+        EduBulletin
+    </a>
+    <div class="nav-right">
+        <a href="{{ url_for('main.dashboard') }}" class="btn-back">
+            <i class="bi bi-arrow-left"></i> Dashboard
+        </a>
+    </div>
+</nav>
 
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, msg in messages %}
-                    <div class="alert alert-{{ 'danger' if category=='error' else 'success' if category=='success' else 'warning' }} alert-dismissible fade show">
-                        {{ msg }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
+<!-- ── Page content ── -->
+<div class="page-content">
 
-        <h5 class="text-white mb-3">
-            <i class="bi bi-plus-circle me-2"></i>Ajouter / Modifier une classe
-        </h5>
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, msg in messages %}
+                <div class="flash-msg flash-{{ 'error' if category=='error' else 'success' if category=='success' else 'warning' }}">
+                    <i class="bi bi-{{ 'exclamation-circle' if category=='error' else 'check-circle' if category=='success' else 'exclamation-triangle' }}"></i>
+                    {{ msg }}
+                    <button class="flash-close" onclick="this.parentElement.remove()"><i class="bi bi-x"></i></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- ── Formulaire ajout ── -->
+    <div class="form-card">
+        <div class="form-card-label">
+            <i class="bi bi-plus-circle"></i> Nouvelle classe
+        </div>
+        <h2>Ajouter une classe</h2>
 
         <form method="POST" id="classeForm">
             <input type="hidden" name="action" value="add">
             <input type="hidden" name="classe_id" id="classeId">
-
-            <div class="row g-3">
-                <div class="col-md-4">
-                    <input type="text" name="nom" id="nom" class="form-control"
-                           placeholder="Nom de la classe (CP1, CM2...)" required>
+            <div class="form-row">
+                <div class="field-group">
+                    <label>Nom de la classe</label>
+                    <input type="text" name="nom" id="nom" placeholder="Ex: CP1, 6ème A, CM2…" required>
                 </div>
-                <div class="col-md-4">
-                    <input type="text" name="annee_scolaire" id="annee_scolaire"
-                           class="form-control" value="2025-2026" required>
+                <div class="field-group">
+                    <label>Année scolaire</label>
+                    <input type="text" name="annee_scolaire" id="annee_scolaire" value="2025-2026" required>
                 </div>
-                <div class="col-md-4">
-                    <button class="btn btn-primary btn-rounded w-100">
-                        <i class="bi bi-save me-1"></i>Enregistrer
-                    </button>
-                </div>
+                <button type="submit" class="btn-save">
+                    <i class="bi bi-check-lg"></i> Enregistrer
+                </button>
             </div>
         </form>
     </div>
 
-    <!-- Bouton retour -->
-    <div class="mb-4">
-        <a href="{{ url_for('main.dashboard') }}" class="btn btn-secondary back-btn">
-            <i class="bi bi-arrow-left me-2"></i>Retour au Dashboard
-        </a>
+    <!-- ── Liste des classes ── -->
+    <div class="section-header">
+        <h2 class="section-title">
+            Classes existantes
+            <span class="count-badge">{{ classes|length }}</span>
+        </h2>
     </div>
 
-    <h4 class="section-title">Classes existantes</h4>
-
-    {% if not classes %}
-        <div class="alert alert-info d-flex align-items-center">
-            <i class="bi bi-info-circle me-2"></i>
-            Aucune classe créée pour le moment.
-        </div>
-    {% else %}
-        <div class="row g-4">
+    {% if classes %}
+        <div class="classes-grid">
             {% for c in classes %}
-            <div class="col-md-6">
-                <div class="card class-card h-100">
-                    <div class="card-body text-center">
+            <div class="classe-card">
+                <div class="classe-card-top">
+                    <div class="classe-icon"><i class="bi bi-diagram-3"></i></div>
+                    <span class="classe-year">{{ c.annee_scolaire }}</span>
+                </div>
 
-                        <h5 class="fw-bold">
-                            <i class="bi bi-easel2-fill text-primary me-1"></i>
-                            {{ c.nom }}
-                        </h5>
-                        <p class="text-muted mb-3">
-                            Année scolaire : {{ c.annee_scolaire }}
-                        </p>
+                <h3 class="classe-name">{{ c.nom }}</h3>
 
-                        <!-- Stats -->
-                        <div class="row mb-3">
-                            <div class="col-6">
-                                <div class="stat-box">
-                                    <h6 class="text-primary mb-1">{{ c.nb_eleves }}</h6>
-                                    <small class="text-muted">Élèves</small>
-                                </div>
-                            </div>
-                            <div class="col-6">
-                                <div class="stat-box">
-                                    <h6 class="text-success mb-1">{{ c.nb_matieres }}</h6>
-                                    <small class="text-muted">Matières</small>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Quick actions -->
-                        <div class="row g-2 mb-3">
-                            <div class="col-4">
-                                <a href="{{ url_for('eleve.add_eleve', classe_id=c.id) }}"
-                                   class="btn btn-sm btn-primary w-100" title="Gérer les élèves">
-                                    <i class="bi bi-person-plus"></i>
-                                </a>
-                            </div>
-                            <div class="col-4">
-                                <a href="{{ url_for('matiere.add_matiere', classe_id=c.id) }}"
-                                   class="btn btn-sm btn-success w-100" title="Gérer les matières">
-                                    <i class="bi bi-book"></i>
-                                </a>
-                            </div>
-                            <div class="col-4">
-                                <a href="{{ url_for('notes.saisir_notes', classe_id=c.id) }}"
-                                   class="btn btn-sm btn-warning w-100" title="Saisir les notes">
-                                    <i class="bi bi-pencil"></i>
-                                </a>
-                            </div>
-                        </div>
-
-                        <!-- Actions -->
-                        <div class="d-flex justify-content-center gap-2 flex-wrap">
-                            <a href="{{ url_for('main.voir_classe', classe_id=c.id) }}"
-                               class="btn btn-outline-info btn-sm" title="Voir la classe">
-                                <i class="bi bi-eye"></i>
-                            </a>
-
-                            <button class="btn btn-outline-primary btn-sm btn-modifier"
-                                    data-id="{{ c.id }}"
-                                    data-nom="{{ c.nom }}"
-                                    data-annee="{{ c.annee_scolaire }}"
-                                    title="Modifier">
-                                <i class="bi bi-pencil"></i>
-                            </button>
-
-                            <button class="btn btn-outline-danger btn-sm btn-supprimer"
-                                    data-id="{{ c.id }}"
-                                    data-nom="{{ c.nom }}"
-                                    title="Supprimer">
-                                <i class="bi bi-trash"></i>
-                            </button>
-
-                            
-                        </div>
-
+                <div class="stats-row">
+                    <div class="stat-box">
+                        <div class="stat-num">{{ c.nb_eleves }}</div>
+                        <div class="stat-label">Élèves</div>
                     </div>
+                    <div class="stat-box">
+                        <div class="stat-num">{{ c.nb_matieres }}</div>
+                        <div class="stat-label">Matières</div>
+                    </div>
+                </div>
+
+                <div class="quick-actions">
+                    <a href="{{ url_for('eleve.add_eleve', classe_id=c.id) }}" class="quick-btn eleves">
+                        <i class="bi bi-person-plus"></i> Élèves
+                    </a>
+                    <a href="{{ url_for('matiere.add_matiere', classe_id=c.id) }}" class="quick-btn matieres">
+                        <i class="bi bi-book"></i> Matières
+                    </a>
+                    <a href="{{ url_for('notes.saisir_notes', classe_id=c.id) }}" class="quick-btn notes">
+                        <i class="bi bi-pencil"></i> Notes
+                    </a>
+                </div>
+
+                <div class="card-actions">
+                    <a href="{{ url_for('main.voir_classe', classe_id=c.id) }}" class="action-btn voir">
+                        <i class="bi bi-eye"></i> Voir
+                    </a>
+                    <button class="action-btn edit btn-modifier"
+                            data-id="{{ c.id }}"
+                            data-nom="{{ c.nom }}"
+                            data-annee="{{ c.annee_scolaire }}">
+                        <i class="bi bi-pencil"></i>
+                    </button>
+                    <button class="action-btn del btn-supprimer"
+                            data-id="{{ c.id }}"
+                            data-nom="{{ c.nom }}">
+                        <i class="bi bi-trash"></i>
+                    </button>
                 </div>
             </div>
             {% endfor %}
+        </div>
+
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-icon"><i class="bi bi-diagram-3"></i></div>
+            <h3>Aucune classe créée</h3>
+            <p>Utilisez le formulaire ci-dessus pour créer votre première classe.</p>
         </div>
     {% endif %}
 
 </div>
 
-<!-- Modal Édition -->
-<div class="modal fade" id="editModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <form method="POST">
-                <input type="hidden" name="action" value="edit">
-                <input type="hidden" name="classe_id" id="editClasseId">
-                <div class="modal-header">
-                    <h5 class="modal-title">Modifier la classe</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label class="form-label">Nom de la classe</label>
-                        <input type="text" name="nom" id="editNom" class="form-control" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Année scolaire</label>
-                        <input type="text" name="annee_scolaire" id="editAnnee" class="form-control" required>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                    <button type="submit" class="btn btn-primary">Sauvegarder</button>
-                </div>
-            </form>
-        </div>
+<!-- ── Modal Édition ── -->
+<div class="modal-overlay" id="editModal">
+    <div class="modal-box">
+        <h3 class="modal-title">Modifier la classe</h3>
+        <p class="modal-sub">Mettez à jour les informations de la classe</p>
+        <form method="POST">
+            <input type="hidden" name="action" value="edit">
+            <input type="hidden" name="classe_id" id="editClasseId">
+            <div class="modal-field">
+                <label>Nom de la classe</label>
+                <input type="text" name="nom" id="editNom" required>
+            </div>
+            <div class="modal-field">
+                <label>Année scolaire</label>
+                <input type="text" name="annee_scolaire" id="editAnnee" required>
+            </div>
+            <div class="modal-footer-btns">
+                <button type="button" class="btn-cancel" onclick="closeModal('editModal')">Annuler</button>
+                <button type="submit" class="btn-confirm">Sauvegarder</button>
+            </div>
+        </form>
     </div>
 </div>
 
-<!-- Modal Suppression -->
-<div class="modal fade" id="deleteModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <form method="POST">
-                <input type="hidden" name="action" value="delete">
-                <input type="hidden" name="classe_id" id="deleteClasseId">
-                <div class="modal-header">
-                    <h5 class="modal-title text-danger">Supprimer la classe ?</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <p>Êtes-vous sûr de vouloir supprimer la classe <strong id="deleteNom"></strong> ?</p>
-                    <p class="text-muted small">Cette action est irréversible et supprimera tous les élèves, matières et notes associés.</p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                    <button type="submit" class="btn btn-danger">Supprimer</button>
-                </div>
-            </form>
+<!-- ── Modal Suppression ── -->
+<div class="modal-overlay" id="deleteModal">
+    <div class="modal-box">
+        <h3 class="modal-title">Supprimer la classe ?</h3>
+        <p class="modal-sub">Cette action est irréversible</p>
+        <div class="delete-warning">
+            <strong id="deleteNom"></strong>
+            <p>Tous les élèves, matières et notes associés seront supprimés définitivement.</p>
         </div>
+        <form method="POST">
+            <input type="hidden" name="action" value="delete">
+            <input type="hidden" name="classe_id" id="deleteClasseId">
+            <div class="modal-footer-btns">
+                <button type="button" class="btn-cancel" onclick="closeModal('deleteModal')">Annuler</button>
+                <button type="submit" class="btn-confirm danger">
+                    <i class="bi bi-trash"></i> Supprimer
+                </button>
+            </div>
+        </form>
     </div>
 </div>
 
-<!-- Scripts -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+    // Modals
+    function openModal(id) {
+        document.getElementById(id).classList.add('open');
+    }
+    function closeModal(id) {
+        document.getElementById(id).classList.remove('open');
+    }
+
+    // Fermer en cliquant en dehors
+    document.querySelectorAll('.modal-overlay').forEach(overlay => {
+        overlay.addEventListener('click', function(e) {
+            if (e.target === this) closeModal(this.id);
+        });
+    });
+
     // Modifier
     document.querySelectorAll('.btn-modifier').forEach(btn => {
         btn.addEventListener('click', () => {
-            const modal = new bootstrap.Modal(document.getElementById('editModal'));
             document.getElementById('editClasseId').value = btn.dataset.id;
             document.getElementById('editNom').value = btn.dataset.nom;
             document.getElementById('editAnnee').value = btn.dataset.annee;
-            modal.show();
+            openModal('editModal');
         });
     });
 
     // Supprimer
     document.querySelectorAll('.btn-supprimer').forEach(btn => {
         btn.addEventListener('click', () => {
-            const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
             document.getElementById('deleteClasseId').value = btn.dataset.id;
             document.getElementById('deleteNom').textContent = btn.dataset.nom;
-            modal.show();
+            openModal('deleteModal');
         });
     });
 
-    // Impression
-    function imprimerBulletins(classe_id, classe_nom, nb_eleves, nb_matieres) {
-        if (parseInt(nb_eleves) === 0) {
-            alert('Aucun élève dans cette classe.');
-        } else if (parseInt(nb_matieres) === 0) {
-            alert('Aucune matière configurée.');
-        } else if (confirm(`Imprimer tous les bulletins de la classe ${classe_nom} ?`)) {
-            alert('Fonctionnalité d\'impression groupée à implémenter.');
+    // Fermer avec Escape
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') {
+            document.querySelectorAll('.modal-overlay.open').forEach(m => m.classList.remove('open'));
         }
-    }
+    });
 </script>
 
 </body>
 </html>
-
