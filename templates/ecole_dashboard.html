@@ -3,657 +3,682 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard de l'Ecole {{ ecole.nom }}</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>Dashboard — {{ ecole.nom }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <style>
         :root {
-            --primary-color: #6366f1;
-            --primary-dark: #4f46e5;
-            --secondary-color: #8b5cf6;
-            --success-color: #10b981;
-            --warning-color: #f59e0b;
-            --danger-color: #ef4444;
-            --info-color: #06b6d4;
-            --dark-color: #1f2937;
-            --light-bg: #f8fafc;
-            --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            --card-shadow-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-            --glass-bg: rgba(255, 255, 255, 0.8);
-            --glass-border: rgba(255, 255, 255, 0.2);
+            --ink: #0d1117;
+            --cream: #f5f0e8;
+            --gold: #c9a84c;
+            --gold-light: #e8d5a3;
+            --rust: #c4622d;
+            --mist: #e8edf2;
+            --white: #ffffff;
+            --text-muted: #6b7685;
+            --border: #e8edf2;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'DM Sans', sans-serif;
+            background: var(--cream);
             min-height: 100vh;
             position: relative;
+            overflow-x: hidden;
         }
 
-        body::before {
-            content: '';
+        /* ── Fond décoratif ── */
+        .bg-decor {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: url('data:image/svg+xml,<svg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><g fill="none" fill-rule="evenodd"><g fill="%23ffffff" fill-opacity="0.05"><circle cx="30" cy="30" r="1"/></g></g></svg>');
-            z-index: -1;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
         }
 
-        /* Navigation moderne */
+        .bg-decor::before {
+            content: '';
+            position: absolute;
+            top: -200px; right: -200px;
+            width: 600px; height: 600px;
+            background: radial-gradient(circle, rgba(201,168,76,0.1) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .bg-decor::after {
+            content: '';
+            position: absolute;
+            bottom: -150px; left: -150px;
+            width: 500px; height: 500px;
+            background: radial-gradient(circle, rgba(196,98,45,0.07) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .grid-dots {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            background-image: radial-gradient(circle, #c9a84c18 1px, transparent 1px);
+            background-size: 32px 32px;
+        }
+
+        /* ── Navbar ── */
         .navbar {
-            background: var(--glass-bg) !important;
-            /*backdrop-filter: blur(20px);*/
-            border-bottom: 1px solid var(--glass-border);
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(245,240,232,0.9);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(201,168,76,0.2);
+            padding: 0 40px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
 
-        .navbar-brand {
-            font-weight: 700;
-            font-size: 1.5rem;
-            color: var(--primary-color) !important;
-            transition: transform 0.3s ease;
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-family: 'DM Serif Display', serif;
+            font-size: 1.3rem;
+            color: var(--ink);
+            text-decoration: none;
         }
 
-        .navbar-brand:hover {
-            transform: scale(1.05);
+        .nav-brand .brand-icon {
+            width: 36px; height: 36px;
+            background: var(--ink);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--gold);
+            font-size: 1rem;
         }
 
-        .navbar-text {
-            color: var(--dark-color) !important;
-            font-weight: 500;
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
         }
 
-        .nav-link {
-            color: var(--dark-color) !important;
-            font-weight: 500;
-            padding: 0.5rem 1rem !important;
-            border-radius: 0.5rem;
-            transition: all 0.3s ease;
+        .nav-welcome {
+            font-size: 0.85rem;
+            color: var(--text-muted);
         }
 
-        .nav-link:hover {
-            background: rgba(99, 102, 241, 0.1);
-            color: var(--primary-color) !important;
+        .nav-welcome strong {
+            color: var(--ink);
+            font-weight: 600;
         }
 
-        /* === CORRECTION DU MENU DÉROULANT === */
+        /* ── Dropdown ── */
+        .dropdown { position: relative; }
+
+        .dropdown-trigger {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: var(--ink);
+            color: var(--cream);
+            border: none;
+            border-radius: 50px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .dropdown-trigger:hover {
+            background: #1a2332;
+            transform: translateY(-1px);
+        }
+
         .dropdown-menu {
-            background: white !important;
-            border: 1px solid rgba(0,0,0,0.15);
-            box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.175);
-            z-index: 1050 !important;
-            overflow: visible !important;
-            min-width: 200px !important;
-            backdrop-filter: none !important; /* Empêche le flou de cacher le contenu */
+            position: absolute;
+            top: calc(100% + 10px);
+            right: 0;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 8px;
+            min-width: 200px;
+            box-shadow: 0 16px 40px rgba(13,17,23,0.12);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-8px);
+            transition: all 0.2s ease;
+            z-index: 200;
+        }
+
+        .dropdown:hover .dropdown-menu,
+        .dropdown.open .dropdown-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
         }
 
         .dropdown-item {
-            color: var(--dark-color) !important;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-size: 0.87rem;
+            color: var(--ink);
+            text-decoration: none;
+            transition: background 0.15s;
         }
 
-        .dropdown-item:hover {
-            background: rgba(99, 102, 241, 0.1) !important;
-            color: var(--primary-color) !important;
-        }
+        .dropdown-item:hover { background: var(--mist); }
 
-        .dropdown-item.text-danger:hover {
-            background: rgba(239, 68, 68, 0.1) !important;
-            color: var(--danger-color) !important;
-        }
+        .dropdown-item.danger { color: var(--rust); }
+        .dropdown-item.danger:hover { background: rgba(196,98,45,0.08); }
 
         .dropdown-divider {
-            margin: 0.5rem 0 !important;
+            height: 1px;
+            background: var(--border);
+            margin: 6px 0;
         }
 
-        /* Container principal */
-        .container {
-            margin-top: 2rem;
+        /* ── Page content ── */
+        .page-content {
+            position: relative;
+            z-index: 1;
+            padding: 40px;
+            max-width: 1200px;
+            margin: 0 auto;
         }
 
-        /* Cards modernes */
-        .card {
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border);
-            border-radius: 1rem;
-            box-shadow: var(--card-shadow);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            overflow: hidden;
-        }
-
-        .card:hover {
-            box-shadow: var(--card-shadow-hover);
-            transform: translateY(-2px);
-        }
-
-        .card-header {
-            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
-            border-bottom: 1px solid rgba(99, 102, 241, 0.2);
-            padding: 1.5rem;
-            border-radius: 1rem 1rem 0 0;
-        }
-
-        .card-header h5 {
-            color: var(--dark-color);
-            font-weight: 600;
-            margin: 0;
+        /* ── Flash messages ── */
+        .flash-msg {
+            padding: 14px 18px;
+            border-radius: 14px;
+            font-size: 0.88rem;
+            margin-bottom: 16px;
             display: flex;
             align-items: center;
+            gap: 10px;
+            animation: slideDown 0.4s ease;
         }
 
-        .card-header h5 i {
-            color: var(--primary-color);
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to   { opacity: 1; transform: translateY(0); }
         }
 
-        .card-body {
-            padding: 1.5rem;
+        .flash-success {
+            background: rgba(39,174,96,0.08);
+            border: 1px solid rgba(39,174,96,0.2);
+            color: #1a6b3c;
         }
 
-        /* Hero card */
-        .hero-card .card-body {
-            background: linear-gradient(135deg, rgba(99, 102, 241, 0.9) 0%, rgba(139, 92, 246, 0.9) 100%);
-            color: white;
-            text-align: center;
-            padding: 3rem 2rem;
+        .flash-error {
+            background: rgba(196,98,45,0.08);
+            border: 1px solid rgba(196,98,45,0.2);
+            color: var(--rust);
         }
 
-        .hero-card h2 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-            animation: fadeInUp 0.8s ease;
+        .flash-warning {
+            background: rgba(201,168,76,0.1);
+            border: 1px solid rgba(201,168,76,0.3);
+            color: #7a5c10;
         }
 
-        .hero-card p {
-            font-size: 1.2rem;
-            opacity: 0.9;
-            animation: fadeInUp 0.8s ease 0.2s both;
+        .flash-close {
+            margin-left: auto;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: inherit;
+            opacity: 0.6;
+            font-size: 1rem;
         }
 
-        /* Boutons modernes */
-        .btn {
-            border-radius: 0.75rem;
-            font-weight: 500;
-            font-size: 0.95rem;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
+        /* ── Hero section ── */
+        .hero {
+            background: var(--ink);
+            border-radius: 24px;
+            padding: 48px;
+            margin-bottom: 32px;
             position: relative;
             overflow: hidden;
+            animation: fadeUp 0.6s ease both;
         }
 
-        .btn::before {
+        .hero::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: left 0.5s ease;
+            top: -80px; right: -80px;
+            width: 350px; height: 350px;
+            background: radial-gradient(circle, rgba(201,168,76,0.12) 0%, transparent 70%);
+            border-radius: 50%;
         }
 
-        .btn:hover::before {
-            left: 100%;
+        .hero::after {
+            content: '';
+            position: absolute;
+            bottom: -60px; left: 200px;
+            width: 250px; height: 250px;
+            background: radial-gradient(circle, rgba(196,98,45,0.08) 0%, transparent 70%);
+            border-radius: 50%;
         }
 
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
-            border: none;
-        }
+        .hero-content { position: relative; z-index: 1; }
 
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
-        }
-
-        .btn-outline-primary {
-            border: 2px solid var(--primary-color);
-            color: var(--primary-color);
-            background: transparent;
-        }
-
-        .btn-outline-primary:hover {
-            background: var(--primary-color);
-            border-color: var(--primary-color);
-            color: white;
-            transform: translateY(-2px);
-        }
-
-        .btn-outline-success {
-            border: 2px solid var(--success-color);
-            color: var(--success-color);
-            background: transparent;
-        }
-
-        .btn-outline-success:hover {
-            background: var(--success-color);
-            border-color: var(--success-color);
-            color: white;
-            transform: translateY(-2px);
-        }
-
-        .btn-outline-info {
-            border: 2px solid var(--info-color);
-            color: var(--info-color);
-            background: transparent;
-        }
-
-        .btn-outline-info:hover {
-            background: var(--info-color);
-            border-color: var(--info-color);
-            color: white;
-            transform: translateY(-2px);
-        }
-
-        .btn-outline-warning {
-            border: 2px solid var(--warning-color);
-            color: var(--warning-color);
-            background: transparent;
-        }
-
-        .btn-outline-warning:hover {
-            background: var(--warning-color);
-            border-color: var(--warning-color);
-            color: white;
-            transform: translateY(-2px);
-        }
-
-        /* Classe cards */
-        .border-left-primary {
-            border-left: 4px solid var(--primary-color) !important;
-        }
-
-        .shadow-sm {
-            box-shadow: var(--card-shadow) !important;
-        }
-
-        .card h-100:hover {
-            transform: translateY(-8px);
-            box-shadow: var(--card-shadow-hover);
-        }
-
-        .card-title {
-            color: var(--primary-color);
+        .hero-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(201,168,76,0.12);
+            border: 1px solid rgba(201,168,76,0.25);
+            color: var(--gold);
+            padding: 6px 14px;
+            border-radius: 50px;
+            font-size: 0.78rem;
             font-weight: 600;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+        }
+
+        .hero h1 {
+            font-family: 'DM Serif Display', serif;
+            font-size: clamp(2rem, 4vw, 3rem);
+            color: #e8edf2;
+            line-height: 1.15;
+            margin-bottom: 12px;
+        }
+
+        .hero h1 em {
+            font-style: italic;
+            color: var(--gold-light);
+        }
+
+        .hero-sub {
+            color: #4a5568;
+            font-size: 0.95rem;
+        }
+
+        /* ── Section titre ── */
+        .section-header {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            justify-content: space-between;
+            margin-bottom: 24px;
         }
 
-        .text-muted {
-            color: #64748b !important;
+        .section-title {
+            font-family: 'DM Serif Display', serif;
+            font-size: 1.5rem;
+            color: var(--ink);
         }
 
-        .text-muted.small {
+        /* ── Bouton ajouter ── */
+        .btn-add {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--ink);
+            color: var(--cream);
+            padding: 12px 24px;
+            border-radius: 14px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.25s ease;
+            border: 2px solid var(--ink);
+        }
+
+        .btn-add:hover {
+            background: transparent;
+            color: var(--ink);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(13,17,23,0.1);
+        }
+
+        .btn-add .icon {
+            width: 26px; height: 26px;
+            background: var(--gold);
+            border-radius: 50%;
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-            background: #f8fafc;
-            padding: 0.5rem;
-            border-radius: 0.5rem;
-            font-weight: 500;
+            justify-content: center;
+            font-size: 0.8rem;
         }
 
-        /* Actions buttons dans les cartes */
-        .btn-group-vertical .btn {
-            margin-bottom: 0.5rem;
-            border-radius: 0.5rem !important;
+        /* ── Classes grid ── */
+        .classes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        /* ── Classe card ── */
+        .classe-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 28px;
             transition: all 0.3s ease;
+            animation: fadeUp 0.5s ease both;
         }
 
-        .btn-group-vertical .btn:hover {
-            transform: translateX(5px);
+        .classe-card:nth-child(1) { animation-delay: 0.1s; }
+        .classe-card:nth-child(2) { animation-delay: 0.2s; }
+        .classe-card:nth-child(3) { animation-delay: 0.3s; }
+        .classe-card:nth-child(4) { animation-delay: 0.4s; }
+        .classe-card:nth-child(5) { animation-delay: 0.5s; }
+        .classe-card:nth-child(6) { animation-delay: 0.6s; }
+
+        .classe-card:hover {
+            border-color: var(--gold);
+            box-shadow: 0 12px 32px rgba(13,17,23,0.08);
+            transform: translateY(-4px);
         }
 
-        /* Empty state */
-        .text-center.text-muted.py-5 {
-            padding: 4rem 2rem !important;
+        .classe-card-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 20px;
         }
 
-        .text-center.text-muted.py-5 i {
-            color: #d1d5db;
-            margin-bottom: 1.5rem;
+        .classe-icon {
+            width: 48px; height: 48px;
+            background: linear-gradient(135deg, var(--ink), #1a2332);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--gold);
+            font-size: 1.2rem;
         }
 
-        .text-center.text-muted.py-5 h5 {
-            color: var(--dark-color);
-            font-weight: 600;
-            margin-bottom: 1rem;
-        }
-
-        /* Animations */
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes slideInLeft {
-            from {
-                opacity: 0;
-                transform: translateX(-30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        .animate-fade-in {
-            animation: fadeInUp 0.6s ease;
-        }
-
-        .animate-slide-in {
-            animation: slideInLeft 0.6s ease;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .hero-card h2 {
-                font-size: 2rem;
-            }
-            
-            .hero-card p {
-                font-size: 1rem;
-            }
-            
-            .container {
-                margin-top: 1rem;
-            }
-
-            .btn-group-vertical .btn {
-                font-size: 0.875rem;
-            }
-        }
-
-        /* Alert moderne */
-        .alert {
-            border: none;
-            border-radius: 0.75rem;
-            padding: 1rem 1.5rem;
+        .classe-year {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            background: var(--mist);
+            padding: 4px 10px;
+            border-radius: 50px;
             font-weight: 500;
-            border-left: 4px solid;
-            backdrop-filter: blur(10px);
-            animation: fadeInUp 0.6s ease;
         }
 
-        .alert-success {
-            background: rgba(16, 185, 129, 0.1);
-            color: #065f46;
-            border-left-color: var(--success-color);
+        .classe-name {
+            font-family: 'DM Serif Display', serif;
+            font-size: 1.3rem;
+            color: var(--ink);
+            margin-bottom: 6px;
         }
 
-        .alert-danger {
-            background: rgba(239, 68, 68, 0.1);
-            color: #991b1b;
-            border-left-color: var(--danger-color);
+        .classe-meta {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            margin-bottom: 24px;
         }
 
-        .alert-warning {
-            background: rgba(245, 158, 11, 0.1);
-            color: #92400e;
-            border-left-color: var(--warning-color);
+        /* ── Action buttons dans card ── */
+        .card-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
         }
 
-        /* Animation d'entrée */
-        .row > div {
-            animation: fadeInUp 0.6s ease;
+        .action-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 14px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            border: 1.5px solid transparent;
         }
 
-        .row > div:nth-child(1) { animation-delay: 0.1s; }
-        .row > div:nth-child(2) { animation-delay: 0.2s; }
-        .row > div:nth-child(3) { animation-delay: 0.3s; }
-        .row > div:nth-child(4) { animation-delay: 0.4s; }
-        .row > div:nth-child(5) { animation-delay: 0.5s; }
+        .action-btn i { font-size: 0.9rem; }
+
+        .action-btn.primary {
+            background: var(--ink);
+            color: var(--cream);
+            grid-column: 1 / -1;
+        }
+
+        .action-btn.primary:hover {
+            background: #1a2332;
+            transform: translateY(-1px);
+        }
+
+        .action-btn.success {
+            background: rgba(39,174,96,0.07);
+            border-color: rgba(39,174,96,0.2);
+            color: #1a6b3c;
+        }
+
+        .action-btn.success:hover {
+            background: rgba(39,174,96,0.15);
+            transform: translateY(-1px);
+        }
+
+        .action-btn.info {
+            background: rgba(6,182,212,0.07);
+            border-color: rgba(6,182,212,0.2);
+            color: #0e6e80;
+        }
+
+        .action-btn.info:hover {
+            background: rgba(6,182,212,0.15);
+            transform: translateY(-1px);
+        }
+
+        .action-btn.warning {
+            background: rgba(201,168,76,0.08);
+            border-color: rgba(201,168,76,0.25);
+            color: #7a5c10;
+            grid-column: 1 / -1;
+        }
+
+        .action-btn.warning:hover {
+            background: rgba(201,168,76,0.15);
+            transform: translateY(-1px);
+        }
+
+        /* ── Empty state ── */
+        .empty-state {
+            background: white;
+            border: 2px dashed var(--border);
+            border-radius: 24px;
+            padding: 72px 40px;
+            text-align: center;
+        }
+
+        .empty-icon {
+            width: 80px; height: 80px;
+            background: var(--mist);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+            font-size: 2rem;
+            color: #c8d0da;
+        }
+
+        .empty-state h3 {
+            font-family: 'DM Serif Display', serif;
+            font-size: 1.5rem;
+            color: var(--ink);
+            margin-bottom: 8px;
+        }
+
+        .empty-state p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 32px;
+        }
+
+        /* ── Animations ── */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ── Responsive ── */
+        @media (max-width: 768px) {
+            .navbar { padding: 0 20px; }
+            .page-content { padding: 24px 20px; }
+            .hero { padding: 32px 24px; }
+            .classes-grid { grid-template-columns: 1fr; }
+            .nav-welcome { display: none; }
+        }
     </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg">
-        <div class="container">
-            <!-- Logo / Nom école -->
-            <a class="navbar-brand" href="#">
-                <i class="fas fa-graduation-cap me-2"></i>{{ ecole.nom }}
-            </a>
 
-            <!-- Bouton menu mobile -->
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" 
-                    aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
+<div class="bg-decor"></div>
+<div class="grid-dots"></div>
+
+<!-- ── Navbar ── -->
+<nav class="navbar">
+    <a href="#" class="nav-brand">
+        <span class="brand-icon"><i class="bi bi-mortarboard-fill"></i></span>
+        EduBulletin
+    </a>
+
+    <div class="nav-right">
+        <span class="nav-welcome">
+            Bienvenue, <strong>{{ ecole.directeur or 'Directeur' }}</strong>
+        </span>
+
+        <div class="dropdown" id="userDropdown">
+            <button class="dropdown-trigger" onclick="toggleDropdown()">
+                <i class="bi bi-person-circle"></i>
+                Mon compte
+                <i class="bi bi-chevron-down" style="font-size:0.7rem;"></i>
             </button>
-
-            <!-- Liens -->
-            <div class="collapse navbar-collapse" id="navbarContent">
-                <ul class="navbar-nav ms-auto align-items-center">
-                    <li class="nav-item me-3">
-                        <span class="navbar-text">
-                            Bienvenue, {{ ecole.directeur or 'Directeur' }}
-                        </span>
-                    </li>
-
-                    <!-- Menu utilisateur -->
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userMenu" role="button"
-                           data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="fas fa-user-circle me-2"></i> Mon compte
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="userMenu" style="z-index: 1050; min-width: 200px; overflow: visible;">
-                            <li>
-                                <a class="dropdown-item" href="{{ url_for('main.changer_mot_de_passe') }}">
-                                    <i class="fas fa-key me-2"></i>Changer le mot de passe
-                                </a>
-                            </li>
-                            <li><hr class="dropdown-divider my-1"></li>
-                            <li>
-                                <a class="dropdown-item text-danger" href="{{ url_for('auth.logout') }}">
-                                    <i class="fas fa-sign-out-alt me-2"></i>Déconnexion
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
-
-    <div class="container mt-4">
-        <!-- Messages Flash -->
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ 'danger' if category == 'error' else 'success' if category == 'success' else 'warning' }} alert-dismissible fade show" role="alert">
-                        {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
-
-        <div class="row mb-4">
-            <div class="col-12">
-                <div class="card hero-card">
-                    <div class="card-body text-center">
-                        <i class="fas fa-school fa-3x mb-3" style="opacity: 0.8;"></i>
-                        <h2>{{ ecole.nom }}</h2>
-                        
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Actions rapides -->
-        <div class="row mb-4">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-header">
-                        <h5><i class="fas fa-bolt me-2"></i>Actions rapides</h5>
-                    </div>
-                    <div class="card-body">
-                        <a href="{{ url_for('classe.add_classe') }}" class="btn btn-primary me-2 mb-2">
-                            <i class="fas fa-chalkboard me-2"></i>Ajouter une classe
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Liste des classes -->
-        <div class="row">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5><i class="fas fa-list me-2"></i>Mes Classes ({{ classes|length }})</h5>
-                        <a href="{{ url_for('classe.add_classe') }}" class="btn btn-sm btn-outline-primary">
-                            <i class="fas fa-plus me-1"></i>Nouvelle classe
-                        </a>
-                    </div>
-                    <div class="card-body">
-                        {% if classes %}
-                            <div class="row">
-                                {% for classe in classes %}
-                                <div class="col-lg-4 col-md-6 mb-3">
-                                    <div class="card h-100 border-left-primary shadow-sm">
-                                        <div class="card-body">
-                                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                                <h5 class="card-title text-primary mb-0">
-                                                    <i class="fas fa-chalkboard-teacher me-2"></i>{{ classe.nom }}
-                                                </h5>
-                                            </div>
-                                            <p class="text-muted small mb-3">
-                                                <i class="fas fa-calendar me-1"></i>{{ classe.annee_scolaire }}
-                                            </p>
-                                            
-                                            <!-- Actions pour la classe -->
-                                            <div class="btn-group-vertical w-100" role="group">
-                                                <a href="{{ url_for('main.gestion_classe', classe_id=classe.id) }}" 
-                                                   class="btn btn-outline-primary btn-sm mb-1">
-                                                    <i class="fas fa-cogs me-2"></i>Gérer la classe
-                                                </a>
-                                                <a href="{{ url_for('eleve.add_eleve', classe_id=classe.id) }}" 
-                                                   class="btn btn-outline-success btn-sm mb-1">
-                                                    <i class="fas fa-user-plus me-2"></i>Ajouter élèves
-                                                </a>
-                                                <a href="{{ url_for('matiere.add_matiere', classe_id=classe.id) }}" 
-                                                   class="btn btn-outline-info btn-sm mb-1">
-                                                    <i class="fas fa-book-plus me-2"></i>Ajouter matières
-                                                </a>
-                                                <a href="{{ url_for('notes.saisir_notes', classe_id=classe.id) }}" 
-                                                   class="btn btn-outline-warning btn-sm">
-                                                    <i class="fas fa-edit me-2"></i>Saisir notes
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                {% endfor %}
-                            </div>
-                        {% else %}
-                            <div class="text-center text-muted py-5">
-                                <i class="fas fa-chalkboard fa-4x mb-3"></i>
-                                <h5>Aucune classe créée</h5>
-                                <p>Commencez par ajouter votre première classe</p>
-                                <a href="{{ url_for('classe.add_classe') }}" class="btn btn-primary">
-                                    <i class="fas fa-plus me-2"></i>Créer ma première classe
-                                </a>
-                            </div>
-                        {% endif %}
-                    </div>
-                </div>
+            <div class="dropdown-menu">
+                <a href="{{ url_for('main.changer_mot_de_passe') }}" class="dropdown-item">
+                    <i class="bi bi-key"></i> Changer le mot de passe
+                </a>
+                <div class="dropdown-divider"></div>
+                <a href="{{ url_for('auth.logout') }}" class="dropdown-item danger">
+                    <i class="bi bi-box-arrow-right"></i> Déconnexion
+                </a>
             </div>
         </div>
     </div>
+</nav>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            document.querySelectorAll('.card').forEach(card => {
-                if (!card.classList.contains('hero-card')) {
-                    card.addEventListener('mouseenter', function() {
-                        this.style.transform = 'translateY(-2px)';
-                    });
-                    card.addEventListener('mouseleave', function() {
-                        this.style.transform = 'translateY(0)';
-                    });
-                }
-            });
+<!-- ── Contenu ── -->
+<div class="page-content">
 
-            document.querySelectorAll('.h-100').forEach(card => {
-                card.addEventListener('mouseenter', function() {
-                    this.style.transform = 'translateY(-8px)';
-                });
-                card.addEventListener('mouseleave', function() {
-                    this.style.transform = 'translateY(0)';
-                });
-            });
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, msg in messages %}
+                <div class="flash-msg flash-{{ 'error' if category=='error' else 'success' if category=='success' else 'warning' }}">
+                    <i class="bi bi-{{ 'exclamation-circle' if category=='error' else 'check-circle' if category=='success' else 'exclamation-triangle' }}"></i>
+                    {{ msg }}
+                    <button class="flash-close" onclick="this.parentElement.remove()">
+                        <i class="bi bi-x"></i>
+                    </button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
 
-            document.querySelectorAll('.btn-group-vertical .btn').forEach(btn => {
-                btn.addEventListener('mouseenter', function() {
-                    this.style.transform = 'translateX(5px)';
-                });
-                btn.addEventListener('mouseleave', function() {
-                    this.style.transform = 'translateX(0)';
-                });
-            });
+    <!-- ── Hero ── -->
+    <div class="hero">
+        <div class="hero-content">
+            <div class="hero-label">
+                <i class="bi bi-building"></i>
+                Tableau de bord
+            </div>
+            <h1>{{ ecole.nom }}<br><em>Espace de gestion</em></h1>
+            <p class="hero-sub">Gérez vos classes, élèves, notes et bulletins depuis un seul endroit.</p>
+        </div>
+    </div>
 
-            document.querySelectorAll('.btn').forEach(btn => {
-                btn.addEventListener('click', function(e) {
-                    const ripple = document.createElement('span');
-                    const rect = this.getBoundingClientRect();
-                    const size = Math.max(rect.width, rect.height);
-                    const x = e.clientX - rect.left - size / 2;
-                    const y = e.clientY - rect.top - size / 2;
-                    
-                    ripple.style.width = ripple.style.height = size + 'px';
-                    ripple.style.left = x + 'px';
-                    ripple.style.top = y + 'px';
-                    ripple.style.position = 'absolute';
-                    ripple.style.borderRadius = '50%';
-                    ripple.style.background = 'rgba(255, 255, 255, 0.5)';
-                    ripple.style.transform = 'scale(0)';
-                    ripple.style.animation = 'ripple 0.6s linear';
-                    ripple.style.pointerEvents = 'none';
-                    
-                    this.appendChild(ripple);
-                    
-                    setTimeout(() => {
-                        ripple.remove();
-                    }, 600);
-                });
-            });
-        });
+    <!-- ── Actions rapides ── -->
+    <div class="section-header" style="margin-bottom: 32px;">
+        <h2 class="section-title">Mes classes</h2>
+        <a href="{{ url_for('classe.add_classe') }}" class="btn-add">
+            <span>Nouvelle classe</span>
+            <span class="icon"><i class="bi bi-plus"></i></span>
+        </a>
+    </div>
 
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes ripple {
-                to {
-                    transform: scale(4);
-                    opacity: 0;
-                }
-            }
-            
-            .btn {
-                position: relative;
-                overflow: hidden;
-            }
-        `;
-        document.head.appendChild(style);
-    </script>
+    <!-- ── Classes ── -->
+    {% if classes %}
+        <div class="classes-grid">
+            {% for classe in classes %}
+            <div class="classe-card">
+                <div class="classe-card-header">
+                    <div class="classe-icon">
+                        <i class="bi bi-diagram-3"></i>
+                    </div>
+                    <span class="classe-year">{{ classe.annee_scolaire }}</span>
+                </div>
+
+                <h3 class="classe-name">{{ classe.nom }}</h3>
+                <p class="classe-meta">
+                    <i class="bi bi-calendar3"></i> Année {{ classe.annee_scolaire }}
+                </p>
+
+                <div class="card-actions">
+                    <a href="{{ url_for('main.gestion_classe', classe_id=classe.id) }}" class="action-btn primary">
+                        <i class="bi bi-gear"></i> Gérer la classe
+                    </a>
+                    <a href="{{ url_for('eleve.add_eleve', classe_id=classe.id) }}" class="action-btn success">
+                        <i class="bi bi-person-plus"></i> Élèves
+                    </a>
+                    <a href="{{ url_for('matiere.add_matiere', classe_id=classe.id) }}" class="action-btn info">
+                        <i class="bi bi-book"></i> Matières
+                    </a>
+                    <a href="{{ url_for('notes.saisir_notes', classe_id=classe.id) }}" class="action-btn warning">
+                        <i class="bi bi-pencil-square"></i> Saisir les notes
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+    {% else %}
+        <!-- Empty state -->
+        <div class="empty-state">
+            <div class="empty-icon">
+                <i class="bi bi-diagram-3"></i>
+            </div>
+            <h3>Aucune classe créée</h3>
+            <p>Commencez par créer votre première classe pour gérer vos élèves et leurs notes.</p>
+            <a href="{{ url_for('classe.add_classe') }}" class="btn-add">
+                <span>Créer ma première classe</span>
+                <span class="icon"><i class="bi bi-plus"></i></span>
+            </a>
+        </div>
+    {% endif %}
+
+</div>
+
+<script>
+    function toggleDropdown() {
+        document.getElementById('userDropdown').classList.toggle('open');
+    }
+
+    // Fermer dropdown en cliquant ailleurs
+    document.addEventListener('click', function(e) {
+        const dd = document.getElementById('userDropdown');
+        if (!dd.contains(e.target)) {
+            dd.classList.remove('open');
+        }
+    });
+</script>
+
 </body>
 </html>
