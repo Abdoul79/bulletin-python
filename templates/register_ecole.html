@@ -3,571 +3,599 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Administration - Système de Bulletins Scolaires</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-    <!-- Font Awesome -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <title>Administration — EduBulletin</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding-top: 80px;
+        :root {
+            --ink: #0d1117; --cream: #f5f0e8; --gold: #c9a84c;
+            --gold-light: #e8d5a3; --rust: #c4622d; --mist: #e8edf2;
+            --text-muted: #6b7685; --border: #e8edf2;
+            --success-color: #1a6b3c;
         }
-        .admin-navbar {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'DM Sans',sans-serif; background:var(--cream); min-height:100vh; position:relative; overflow-x:hidden; }
+        .bg-decor { position:fixed; inset:0; z-index:0; pointer-events:none; }
+        .bg-decor::before { content:''; position:absolute; top:-200px; right:-200px; width:600px; height:600px; background:radial-gradient(circle,rgba(201,168,76,0.1) 0%,transparent 70%); border-radius:50%; }
+        .bg-decor::after  { content:''; position:absolute; bottom:-150px; left:-150px; width:500px; height:500px; background:radial-gradient(circle,rgba(196,98,45,0.07) 0%,transparent 70%); border-radius:50%; }
+        .grid-dots { position:fixed; inset:0; z-index:0; background-image:radial-gradient(circle,#c9a84c18 1px,transparent 1px); background-size:32px 32px; }
+
+        /* Navbar */
+        .navbar { position:sticky; top:0; z-index:100; background:rgba(245,240,232,0.92); backdrop-filter:blur(16px); border-bottom:1px solid rgba(201,168,76,0.2); padding:0 40px; height:64px; display:flex; align-items:center; justify-content:space-between; }
+        .nav-brand { display:flex; align-items:center; gap:10px; font-family:'DM Serif Display',serif; font-size:1.3rem; color:var(--ink); }
+        .nav-brand .brand-icon { width:36px; height:36px; background:var(--ink); border-radius:10px; display:flex; align-items:center; justify-content:center; color:var(--gold); font-size:1rem; }
+        .admin-badge { background:rgba(196,98,45,0.1); color:var(--rust); border:1px solid rgba(196,98,45,0.2); border-radius:50px; padding:4px 12px; font-size:0.72rem; font-weight:700; letter-spacing:0.5px; text-transform:uppercase; }
+        .nav-right { display:flex; align-items:center; gap:10px; }
+        .btn-nav { display:flex; align-items:center; gap:8px; padding:8px 18px; background:transparent; border:1.5px solid var(--border); border-radius:50px; font-size:0.85rem; font-weight:600; color:var(--text-muted); text-decoration:none; transition:all 0.2s; cursor:pointer; font-family:'DM Sans',sans-serif; }
+        .btn-nav:hover { border-color:var(--ink); color:var(--ink); }
+        .btn-nav.danger:hover { border-color:var(--rust); color:var(--rust); }
+
+        /* Layout */
+        .page-content { position:relative; z-index:1; padding:40px; max-width:1300px; margin:0 auto; }
+
+        /* Flash */
+        .flash-msg { padding:14px 18px; border-radius:14px; font-size:0.88rem; margin-bottom:16px; display:flex; align-items:center; gap:10px; animation:slideDown 0.4s ease; }
+        @keyframes slideDown { from{opacity:0;transform:translateY(-10px)} to{opacity:1;transform:translateY(0)} }
+        .flash-success { background:rgba(39,174,96,0.08); border:1px solid rgba(39,174,96,0.2); color:var(--success-color); }
+        .flash-error   { background:rgba(196,98,45,0.08); border:1px solid rgba(196,98,45,0.2); color:var(--rust); }
+        .flash-warning { background:rgba(201,168,76,0.1); border:1px solid rgba(201,168,76,0.3); color:#7a5c10; }
+        .flash-close   { margin-left:auto; background:none; border:none; cursor:pointer; color:inherit; opacity:0.6; }
+
+        /* Hero */
+        .hero { background:var(--ink); border-radius:24px; padding:40px 48px; margin-bottom:32px; position:relative; overflow:hidden; animation:fadeUp 0.6s ease both; }
+        .hero::before { content:''; position:absolute; top:-80px; right:-80px; width:300px; height:300px; background:radial-gradient(circle,rgba(201,168,76,0.1) 0%,transparent 70%); border-radius:50%; }
+        .hero-label { display:inline-flex; align-items:center; gap:8px; background:rgba(196,98,45,0.15); border:1px solid rgba(196,98,45,0.3); color:#f87060; padding:6px 14px; border-radius:50px; font-size:0.75rem; font-weight:600; letter-spacing:0.5px; text-transform:uppercase; margin-bottom:14px; }
+        .hero h1 { font-family:'DM Serif Display',serif; font-size:2rem; color:#e8edf2; line-height:1.2; margin-bottom:6px; }
+        .hero h1 em { font-style:italic; color:var(--gold-light); }
+        .hero-sub { color:#4a5568; font-size:0.9rem; }
+
+        /* Stat cards */
+        .stats-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:32px; }
+        .stat-card { background:white; border:1.5px solid var(--border); border-radius:20px; padding:24px 20px; cursor:pointer; transition:all 0.25s; animation:fadeUp 0.6s ease both; position:relative; overflow:hidden; }
+        .stat-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; }
+        .stat-card.blue::before   { background:linear-gradient(90deg,#6366f1,#818cf8); }
+        .stat-card.green::before  { background:linear-gradient(90deg,var(--success-color),#4ade80); }
+        .stat-card.gold::before   { background:linear-gradient(90deg,var(--gold),#f59e0b); }
+        .stat-card.rust::before   { background:linear-gradient(90deg,var(--rust),#f87171); }
+        .stat-card:hover { border-color:var(--gold); box-shadow:0 12px 32px rgba(13,17,23,0.07); transform:translateY(-3px); }
+        .stat-icon { width:46px; height:46px; border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:1.2rem; margin-bottom:14px; }
+        .stat-icon.blue  { background:rgba(99,102,241,0.1); color:#6366f1; }
+        .stat-icon.green { background:rgba(39,174,96,0.1); color:var(--success-color); }
+        .stat-icon.gold  { background:rgba(201,168,76,0.12); color:#7a5c10; }
+        .stat-icon.rust  { background:rgba(196,98,45,0.1); color:var(--rust); }
+        .stat-num   { font-family:'DM Serif Display',serif; font-size:2.2rem; color:var(--ink); line-height:1; margin-bottom:4px; }
+        .stat-label { font-size:0.82rem; color:var(--text-muted); font-weight:500; }
+        .stat-hint  { font-size:0.72rem; color:#c8d0da; margin-top:4px; }
+
+        /* Tabs */
+        .tabs-nav { display:flex; gap:6px; background:white; border:1px solid var(--border); border-radius:16px; padding:6px; margin-bottom:24px; }
+        .tab-btn { flex:1; padding:11px 16px; border:none; border-radius:12px; background:transparent; font-family:'DM Sans',sans-serif; font-size:0.88rem; font-weight:600; color:var(--text-muted); cursor:pointer; transition:all 0.2s; display:flex; align-items:center; justify-content:center; gap:8px; }
+        .tab-btn.active { background:var(--ink); color:var(--gold); }
+        .tab-btn:hover:not(.active) { background:var(--mist); color:var(--ink); }
+
+        /* Tab panels */
+        .tab-panel { display:none; animation:fadeUp 0.4s ease; }
+        .tab-panel.active { display:block; }
+
+        /* Content card */
+        .content-card { background:white; border:1px solid var(--border); border-radius:24px; overflow:hidden; }
+        .content-card-header { padding:24px 28px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:12px; }
+        .content-card-icon { width:40px; height:40px; background:var(--ink); border-radius:12px; display:flex; align-items:center; justify-content:center; color:var(--gold); font-size:1rem; flex-shrink:0; }
+        .content-card-title { font-family:'DM Serif Display',serif; font-size:1.2rem; color:var(--ink); }
+        .content-card-body { padding:28px; }
+
+        /* Form */
+        .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+        .form-grid.full { grid-template-columns:1fr; }
+        .field { display:flex; flex-direction:column; gap:8px; }
+        .field label { font-size:0.75rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; display:flex; align-items:center; gap:6px; }
+        .field input, .field select, .field textarea { background:var(--mist); border:1.5px solid var(--border); border-radius:12px; padding:12px 14px; color:var(--ink); font-family:'DM Sans',sans-serif; font-size:0.92rem; outline:none; transition:all 0.2s; }
+        .field input:focus, .field select:focus, .field textarea:focus { border-color:var(--gold); background:white; box-shadow:0 0 0 3px rgba(201,168,76,0.12); }
+        .field input::placeholder, .field textarea::placeholder { color:#c8d0da; }
+        .field small { font-size:0.75rem; color:var(--text-muted); }
+        .field textarea { resize:vertical; min-height:90px; }
+
+        .form-actions { display:flex; justify-content:flex-end; gap:10px; margin-top:24px; padding-top:20px; border-top:1px solid var(--border); }
+        .btn-reset { display:flex; align-items:center; gap:8px; background:var(--mist); color:var(--text-muted); padding:12px 22px; border-radius:12px; border:none; font-family:'DM Sans',sans-serif; font-size:0.9rem; font-weight:600; cursor:pointer; transition:background 0.2s; }
+        .btn-reset:hover { background:var(--border); color:var(--ink); }
+        .btn-submit { display:flex; align-items:center; gap:8px; background:var(--ink); color:var(--cream); padding:12px 28px; border-radius:12px; border:2px solid var(--ink); font-family:'DM Sans',sans-serif; font-size:0.9rem; font-weight:700; cursor:pointer; transition:all 0.25s; }
+        .btn-submit:hover { background:transparent; color:var(--ink); }
+
+        /* Table */
+        .table-wrap { overflow-x:auto; }
+        .schools-table { width:100%; border-collapse:collapse; min-width:800px; }
+        .schools-table thead th { background:var(--ink); color:var(--gold-light); padding:13px 16px; font-size:0.75rem; font-weight:700; text-align:left; white-space:nowrap; }
+        .schools-table thead th:first-child { border-radius:16px 0 0 0; }
+        .schools-table thead th:last-child { border-radius:0 16px 0 0; }
+        .schools-table tbody tr:hover td { background:rgba(201,168,76,0.03); }
+        .schools-table td { padding:14px 16px; border-bottom:1px solid var(--border); font-size:0.88rem; color:var(--ink); vertical-align:middle; }
+        .schools-table tbody tr:last-child td { border-bottom:none; }
+
+        .school-logo { width:38px; height:38px; border-radius:10px; object-fit:cover; border:1.5px solid var(--border); }
+        .school-logo-placeholder { width:38px; height:38px; border-radius:10px; background:var(--ink); color:var(--gold); display:flex; align-items:center; justify-content:center; font-family:'DM Serif Display',serif; font-size:1rem; font-weight:700; }
+
+        .school-name { font-weight:700; color:var(--ink); margin-bottom:2px; }
+        .school-email { font-size:0.75rem; color:var(--text-muted); }
+        .school-type { display:inline-flex; align-items:center; gap:5px; border-radius:50px; padding:3px 10px; font-size:0.7rem; font-weight:700; margin-top:4px; }
+        .school-type.fr   { background:rgba(99,102,241,0.1); color:#4f46e5; }
+        .school-type.arab { background:rgba(201,168,76,0.12); color:#7a5c10; }
+
+        .status-pill { display:inline-flex; align-items:center; gap:5px; border-radius:50px; padding:5px 12px; font-size:0.75rem; font-weight:700; }
+        .status-active   { background:rgba(39,174,96,0.1); color:var(--success-color); }
+        .status-suspended { background:rgba(201,168,76,0.1); color:#7a5c10; }
+
+        .table-actions { display:flex; gap:6px; align-items:center; flex-wrap:wrap; }
+        .icon-btn-table { display:flex; align-items:center; gap:6px; padding:7px 12px; border-radius:9px; border:1.5px solid var(--border); background:transparent; font-family:'DM Sans',sans-serif; font-size:0.78rem; font-weight:600; color:var(--text-muted); cursor:pointer; transition:all 0.2s; white-space:nowrap; }
+        .icon-btn-table.edit:hover     { background:var(--ink); border-color:var(--ink); color:var(--cream); }
+        .icon-btn-table.activate:hover { background:rgba(39,174,96,0.1); border-color:rgba(39,174,96,0.3); color:var(--success-color); }
+        .icon-btn-table.suspend:hover  { background:rgba(201,168,76,0.1); border-color:rgba(201,168,76,0.3); color:#7a5c10; }
+        .icon-btn-table.del:hover      { background:rgba(196,98,45,0.1); border-color:rgba(196,98,45,0.3); color:var(--rust); }
+
+        /* Empty */
+        .empty-state { padding:64px 24px; text-align:center; }
+        .empty-icon { width:80px; height:80px; background:var(--mist); border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 16px; font-size:2rem; color:#c8d0da; }
+        .empty-state h3 { font-family:'DM Serif Display',serif; font-size:1.3rem; color:var(--ink); margin-bottom:8px; }
+        .empty-state p { color:var(--text-muted); font-size:0.85rem; margin-bottom:20px; }
+        .btn-empty { display:inline-flex; align-items:center; gap:8px; background:var(--ink); color:var(--cream); padding:11px 22px; border-radius:12px; border:none; font-family:'DM Sans',sans-serif; font-size:0.88rem; font-weight:700; cursor:pointer; transition:all 0.2s; }
+        .btn-empty:hover { background:#1a2332; transform:translateY(-2px); }
+
+        /* Stats tab */
+        .stats-summary { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+        .summary-card { background:var(--mist); border-radius:18px; padding:24px; }
+        .summary-card-title { font-family:'DM Serif Display',serif; font-size:1rem; color:var(--ink); margin-bottom:18px; display:flex; align-items:center; gap:8px; }
+        .summary-row { display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid var(--border); }
+        .summary-row:last-child { border-bottom:none; }
+        .summary-row-label { font-size:0.85rem; color:var(--ink); font-weight:600; }
+        .num-chip { background:var(--ink); color:var(--gold); border-radius:50px; padding:3px 12px; font-size:0.78rem; font-weight:700; }
+        .num-chip.green  { background:rgba(39,174,96,0.1); color:var(--success-color); }
+        .num-chip.gold   { background:rgba(201,168,76,0.1); color:#7a5c10; }
+
+        .progress-row { margin-bottom:16px; }
+        .progress-label { display:flex; justify-content:space-between; font-size:0.8rem; color:var(--text-muted); margin-bottom:6px; }
+        .progress-bar-wrap { background:var(--border); border-radius:50px; height:8px; overflow:hidden; }
+        .progress-bar-fill { height:100%; border-radius:50px; transition:width 0.6s ease; }
+        .progress-bar-fill.green { background:linear-gradient(90deg,var(--success-color),#4ade80); }
+        .progress-bar-fill.gold  { background:linear-gradient(90deg,var(--gold),#f59e0b); }
+
+        /* Modal */
+        .modal-overlay { display:none; position:fixed; inset:0; z-index:500; background:rgba(13,17,23,0.5); backdrop-filter:blur(4px); align-items:center; justify-content:center; padding:24px; }
+        .modal-overlay.open { display:flex; }
+        .modal-box { background:white; border-radius:24px; padding:36px; width:100%; max-width:640px; max-height:90vh; overflow-y:auto; box-shadow:0 32px 80px rgba(0,0,0,0.2); animation:popIn 0.3s cubic-bezier(0.22,1,0.36,1); }
+        @keyframes popIn { from{opacity:0;transform:scale(0.95) translateY(10px)} to{opacity:1;transform:scale(1) translateY(0)} }
+        .modal-title { font-family:'DM Serif Display',serif; font-size:1.4rem; color:var(--ink); margin-bottom:4px; }
+        .modal-sub   { color:var(--text-muted); font-size:0.85rem; margin-bottom:24px; }
+        .modal-footer-btns { display:flex; gap:10px; margin-top:24px; padding-top:20px; border-top:1px solid var(--border); }
+        .btn-cancel  { flex:1; padding:13px; background:var(--mist); border:none; border-radius:12px; font-family:'DM Sans',sans-serif; font-size:0.9rem; font-weight:600; color:var(--text-muted); cursor:pointer; }
+        .btn-cancel:hover { background:var(--border); }
+        .btn-confirm { flex:2; padding:13px; background:var(--ink); border:none; border-radius:12px; font-family:'DM Sans',sans-serif; font-size:0.9rem; font-weight:600; color:var(--cream); cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; transition:all 0.2s; }
+        .btn-confirm:hover { background:#1a2332; }
+
+        /* Delete modal */
+        .delete-info { background:rgba(196,98,45,0.06); border:1px solid rgba(196,98,45,0.18); border-radius:14px; padding:16px; margin-bottom:20px; }
+        .delete-name { font-family:'DM Serif Display',serif; font-size:1.1rem; color:var(--ink); margin-bottom:6px; }
+        .delete-warn { font-size:0.8rem; color:var(--text-muted); display:flex; align-items:center; gap:6px; }
+        .btn-confirm.red { background:var(--rust); }
+        .btn-confirm.red:hover { background:#a0522d; }
+
+        @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+
+        @media(max-width:900px) {
+            .navbar { padding:0 20px; }
+            .page-content { padding:24px 16px; }
+            .stats-grid { grid-template-columns:1fr 1fr; }
+            .form-grid { grid-template-columns:1fr; }
+            .stats-summary { grid-template-columns:1fr; }
         }
-        .card {
-            border: none;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
-        }
-        .stat-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            text-align: center;
-            padding: 25px 15px;
-            border-radius: 15px;
-            transition: transform 0.2s;
-            cursor: pointer;
-            height: 100%;
-        }
-        .stat-card:hover {
-            transform: translateY(-5px);
-        }
-        .stat-card .stat-number {
-            font-size: 2.5rem;
-            font-weight: bold;
-        }
-        .nav-pills .nav-link {
-            border-radius: 10px;
-            padding: 12px 20px;
-            margin: 5px;
-            color: #667eea;
-            font-weight: 600;
-        }
-        .nav-pills .nav-link.active {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-        .ecole-logo {
-            width: 40px;
-            height: 40px;
-            object-fit: cover;
-            border-radius: 50%;
-            border: 2px solid #667eea;
-        }
-        .status-badge {
-            font-size: 0.85rem;
-            padding: 5px 12px;
-        }
-        .btn-action {
-            padding: 5px 10px;
-            margin: 2px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-        }
-        .form-control {
-            border-radius: 10px;
-            border: 2px solid #e0e6ed;
-            transition: all 0.3s ease;
-        }
-        .form-control:focus {
-            border-color: #667eea;
-            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
-        }
-        .tab-content {
-            background: white;
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        @media(max-width:560px) {
+            .stats-grid { grid-template-columns:1fr 1fr; }
+            .tabs-nav { flex-direction:column; }
         }
     </style>
 </head>
 <body>
-    <!-- Navbar Admin -->
-    <nav class="navbar navbar-expand-lg admin-navbar fixed-top">
-        <div class="container-fluid">
-            <span class="navbar-brand text-white">
-                <i class="fas fa-shield-alt me-2"></i>Administration - Gestion des Écoles
-            </span>
-            <div class="navbar-nav ms-auto">
-                <span class="nav-link text-white me-3">
-                    <i class="fas fa-user-shield me-1"></i>Admin connecté
-                </span>
-                <button class="btn btn-outline-light btn-sm me-2" onclick="location.reload()">
-                    <i class="fas fa-sync-alt me-1"></i>Actualiser
-                </button>
-                <a href="{{ url_for('auth.admin_logout') }}" class="btn btn-outline-danger btn-sm">
-                    <i class="fas fa-sign-out-alt me-1"></i>Déconnexion
-                </a>
-            </div>
+<div class="bg-decor"></div>
+<div class="grid-dots"></div>
+
+<!-- Navbar -->
+<nav class="navbar">
+    <div style="display:flex;align-items:center;gap:14px;">
+        <div class="nav-brand">
+            <span class="brand-icon"><i class="bi bi-mortarboard-fill"></i></span>
+            EduBulletin
         </div>
-    </nav>
+        <span class="admin-badge"><i class="bi bi-shield-lock-fill"></i> Admin</span>
+    </div>
+    <div class="nav-right">
+        <button class="btn-nav" onclick="location.reload()">
+            <i class="bi bi-arrow-clockwise"></i> Actualiser
+        </button>
+        <a href="{{ url_for('auth.admin_logout') }}" class="btn-nav danger">
+            <i class="bi bi-box-arrow-right"></i> Déconnexion
+        </a>
+    </div>
+</nav>
 
-    <div class="container-fluid" style="padding: 20px;">
-        <!-- Messages flash -->
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
-                        {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
+<div class="page-content">
 
-        <!-- Cartes de statistiques -->
-        <div class="row mb-4">
-            <div class="col-xl-3 col-md-6 mb-3">
-                <div class="stat-card" onclick="showTab('gestion')">
-                    <i class="fas fa-school fa-2x mb-2"></i>
-                    <div class="stat-number">{{ ecoles|length }}</div>
-                    <div>Écoles Total</div>
-                    <small class="opacity-75">Cliquer pour gérer</small>
-                </div>
-            </div>
-            <div class="col-xl-3 col-md-6 mb-3">
-                <div class="stat-card" style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);">
-                    <i class="fas fa-check-circle fa-2x mb-2"></i>
-                    <div class="stat-number">{{ ecoles|selectattr('statut', 'equalto', 'actif')|list|length if ecoles else 0 }}</div>
-                    <div>Écoles Actives</div>
-                </div>
-            </div>
-            <div class="col-xl-3 col-md-6 mb-3">
-                <div class="stat-card" style="background: linear-gradient(135deg, #ffc107 0%, #ff8f00 100%);">
-                    <i class="fas fa-pause-circle fa-2x mb-2"></i>
-                    <div class="stat-number">{{ ecoles|selectattr('statut', 'equalto', 'suspendu')|list|length if ecoles else 0 }}</div>
-                    <div>Écoles Suspendues</div>
-                </div>
-            </div>
-            <div class="col-xl-3 col-md-6 mb-3">
-                <div class="stat-card" style="background: linear-gradient(135deg, #ff6b6b 0%, #feca57 100%);" onclick="showTab('ajout')">
-                    <i class="fas fa-plus-circle fa-2x mb-2"></i>
-                    <div class="stat-number">+</div>
-                    <div>Ajouter École</div>
-                    <small class="opacity-75">Cliquer pour ajouter</small>
-                </div>
-            </div>
+    <!-- Flash -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}{% for category, msg in messages %}
+        <div class="flash-msg flash-{{ 'error' if category=='error' else 'success' if category=='success' else 'warning' }}">
+            <i class="bi bi-{{ 'exclamation-circle' if category=='error' else 'check-circle' if category=='success' else 'exclamation-triangle' }}"></i>
+            {{ msg }}
+            <button class="flash-close" onclick="this.parentElement.remove()"><i class="bi bi-x"></i></button>
         </div>
+        {% endfor %}{% endif %}
+    {% endwith %}
 
-        <!-- Navigation par onglets -->
-        <div class="card">
-            <div class="card-body">
-                <ul class="nav nav-pills nav-fill mb-3" id="adminTabs" role="tablist">
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link active" id="ajout-tab" data-bs-toggle="pill" data-bs-target="#ajout" type="button">
-                            <i class="fas fa-plus-circle me-2"></i>Ajouter École
-                        </button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="gestion-tab" data-bs-toggle="pill" data-bs-target="#gestion" type="button">
-                            <i class="fas fa-list me-2"></i>Gestion des Écoles
-                        </button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="stats-tab" data-bs-toggle="pill" data-bs-target="#stats" type="button">
-                            <i class="fas fa-chart-bar me-2"></i>Statistiques
-                        </button>
-                    </li>
-                </ul>
+    <!-- Hero -->
+    <div class="hero">
+        <div class="hero-label"><i class="bi bi-shield-lock"></i> Zone d'administration</div>
+        <h1>Gestion des Écoles<br><em>Tableau de bord admin</em></h1>
+        <p class="hero-sub">Gérez les établissements enregistrés sur la plateforme EduBulletin.</p>
+    </div>
 
-                <div class="tab-content" id="adminTabsContent">
-                    <!-- Onglet 1: Ajouter École -->
-                    <div class="tab-pane fade show active" id="ajout" role="tabpanel">
-                        <h4 class="mb-4">
-                            <i class="fas fa-plus-circle me-2 text-success"></i>Enregistrer une Nouvelle École
-                        </h4>
-                        
-                        <form method="POST" enctype="multipart/form-data">
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label for="nom" class="form-label">
-                                        <i class="fas fa-school me-2 text-primary"></i>Nom de l'école *
-                                    </label>
-                                    <input type="text" class="form-control" id="nom" name="nom" required 
-                                           placeholder="Ex: École Primaire Centrale">
-                                </div>
-                                
-                                <div class="col-md-6 mb-3">
-                                    <label for="type_ecole" class="form-label">
-                                        <i class="fas fa-language me-2 text-primary"></i>Type d'école *
-                                    </label>
-                                    <select class="form-control" id="type_ecole" name="type_ecole" required>
-                                        <option value="francaise">Française</option>
-                                        <option value="franco-arabe">Franco-Arabe (بالعربية)</option>
-                                    </select>
-                                    <small class="form-text text-muted">
-                                        Les écoles Franco-Arabe auront une interface en arabe
-                                    </small>
-                                </div>
-                                
-                                <div class="col-md-6 mb-3">
-                                    <label for="email" class="form-label">
-                                        <i class="fas fa-envelope me-2 text-primary"></i>Email *
-                                    </label>
-                                    <input type="email" class="form-control" id="email" name="email" required
-                                           placeholder="ecole@exemple.com">
-                                </div>
-                                
-                                <div class="col-md-6 mb-3">
-                                    <label for="password" class="form-label">
-                                        <i class="fas fa-lock me-2 text-primary"></i>Mot de passe *
-                                    </label>
-                                    <input type="password" class="form-control" id="password" name="password" required
-                                           placeholder="Mot de passe pour l'école">
-                                </div>
-                                
-                                <div class="col-md-6 mb-3">
-                                    <label for="directeur" class="form-label">
-                                        <i class="fas fa-user me-2 text-primary"></i>Directeur
-                                    </label>
-                                    <input type="text" class="form-control" id="directeur" name="directeur"
-                                           placeholder="M./Mme Directeur">
-                                </div>
-                                
-                                <div class="col-md-6 mb-3">
-                                    <label for="telephone" class="form-label">
-                                        <i class="fas fa-phone me-2 text-primary"></i>Téléphone
-                                    </label>
-                                    <input type="tel" class="form-control" id="telephone" name="telephone"
-                                           placeholder="+33 1 23 45 67 89">
-                                </div>
-                                
-                                <div class="col-md-6 mb-3">
-                                    <label for="logo" class="form-label">
-                                        <i class="fas fa-image me-2 text-primary"></i>Logo
-                                    </label>
-                                    <input type="file" class="form-control" id="logo" name="logo" accept="image/*">
-                                </div>
-                                
-                                <div class="col-md-12 mb-3">
-                                    <label for="adresse" class="form-label">
-                                        <i class="fas fa-map-marker-alt me-2 text-primary"></i>Adresse
-                                    </label>
-                                    <textarea class="form-control" id="adresse" name="adresse" rows="3"
-                                              placeholder="Adresse complète de l'école"></textarea>
-                                </div>
-                            </div>
-                            
-                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                                <button type="reset" class="btn btn-secondary">
-                                    <i class="fas fa-redo me-1"></i>Réinitialiser
-                                </button>
-                                <button type="submit" class="btn btn-success">
-                                    <i class="fas fa-save me-1"></i>Enregistrer l'École
-                                </button>
-                            </div>
-                        </form>
-                    </div>
+    <!-- Stats -->
+    {% set nb_total = ecoles|length %}
+    {% set nb_actifs = ecoles|selectattr('statut','equalto','actif')|list|length if ecoles else 0 %}
+    {% set nb_suspendus = ecoles|selectattr('statut','equalto','suspendu')|list|length if ecoles else 0 %}
 
-                    <!-- Onglet 2: Gestion des Écoles -->
-                    <div class="tab-pane fade" id="gestion" role="tabpanel">
-                        <h4 class="mb-4">
-                            <i class="fas fa-school me-2 text-primary"></i>Gestion des Écoles ({{ ecoles|length }})
-                        </h4>
-                        
-                        {% if ecoles and ecoles|length > 0 %}
-                            <div class="table-responsive">
-                                <table class="table table-hover align-middle">
-                                    <thead class="table-dark">
-                                        <tr>
-                                            <th style="width: 50px;">#</th>
-                                            <th style="width: 60px;">Logo</th>
-                                            <th>École</th>
-                                            <th>Directeur</th>
-                                            <th>Contact</th>
-                                            <th>Statut</th>
-                                            <th style="width: 250px;">Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {% for ecole in ecoles %}
-                                        <tr>
-                                            <td><strong>{{ loop.index }}</strong></td>
-                                            <td>
-                                                {% if ecole.logo %}
-                                                    <img src="{{ url_for('static', filename='img/' + ecole.logo) }}" 
-                                                         alt="Logo" class="ecole-logo">
-                                                {% else %}
-                                                    <div class="ecole-logo bg-secondary text-white d-flex align-items-center justify-content-center">
-                                                        {{ ecole.nom[0] if ecole.nom else 'E' }}
-                                                    </div>
-                                                {% endif %}
-                                            </td>
-                                            <td>
-                                                <div class="fw-bold">{{ ecole.nom }}</div>
-                                                <small class="text-muted">{{ ecole.email }}</small>
-                                                <br>
-                                                {% if ecole.type_ecole == 'franco-arabe' %}
-                                                    <span class="badge bg-info mt-1">
-                                                        <i class="fas fa-language me-1"></i>Franco-Arabe
-                                                    </span>
-                                                {% else %}
-                                                    <span class="badge bg-primary mt-1">
-                                                        <i class="fas fa-flag me-1"></i>Française
-                                                    </span>
-                                                {% endif %}
-                                            </td>
-                                            <td>{{ ecole.directeur or 'Non renseigné' }}</td>
-                                            <td>
-                                                <div>{{ ecole.telephone or 'N/A' }}</div>
-                                                {% if ecole.adresse %}
-                                                    <small class="text-muted">{{ ecole.adresse[:30] }}...</small>
-                                                {% endif %}
-                                            </td>
-                                            <td>
-                                                {% set statut = ecole.statut if ecole.statut else 'actif' %}
-                                                {% if statut == 'suspendu' %}
-                                                    <span class="badge bg-warning status-badge">
-                                                        <i class="fas fa-pause me-1"></i>Suspendue
-                                                    </span>
-                                                {% else %}
-                                                    <span class="badge bg-success status-badge">
-                                                        <i class="fas fa-check me-1"></i>Active
-                                                    </span>
-                                                {% endif %}
-                                            </td>
-                                            <td>
-                                                <div class="d-flex flex-wrap gap-1">
-                                                    <button class="btn btn-sm btn-outline-info btn-action" 
-                                                            onclick="editEcole({{ ecole.id }}, '{{ ecole.nom|e }}', '{{ ecole.email|e }}', '{{ (ecole.directeur or '')|e }}', '{{ (ecole.telephone or '')|e }}', '{{ (ecole.adresse or '')|e }}')"
-                                                            data-bs-toggle="modal" data-bs-target="#editModal">
-                                                        <i class="fas fa-edit me-1"></i>Modifier
-                                                    </button>
-                                                    
-                                                    {% set statut = ecole.statut if ecole.statut else 'actif' %}
-                                                    {% if statut == 'suspendu' %}
-                                                        <button class="btn btn-sm btn-outline-success btn-action" 
-                                                                onclick="toggleStatus({{ ecole.id }}, 'activer', '{{ ecole.nom|e }}')">
-                                                            <i class="fas fa-play me-1"></i>Activer
-                                                        </button>
-                                                    {% else %}
-                                                        <button class="btn btn-sm btn-outline-warning btn-action" 
-                                                                onclick="toggleStatus({{ ecole.id }}, 'suspendre', '{{ ecole.nom|e }}')">
-                                                            <i class="fas fa-pause me-1"></i>Suspendre
-                                                        </button>
-                                                    {% endif %}
-                                                    
-                                                    <button class="btn btn-sm btn-outline-danger btn-action" 
-                                                            onclick="confirmDelete({{ ecole.id }}, '{{ ecole.nom|e }}')">
-                                                        <i class="fas fa-trash me-1"></i>Supprimer
-                                                    </button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
-                            </div>
-                        {% else %}
-                            <div class="text-center p-5">
-                                <i class="fas fa-school fa-5x text-muted mb-3"></i>
-                                <h4 class="text-muted">Aucune école enregistrée</h4>
-                                <p class="text-muted">Commencez par ajouter votre première école</p>
-                                <button class="btn btn-success" onclick="showTab('ajout')">
-                                    <i class="fas fa-plus me-1"></i>Ajouter une École
-                                </button>
-                            </div>
-                        {% endif %}
-                    </div>
-
-                    <!-- Onglet 3: Statistiques -->
-                    <div class="tab-pane fade" id="stats" role="tabpanel">
-                        <h4 class="mb-4">
-                            <i class="fas fa-chart-bar me-2 text-info"></i>Statistiques du Système
-                        </h4>
-                        
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="card border-info">
-                                    <div class="card-header bg-info text-white">
-                                        <h5 class="mb-0">Résumé</h5>
-                                    </div>
-                                    <div class="card-body">
-                                        <table class="table table-borderless">
-                                            <tr>
-                                                <td><strong>Total des écoles:</strong></td>
-                                                <td class="text-end">
-                                                    <span class="badge bg-primary fs-6">{{ ecoles|length }}</span>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td><strong>Écoles actives:</strong></td>
-                                                <td class="text-end">
-                                                    <span class="badge bg-success fs-6">
-                                                        {{ ecoles|selectattr('statut', 'equalto', 'actif')|list|length if ecoles else 0 }}
-                                                    </span>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td><strong>Écoles suspendues:</strong></td>
-                                                <td class="text-end">
-                                                    <span class="badge bg-warning fs-6">
-                                                        {{ ecoles|selectattr('statut', 'equalto', 'suspendu')|list|length if ecoles else 0 }}
-                                                    </span>
-                                                </td>
-                                            </tr>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="col-md-6">
-                                <div class="card border-success">
-                                    <div class="card-header bg-success text-white">
-                                        <h5 class="mb-0">Répartition</h5>
-                                    </div>
-                                    <div class="card-body">
-                                        {% set total = ecoles|length %}
-                                        {% set actives = ecoles|selectattr('statut', 'equalto', 'actif')|list|length if ecoles else 0 %}
-                                        {% set suspendues = ecoles|selectattr('statut', 'equalto', 'suspendu')|list|length if ecoles else 0 %}
-                                        
-                                        <div class="mb-3">
-                                            <div class="d-flex justify-content-between mb-1">
-                                                <span>Actives</span>
-                                                <span>{{ actives }} / {{ total }}</span>
-                                            </div>
-                                            <div class="progress">
-                                                <div class="progress-bar bg-success" role="progressbar" 
-                                                     style="width: {{ (actives / total * 100) if total > 0 else 0 }}%">
-                                                </div>
-                                            </div>
-                                        </div>
-                                        
-                                        <div class="mb-3">
-                                            <div class="d-flex justify-content-between mb-1">
-                                                <span>Suspendues</span>
-                                                <span>{{ suspendues }} / {{ total }}</span>
-                                            </div>
-                                            <div class="progress">
-                                                <div class="progress-bar bg-warning" role="progressbar" 
-                                                     style="width: {{ (suspendues / total * 100) if total > 0 else 0 }}%">
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    <div class="stats-grid">
+        <div class="stat-card blue" onclick="switchTab('gestion')" style="animation-delay:0.05s">
+            <div class="stat-icon blue"><i class="bi bi-buildings-fill"></i></div>
+            <div class="stat-num">{{ nb_total }}</div>
+            <div class="stat-label">Écoles total</div>
+            <div class="stat-hint">Cliquer pour gérer</div>
+        </div>
+        <div class="stat-card green" style="animation-delay:0.1s">
+            <div class="stat-icon green"><i class="bi bi-check-circle-fill"></i></div>
+            <div class="stat-num">{{ nb_actifs }}</div>
+            <div class="stat-label">Écoles actives</div>
+        </div>
+        <div class="stat-card gold" style="animation-delay:0.15s">
+            <div class="stat-icon gold"><i class="bi bi-pause-circle-fill"></i></div>
+            <div class="stat-num">{{ nb_suspendus }}</div>
+            <div class="stat-label">Écoles suspendues</div>
+        </div>
+        <div class="stat-card rust" onclick="switchTab('ajout')" style="animation-delay:0.2s">
+            <div class="stat-icon rust"><i class="bi bi-plus-circle-fill"></i></div>
+            <div class="stat-num"><i class="bi bi-plus-lg" style="font-size:1.6rem;"></i></div>
+            <div class="stat-label">Ajouter une école</div>
+            <div class="stat-hint">Cliquer pour ajouter</div>
         </div>
     </div>
 
-    <!-- Modal Modification École -->
-    <div class="modal fade" id="editModal" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title">
-                        <i class="fas fa-edit me-2"></i>Modifier École
-                    </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+    <!-- Tabs nav -->
+    <div class="tabs-nav">
+        <button class="tab-btn active" id="tab-ajout" onclick="switchTab('ajout')">
+            <i class="bi bi-plus-circle"></i> Ajouter une école
+        </button>
+        <button class="tab-btn" id="tab-gestion" onclick="switchTab('gestion')">
+            <i class="bi bi-list-ul"></i> Gestion des écoles
+            <span style="background:var(--gold);color:var(--ink);border-radius:50px;padding:1px 8px;font-size:0.7rem;">{{ nb_total }}</span>
+        </button>
+        <button class="tab-btn" id="tab-stats" onclick="switchTab('stats')">
+            <i class="bi bi-bar-chart-fill"></i> Statistiques
+        </button>
+    </div>
+
+    <!-- Tab: Ajouter -->
+    <div class="tab-panel active" id="panel-ajout">
+        <div class="content-card">
+            <div class="content-card-header">
+                <div class="content-card-icon"><i class="bi bi-plus-circle"></i></div>
+                <div>
+                    <div class="content-card-title">Enregistrer une nouvelle école</div>
                 </div>
-                <form id="editForm" method="POST" action="{{ url_for('auth.admin_edit_ecole') }}">
-                    <div class="modal-body">
-                        <input type="hidden" id="edit_ecole_id" name="ecole_id">
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="edit_nom" class="form-label">Nom de l'école</label>
-                                <input type="text" class="form-control" id="edit_nom" name="nom" required>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="edit_email" class="form-label">Email</label>
-                                <input type="email" class="form-control" id="edit_email" name="email" required>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="edit_directeur" class="form-label">Directeur</label>
-                                <input type="text" class="form-control" id="edit_directeur" name="directeur">
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="edit_telephone" class="form-label">Téléphone</label>
-                                <input type="tel" class="form-control" id="edit_telephone" name="telephone">
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="edit_type_ecole" class="form-label">Type d'école</label>
-                                <select class="form-control" id="edit_type_ecole" name="type_ecole" required>
-                                    <option value="francaise">Française</option>
-                                    <option value="franco-arabe">Franco-Arabe (بالعربية)</option>
-                                </select>
-                            </div>
-                            <div class="col-md-12 mb-3">
-                                <label for="edit_adresse" class="form-label">Adresse</label>
-                                <textarea class="form-control" id="edit_adresse" name="adresse" rows="2"></textarea>
-                            </div>
+            </div>
+            <div class="content-card-body">
+                <form method="POST" enctype="multipart/form-data">
+                    <div class="form-grid">
+                        <div class="field">
+                            <label><i class="bi bi-building"></i> Nom de l'école <span style="color:var(--rust)">*</span></label>
+                            <input type="text" name="nom" placeholder="Ex: École Primaire Centrale" required>
+                        </div>
+                        <div class="field">
+                            <label><i class="bi bi-translate"></i> Type d'école <span style="color:var(--rust)">*</span></label>
+                            <select name="type_ecole" required>
+                                <option value="francaise">Française</option>
+                                <option value="franco-arabe">Franco-Arabe (بالعربية)</option>
+                            </select>
+                            <small>Les écoles Franco-Arabe auront une interface en arabe</small>
+                        </div>
+                        <div class="field">
+                            <label><i class="bi bi-envelope"></i> Email <span style="color:var(--rust)">*</span></label>
+                            <input type="email" name="email" placeholder="ecole@exemple.com" required>
+                        </div>
+                        <div class="field">
+                            <label><i class="bi bi-lock"></i> Mot de passe <span style="color:var(--rust)">*</span></label>
+                            <input type="password" name="password" placeholder="Mot de passe pour l'école" required>
+                        </div>
+                        <div class="field">
+                            <label><i class="bi bi-person"></i> Directeur</label>
+                            <input type="text" name="directeur" placeholder="M./Mme Directeur">
+                        </div>
+                        <div class="field">
+                            <label><i class="bi bi-telephone"></i> Téléphone</label>
+                            <input type="tel" name="telephone" placeholder="+33 1 23 45 67 89">
+                        </div>
+                        <div class="field">
+                            <label><i class="bi bi-image"></i> Logo</label>
+                            <input type="file" name="logo" accept="image/*">
                         </div>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-save me-1"></i>Enregistrer
-                        </button>
+                    <div class="form-grid full" style="margin-top:18px;">
+                        <div class="field">
+                            <label><i class="bi bi-geo-alt"></i> Adresse</label>
+                            <textarea name="adresse" placeholder="Adresse complète de l'école"></textarea>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="reset" class="btn-reset"><i class="bi bi-arrow-counterclockwise"></i> Réinitialiser</button>
+                        <button type="submit" class="btn-submit"><i class="bi bi-check-lg"></i> Enregistrer l'école</button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
 
-    <!-- Formulaires cachés -->
-    <form id="statusForm" method="POST" action="{{ url_for('auth.admin_toggle_status') }}" style="display: none;">
-        <input type="hidden" id="status_ecole_id" name="ecole_id">
-        <input type="hidden" id="status_action" name="action">
-    </form>
+    <!-- Tab: Gestion -->
+    <div class="tab-panel" id="panel-gestion">
+        <div class="content-card">
+            <div class="content-card-header">
+                <div class="content-card-icon"><i class="bi bi-list-ul"></i></div>
+                <div class="content-card-title">Gestion des écoles ({{ nb_total }})</div>
+            </div>
+            {% if ecoles and nb_total > 0 %}
+            <div class="table-wrap">
+                <table class="schools-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Logo</th>
+                            <th>École</th>
+                            <th>Directeur</th>
+                            <th>Contact</th>
+                            <th>Statut</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for ecole in ecoles %}
+                        {% set statut = ecole.statut if ecole.statut else 'actif' %}
+                        <tr>
+                            <td><strong>{{ loop.index }}</strong></td>
+                            <td>
+                                {% if ecole.logo %}
+                                <img src="{{ url_for('static', filename='img/' + ecole.logo) }}" class="school-logo" alt="Logo">
+                                {% else %}
+                                <div class="school-logo-placeholder">{{ ecole.nom[0] if ecole.nom else 'E' }}</div>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="school-name">{{ ecole.nom }}</div>
+                                <div class="school-email">{{ ecole.email }}</div>
+                                {% if ecole.type_ecole == 'franco-arabe' %}
+                                <span class="school-type arab"><i class="bi bi-translate"></i> Franco-Arabe</span>
+                                {% else %}
+                                <span class="school-type fr"><i class="bi bi-flag"></i> Française</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ ecole.directeur or '—' }}</td>
+                            <td>
+                                <div>{{ ecole.telephone or '—' }}</div>
+                                {% if ecole.adresse %}<small style="color:var(--text-muted);">{{ ecole.adresse[:30] }}…</small>{% endif %}
+                            </td>
+                            <td>
+                                {% if statut == 'suspendu' %}
+                                <span class="status-pill status-suspended"><i class="bi bi-pause-circle"></i> Suspendue</span>
+                                {% else %}
+                                <span class="status-pill status-active"><i class="bi bi-check-circle"></i> Active</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="table-actions">
+                                    <button class="icon-btn-table edit"
+                                            onclick="openEditModal({{ ecole.id }}, '{{ ecole.nom|e }}', '{{ ecole.email|e }}', '{{ (ecole.directeur or '')|e }}', '{{ (ecole.telephone or '')|e }}', '{{ (ecole.adresse or '')|e }}', '{{ ecole.type_ecole or 'francaise' }}')"
+                                            title="Modifier">
+                                        <i class="bi bi-pencil"></i> Modifier
+                                    </button>
+                                    {% if statut == 'suspendu' %}
+                                    <button class="icon-btn-table activate" onclick="toggleStatus({{ ecole.id }}, 'activer', '{{ ecole.nom|e }}')" title="Activer">
+                                        <i class="bi bi-play"></i> Activer
+                                    </button>
+                                    {% else %}
+                                    <button class="icon-btn-table suspend" onclick="toggleStatus({{ ecole.id }}, 'suspendre', '{{ ecole.nom|e }}')" title="Suspendre">
+                                        <i class="bi bi-pause"></i> Suspendre
+                                    </button>
+                                    {% endif %}
+                                    <button class="icon-btn-table del" onclick="openDeleteModal({{ ecole.id }}, '{{ ecole.nom|e }}')" title="Supprimer">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-icon"><i class="bi bi-buildings"></i></div>
+                <h3>Aucune école enregistrée</h3>
+                <p>Commencez par ajouter votre première école.</p>
+                <button class="btn-empty" onclick="switchTab('ajout')">
+                    <i class="bi bi-plus-lg"></i> Ajouter une école
+                </button>
+            </div>
+            {% endif %}
+        </div>
+    </div>
 
-    <form id="deleteForm" method="POST" action="{{ url_for('auth.admin_delete_ecole') }}" style="display: none;">
-        <input type="hidden" id="delete_ecole_id" name="ecole_id">
-    </form>
+    <!-- Tab: Stats -->
+    <div class="tab-panel" id="panel-stats">
+        <div class="content-card">
+            <div class="content-card-header">
+                <div class="content-card-icon" style="background:rgba(99,102,241,0.1);color:#6366f1;"><i class="bi bi-bar-chart-fill"></i></div>
+                <div class="content-card-title">Statistiques du système</div>
+            </div>
+            <div class="content-card-body">
+                <div class="stats-summary">
+                    <div class="summary-card">
+                        <div class="summary-card-title"><i class="bi bi-list-check" style="color:var(--gold);"></i> Résumé</div>
+                        <div class="summary-row">
+                            <span class="summary-row-label">Total des écoles</span>
+                            <span class="num-chip">{{ nb_total }}</span>
+                        </div>
+                        <div class="summary-row">
+                            <span class="summary-row-label">Écoles actives</span>
+                            <span class="num-chip green">{{ nb_actifs }}</span>
+                        </div>
+                        <div class="summary-row">
+                            <span class="summary-row-label">Écoles suspendues</span>
+                            <span class="num-chip gold">{{ nb_suspendus }}</span>
+                        </div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="summary-card-title"><i class="bi bi-pie-chart" style="color:var(--success-color);"></i> Répartition</div>
+                        <div class="progress-row">
+                            <div class="progress-label">
+                                <span>Actives</span>
+                                <span>{{ nb_actifs }} / {{ nb_total }}</span>
+                            </div>
+                            <div class="progress-bar-wrap">
+                                <div class="progress-bar-fill green" style="width:{{ (nb_actifs / nb_total * 100)|int if nb_total > 0 else 0 }}%"></div>
+                            </div>
+                        </div>
+                        <div class="progress-row">
+                            <div class="progress-label">
+                                <span>Suspendues</span>
+                                <span>{{ nb_suspendus }} / {{ nb_total }}</span>
+                            </div>
+                            <div class="progress-bar-wrap">
+                                <div class="progress-bar-fill gold" style="width:{{ (nb_suspendus / nb_total * 100)|int if nb_total > 0 else 0 }}%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <script>
-        // Fonction pour changer d'onglet
-        function showTab(tabName) {
-            const tabTrigger = new bootstrap.Tab(document.getElementById(tabName + '-tab'));
-            tabTrigger.show();
+</div>
+
+<!-- Modal Modifier -->
+<div class="modal-overlay" id="editModal">
+    <div class="modal-box">
+        <h3 class="modal-title">Modifier l'école</h3>
+        <p class="modal-sub">Mettez à jour les informations de l'établissement</p>
+        <form id="editForm" method="POST" action="{{ url_for('auth.admin_edit_ecole') }}">
+            <input type="hidden" id="edit_ecole_id" name="ecole_id">
+            <div class="form-grid">
+                <div class="field">
+                    <label>Nom de l'école</label>
+                    <input type="text" id="edit_nom" name="nom" required>
+                </div>
+                <div class="field">
+                    <label>Email</label>
+                    <input type="email" id="edit_email" name="email" required>
+                </div>
+                <div class="field">
+                    <label>Directeur</label>
+                    <input type="text" id="edit_directeur" name="directeur">
+                </div>
+                <div class="field">
+                    <label>Téléphone</label>
+                    <input type="tel" id="edit_telephone" name="telephone">
+                </div>
+                <div class="field">
+                    <label>Type d'école</label>
+                    <select id="edit_type_ecole" name="type_ecole">
+                        <option value="francaise">Française</option>
+                        <option value="franco-arabe">Franco-Arabe (بالعربية)</option>
+                    </select>
+                </div>
+            </div>
+            <div class="field" style="margin-top:16px;">
+                <label>Adresse</label>
+                <textarea id="edit_adresse" name="adresse"></textarea>
+            </div>
+            <div class="modal-footer-btns">
+                <button type="button" class="btn-cancel" onclick="closeModal('editModal')">Annuler</button>
+                <button type="submit" class="btn-confirm"><i class="bi bi-check-lg"></i> Enregistrer</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal Supprimer -->
+<div class="modal-overlay" id="deleteModal">
+    <div class="modal-box" style="max-width:440px;">
+        <h3 class="modal-title">Supprimer l'école ?</h3>
+        <p class="modal-sub">Cette action est définitive et irréversible.</p>
+        <div class="delete-info">
+            <div class="delete-name" id="delete_nom_display"></div>
+            <div class="delete-warn"><i class="bi bi-exclamation-triangle" style="color:var(--rust);"></i> Toutes les données liées seront supprimées.</div>
+        </div>
+        <form id="deleteForm" method="POST" action="{{ url_for('auth.admin_delete_ecole') }}">
+            <input type="hidden" id="delete_ecole_id" name="ecole_id">
+            <div class="modal-footer-btns">
+                <button type="button" class="btn-cancel" onclick="closeModal('deleteModal')">Annuler</button>
+                <button type="submit" class="btn-confirm red"><i class="bi bi-trash"></i> Supprimer</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Formulaire status caché -->
+<form id="statusForm" method="POST" action="{{ url_for('auth.admin_toggle_status') }}" style="display:none;">
+    <input type="hidden" id="status_ecole_id" name="ecole_id">
+    <input type="hidden" id="status_action" name="action">
+</form>
+
+<script>
+    // ── Tabs ──
+    function switchTab(name) {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+        document.getElementById('tab-' + name).classList.add('active');
+        document.getElementById('panel-' + name).classList.add('active');
+    }
+
+    // ── Modals ──
+    function openModal(id) { document.getElementById(id).classList.add('open'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+    document.querySelectorAll('.modal-overlay').forEach(o => o.addEventListener('click', e => { if(e.target===o) o.classList.remove('open'); }));
+    document.addEventListener('keydown', e => { if(e.key==='Escape') document.querySelectorAll('.modal-overlay.open').forEach(m => m.classList.remove('open')); });
+
+    // ── Modifier ──
+    function openEditModal(id, nom, email, directeur, telephone, adresse, type) {
+        document.getElementById('edit_ecole_id').value = id;
+        document.getElementById('edit_nom').value = nom;
+        document.getElementById('edit_email').value = email;
+        document.getElementById('edit_directeur').value = directeur;
+        document.getElementById('edit_telephone').value = telephone;
+        document.getElementById('edit_adresse').value = adresse;
+        document.getElementById('edit_type_ecole').value = type;
+        openModal('editModal');
+    }
+
+    // ── Supprimer ──
+    function openDeleteModal(id, nom) {
+        document.getElementById('delete_ecole_id').value = id;
+        document.getElementById('delete_nom_display').textContent = nom;
+        openModal('deleteModal');
+    }
+
+    // ── Toggle statut ──
+    function toggleStatus(id, action, nom) {
+        const txt = action === 'suspendre' ? 'suspendre' : 'activer';
+        if(confirm(`Êtes-vous sûr de vouloir ${txt} l'école "${nom}" ?`)) {
+            document.getElementById('status_ecole_id').value = id;
+            document.getElementById('status_action').value = action;
+            document.getElementById('statusForm').submit();
         }
-
-        // Modification école
-        function editEcole(id, nom, email, directeur, telephone, adresse) {
-            document.getElementById('edit_ecole_id').value = id;
-            document.getElementById('edit_nom').value = nom;
-            document.getElementById('edit_email').value = email;
-            document.getElementById('edit_directeur').value = directeur;
-            document.getElementById('edit_telephone').value = telephone;
-            document.getElementById('edit_adresse').value = adresse;
-            // Détermine le type d'école (à ajuster si tu passes cette info)
-            // Pour l'instant, on laisse la valeur par défaut du select
-        }
-
-        // Toggle statut
-        function toggleStatus(ecoleId, action, nomEcole) {
-            const actionText = action === 'suspendre' ? 'suspendre' : 'activer';
-            if (confirm(`Êtes-vous sûr de vouloir ${actionText} l'école "${nomEcole}" ?`)) {
-                document.getElementById('status_ecole_id').value = ecoleId;
-                document.getElementById('status_action').value = action;
-                document.getElementById('statusForm').submit();
-            }
-        }
-
-        // Suppression
-        function confirmDelete(ecoleId, nomEcole) {
-            if (confirm(`⚠️ ATTENTION: Êtes-vous sûr de vouloir supprimer définitivement l'école "${nomEcole}" ?\n\nCette action est irréversible.`)) {
-                if (confirm('Dernière confirmation: Continuer la suppression ?')) {
-                    document.getElementById('delete_ecole_id').value = ecoleId;
-                    document.getElementById('deleteForm').submit();
-                }
-            }
-        }
-    </script>
+    }
+</script>
 </body>
 </html>
