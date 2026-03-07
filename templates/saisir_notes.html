@@ -3,748 +3,641 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Saisir les Notes - {{ classe.nom }}</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <title>Saisir les Notes — {{ classe.nom }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <style>
-        .note-input {
-            width: 80px;
-            text-align: center;
+        :root {
+            --ink: #0d1117; --cream: #f5f0e8; --gold: #c9a84c;
+            --gold-light: #e8d5a3; --rust: #c4622d; --mist: #e8edf2;
+            --text-muted: #6b7685; --border: #e8edf2;
+            --success-color: #1a6b3c;
         }
-        .table-responsive {
-            max-height: 400px;
-            overflow-y: auto;
-        }
-        .notes-history {
-            max-height: 500px;
-            overflow-y: auto;
-        }
-        .note-status-active {
-            background-color: #d4edda !important;
-        }
-        .note-status-suspended {
-            background-color: #f8d7da !important;
-        }
-        .btn-sm i {
-            font-size: 0.875rem;
-        }
-        
-        /* Style pour les champs vides */
-        .note-input:focus {
-            border-color: #0d6efd;
-            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
-        }
-        
-        .note-input:valid {
-            border-color: #198754;
-        }
-        
-        .empty-form-notice {
-            background: linear-gradient(45deg, #e3f2fd, #f3e5f5);
-            border-left: 4px solid #2196f3;
-            padding: 15px;
-            margin: 20px 0;
-            border-radius: 5px;
-        }
-        
-        .modification-notice {
-            background: #fff3cd;
-            border-left: 4px solid #ffc107;
-            padding: 10px 15px;
-            margin: 10px 0;
-            border-radius: 3px;
-        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'DM Sans',sans-serif; background:var(--cream); min-height:100vh; position:relative; overflow-x:hidden; }
+        .bg-decor { position:fixed; inset:0; z-index:0; pointer-events:none; }
+        .bg-decor::before { content:''; position:absolute; top:-200px; right:-200px; width:600px; height:600px; background:radial-gradient(circle,rgba(201,168,76,0.1) 0%,transparent 70%); border-radius:50%; }
+        .bg-decor::after  { content:''; position:absolute; bottom:-150px; left:-150px; width:500px; height:500px; background:radial-gradient(circle,rgba(196,98,45,0.07) 0%,transparent 70%); border-radius:50%; }
+        .grid-dots { position:fixed; inset:0; z-index:0; background-image:radial-gradient(circle,#c9a84c18 1px,transparent 1px); background-size:32px 32px; }
 
-        /* Styles pour l'historique groupé */
-        .student-group {
-            border: 1px solid #dee2e6;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            overflow: hidden;
-        }
+        /* Navbar */
+        .navbar { position:sticky; top:0; z-index:100; background:rgba(245,240,232,0.92); backdrop-filter:blur(16px); border-bottom:1px solid rgba(201,168,76,0.2); padding:0 40px; height:64px; display:flex; align-items:center; justify-content:space-between; }
+        .nav-brand { display:flex; align-items:center; gap:10px; font-family:'DM Serif Display',serif; font-size:1.3rem; color:var(--ink); text-decoration:none; }
+        .nav-brand .brand-icon { width:36px; height:36px; background:var(--ink); border-radius:10px; display:flex; align-items:center; justify-content:center; color:var(--gold); font-size:1rem; }
+        .nav-right { display:flex; align-items:center; gap:10px; }
+        .btn-back { display:flex; align-items:center; gap:8px; padding:8px 18px; background:transparent; border:1.5px solid var(--border); border-radius:50px; font-size:0.85rem; font-weight:600; color:var(--text-muted); text-decoration:none; transition:all 0.2s; }
+        .btn-back:hover { border-color:var(--ink); color:var(--ink); }
 
-        .student-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 12px 15px;
-            font-weight: bold;
-        }
+        /* Content */
+        .page-content { position:relative; z-index:1; padding:40px; max-width:1300px; margin:0 auto; }
 
-        .notes-list {
-            padding: 10px 15px;
-            background: #f8f9fa;
-        }
+        /* Flash */
+        .flash-msg { padding:14px 18px; border-radius:14px; font-size:0.88rem; margin-bottom:16px; display:flex; align-items:center; gap:10px; animation:slideDown 0.4s ease; }
+        @keyframes slideDown { from{opacity:0;transform:translateY(-10px)} to{opacity:1;transform:translateY(0)} }
+        .flash-success { background:rgba(39,174,96,0.08); border:1px solid rgba(39,174,96,0.2); color:var(--success-color); }
+        .flash-error   { background:rgba(196,98,45,0.08); border:1px solid rgba(196,98,45,0.2); color:var(--rust); }
+        .flash-warning { background:rgba(201,168,76,0.1); border:1px solid rgba(201,168,76,0.3); color:#7a5c10; }
+        .flash-close   { margin-left:auto; background:none; border:none; cursor:pointer; color:inherit; opacity:0.6; }
 
-        .note-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 0;
-            border-bottom: 1px solid #e9ecef;
-        }
+        /* Hero */
+        .hero { background:var(--ink); border-radius:24px; padding:40px 48px; margin-bottom:32px; position:relative; overflow:hidden; animation:fadeUp 0.6s ease both; }
+        .hero::before { content:''; position:absolute; top:-80px; right:-80px; width:300px; height:300px; background:radial-gradient(circle,rgba(201,168,76,0.1) 0%,transparent 70%); border-radius:50%; }
+        .hero-label { display:inline-flex; align-items:center; gap:8px; background:rgba(201,168,76,0.12); border:1px solid rgba(201,168,76,0.25); color:var(--gold); padding:6px 14px; border-radius:50px; font-size:0.75rem; font-weight:600; letter-spacing:0.5px; text-transform:uppercase; margin-bottom:14px; }
+        .hero h1 { font-family:'DM Serif Display',serif; font-size:2rem; color:#e8edf2; line-height:1.2; margin-bottom:6px; }
+        .hero h1 em { font-style:italic; color:var(--gold-light); }
+        .hero-sub { color:#4a5568; font-size:0.9rem; }
 
-        .note-item:last-child {
-            border-bottom: none;
-        }
+        /* Notice */
+        .notice-box { background:rgba(201,168,76,0.08); border:1px solid rgba(201,168,76,0.25); border-radius:16px; padding:18px 20px; margin-bottom:28px; display:flex; align-items:flex-start; gap:14px; }
+        .notice-icon { width:40px; height:40px; background:rgba(201,168,76,0.12); border-radius:10px; display:flex; align-items:center; justify-content:center; color:var(--gold); font-size:1.1rem; flex-shrink:0; }
+        .notice-title { color:var(--ink); font-size:0.88rem; font-weight:700; margin-bottom:6px; }
+        .notice-list { margin:0; padding-left:16px; color:var(--text-muted); font-size:0.82rem; line-height:1.9; }
 
-        .note-details {
-            flex-grow: 1;
-        }
+        /* Form card */
+        .form-card { background:white; border:1px solid var(--border); border-radius:24px; margin-bottom:32px; overflow:hidden; animation:fadeUp 0.6s ease 0.1s both; }
+        .form-card-header { background:var(--ink); padding:20px 28px; display:flex; align-items:center; gap:12px; }
+        .form-card-header-icon { width:36px; height:36px; background:rgba(201,168,76,0.15); border-radius:10px; display:flex; align-items:center; justify-content:center; color:var(--gold); font-size:1rem; flex-shrink:0; }
+        .form-card-title { font-family:'DM Serif Display',serif; font-size:1.1rem; color:var(--gold-light); }
+        .form-card-body { padding:28px; }
 
-        .note-actions {
-            flex-shrink: 0;
-            margin-left: 10px;
-        }
+        /* Trimestre + Actions row */
+        .top-controls { display:flex; align-items:flex-end; gap:16px; margin-bottom:24px; flex-wrap:wrap; }
+        .field { display:flex; flex-direction:column; gap:8px; }
+        .field label { font-size:0.75rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; }
+        .field select { background:var(--mist); border:1.5px solid var(--border); border-radius:12px; padding:11px 14px; color:var(--ink); font-family:'DM Sans',sans-serif; font-size:0.92rem; outline:none; transition:all 0.2s; min-width:220px; }
+        .field select:focus { border-color:var(--gold); background:white; box-shadow:0 0 0 3px rgba(201,168,76,0.12); }
 
-        /* Barre de recherche intégrée */
-        .search-in-history {
-            position: sticky;
-            top: 0;
-            z-index: 10;
-            background: white;
-            padding: 10px;
-            border-bottom: 2px solid #dee2e6;
-        }
+        .actions-row { display:flex; gap:10px; align-items:flex-end; }
+        .btn-save-notes { display:flex; align-items:center; gap:8px; background:var(--ink); color:var(--cream); padding:11px 24px; border-radius:12px; border:2px solid var(--ink); font-family:'DM Sans',sans-serif; font-size:0.88rem; font-weight:700; cursor:pointer; transition:all 0.25s; }
+        .btn-save-notes:hover { background:transparent; color:var(--ink); }
+        .btn-clear { display:flex; align-items:center; gap:8px; background:var(--mist); color:var(--text-muted); padding:11px 18px; border-radius:12px; border:none; font-family:'DM Sans',sans-serif; font-size:0.88rem; font-weight:600; cursor:pointer; transition:background 0.2s; }
+        .btn-clear:hover { background:var(--border); color:var(--ink); }
 
-        .search-highlight {
-            background-color: yellow;
-            font-weight: bold;
-            padding: 1px 3px;
-            border-radius: 3px;
+        /* Hint bar */
+        .hint-bar { background:rgba(201,168,76,0.06); border:1px solid rgba(201,168,76,0.2); border-radius:12px; padding:12px 16px; font-size:0.82rem; color:#7a5c10; margin-top:18px; display:flex; align-items:center; gap:8px; }
+
+        /* Notes table */
+        .table-wrap { overflow-x:auto; border-radius:16px; border:1px solid var(--border); }
+        .notes-table { width:100%; border-collapse:collapse; min-width:500px; }
+        .notes-table thead th { background:var(--ink); color:var(--gold-light); padding:13px 16px; font-size:0.75rem; font-weight:700; text-align:center; white-space:nowrap; letter-spacing:0.3px; }
+        .notes-table thead th:first-child { text-align:left; border-radius:16px 0 0 0; }
+        .notes-table thead th:last-child { border-radius:0 16px 0 0; }
+        .notes-table tbody tr:nth-child(even) td { background:rgba(232,237,242,0.3); }
+        .notes-table tbody tr:hover td { background:rgba(201,168,76,0.04); }
+        .notes-table td { padding:12px 14px; border-bottom:1px solid var(--border); font-size:0.88rem; color:var(--ink); text-align:center; }
+        .notes-table td:first-child { text-align:left; font-weight:700; }
+        .notes-table tbody tr:last-child td { border-bottom:none; }
+
+        .note-input { width:72px; background:var(--mist); border:1.5px solid var(--border); border-radius:10px; padding:8px 6px; text-align:center; color:var(--ink); font-family:'DM Sans',sans-serif; font-size:0.88rem; outline:none; transition:all 0.2s; }
+        .note-input:focus { border-color:var(--gold); background:white; box-shadow:0 0 0 3px rgba(201,168,76,0.12); }
+
+        .avg-badge { display:inline-block; padding:5px 12px; border-radius:50px; font-size:0.8rem; font-weight:700; }
+        .avg-good    { background:rgba(39,174,96,0.12); color:var(--success-color); }
+        .avg-medium  { background:rgba(201,168,76,0.12); color:#7a5c10; }
+        .avg-bad     { background:rgba(196,98,45,0.1); color:var(--rust); }
+        .avg-neutral { background:var(--mist); color:var(--text-muted); }
+
+        /* Matricule */
+        .eleve-cell { display:flex; flex-direction:column; gap:2px; }
+        .eleve-name { font-weight:700; color:var(--ink); font-size:0.88rem; }
+        .eleve-mat  { font-size:0.72rem; font-weight:600; color:var(--gold); background:rgba(201,168,76,0.1); border-radius:6px; padding:1px 7px; display:inline-block; letter-spacing:0.3px; }
+
+        /* History card */
+        .history-card { background:white; border:1px solid var(--border); border-radius:24px; overflow:hidden; animation:fadeUp 0.6s ease 0.2s both; }
+        .history-header { padding:24px 28px; border-bottom:1px solid var(--border); }
+        .history-title-row { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:14px; margin-bottom:18px; }
+        .history-title { font-family:'DM Serif Display',serif; font-size:1.3rem; color:var(--ink); display:flex; align-items:center; gap:10px; }
+        .count-badge { background:var(--ink); color:var(--gold); padding:3px 12px; border-radius:50px; font-family:'DM Sans',sans-serif; font-size:0.75rem; font-weight:600; }
+        .history-controls { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+
+        .btn-del-all { display:flex; align-items:center; gap:7px; padding:8px 16px; border-radius:10px; border:1.5px solid rgba(196,98,45,0.3); background:rgba(196,98,45,0.06); color:var(--rust); font-size:0.82rem; font-weight:600; cursor:pointer; transition:all 0.2s; font-family:'DM Sans',sans-serif; }
+        .btn-del-all:hover { background:rgba(196,98,45,0.12); }
+
+        .trim-filter { display:flex; gap:6px; }
+        .trim-btn { padding:6px 14px; border-radius:50px; border:1.5px solid var(--border); background:transparent; color:var(--text-muted); font-family:'DM Sans',sans-serif; font-size:0.78rem; font-weight:700; cursor:pointer; transition:all 0.2s; }
+        .trim-btn.active { background:var(--ink); border-color:var(--ink); color:var(--gold); }
+        .trim-btn:hover:not(.active) { border-color:var(--ink); color:var(--ink); }
+
+        .stats-text { font-size:0.8rem; color:var(--text-muted); white-space:nowrap; }
+
+        /* Search */
+        .search-wrap { position:relative; }
+        .search-wrap i { position:absolute; left:14px; top:50%; transform:translateY(-50%); color:#c8d0da; font-size:0.9rem; pointer-events:none; }
+        .search-input { width:100%; background:var(--mist); border:1.5px solid var(--border); border-radius:12px; padding:11px 16px 11px 38px; color:var(--ink); font-family:'DM Sans',sans-serif; font-size:0.9rem; outline:none; transition:all 0.2s; }
+        .search-input:focus { border-color:var(--gold); background:white; box-shadow:0 0 0 3px rgba(201,168,76,0.12); }
+
+        /* Student groups */
+        .history-body { padding:20px 28px; max-height:600px; overflow-y:auto; }
+        .student-group { border:1px solid var(--border); border-radius:18px; margin-bottom:16px; overflow:hidden; transition:all 0.2s; }
+        .student-group:hover { border-color:rgba(201,168,76,0.3); }
+        .student-header { background:var(--ink); padding:14px 20px; display:flex; align-items:center; justify-content:space-between; }
+        .student-name { color:#e8edf2; font-weight:700; font-size:0.92rem; display:flex; align-items:center; gap:10px; }
+        .student-name i { color:var(--gold); }
+        .student-count { background:rgba(201,168,76,0.15); color:var(--gold); border-radius:50px; padding:3px 12px; font-size:0.72rem; font-weight:700; }
+
+        .notes-list { background:white; padding:8px 12px; }
+        .note-item { display:flex; align-items:center; justify-content:space-between; padding:12px 8px; border-radius:12px; transition:background 0.15s; gap:12px; }
+        .note-item:not(:last-child) { border-bottom:1px solid var(--mist); }
+        .note-item:hover { background:rgba(201,168,76,0.03); }
+
+        .note-details { flex:1; display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+
+        /* Trimestre chips */
+        .chip { display:inline-flex; align-items:center; padding:3px 10px; border-radius:50px; font-size:0.72rem; font-weight:700; }
+        .chip-t1 { background:rgba(13,71,161,0.1); color:#1d4ed8; }
+        .chip-t2 { background:rgba(201,168,76,0.12); color:#7a5c10; }
+        .chip-t3 { background:rgba(6,182,212,0.1); color:#0e6e80; }
+
+        .note-matiere { font-weight:700; font-size:0.88rem; color:var(--ink); }
+
+        .score-chip { display:inline-flex; align-items:center; padding:4px 12px; border-radius:50px; font-size:0.82rem; font-weight:700; }
+        .score-good   { background:rgba(39,174,96,0.1); color:var(--success-color); }
+        .score-medium { background:rgba(201,168,76,0.1); color:#7a5c10; }
+        .score-bad    { background:rgba(196,98,45,0.1); color:var(--rust); }
+
+        .status-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+        .status-active   { background:#27ae60; }
+        .status-suspended { background:var(--rust); }
+
+        .note-date { font-size:0.75rem; color:#c8d0da; }
+
+        .note-actions { display:flex; gap:5px; flex-shrink:0; }
+        .icon-btn { width:30px; height:30px; border-radius:8px; display:flex; align-items:center; justify-content:center; border:1.5px solid var(--border); background:transparent; color:var(--text-muted); cursor:pointer; transition:all 0.2s; font-size:0.78rem; }
+        .icon-btn.edit:hover    { background:var(--ink); border-color:var(--ink); color:var(--cream); }
+        .icon-btn.suspend:hover { background:rgba(201,168,76,0.1); border-color:rgba(201,168,76,0.3); color:#7a5c10; }
+        .icon-btn.activate:hover{ background:rgba(39,174,96,0.1); border-color:rgba(39,174,96,0.3); color:var(--success-color); }
+        .icon-btn.del:hover     { background:rgba(196,98,45,0.1); border-color:rgba(196,98,45,0.3); color:var(--rust); }
+
+        /* Search highlight */
+        .search-hl { background:rgba(201,168,76,0.3); border-radius:3px; padding:1px 3px; font-weight:700; }
+
+        /* Empty state */
+        .empty-state { padding:64px 40px; text-align:center; }
+        .empty-icon { width:80px; height:80px; background:var(--mist); border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 20px; font-size:2rem; color:#c8d0da; }
+        .empty-state h3 { font-family:'DM Serif Display',serif; font-size:1.4rem; color:var(--ink); margin-bottom:8px; }
+        .empty-state p  { color:var(--text-muted); font-size:0.88rem; }
+
+        /* Modal */
+        .modal-overlay { display:none; position:fixed; inset:0; z-index:500; background:rgba(13,17,23,0.5); backdrop-filter:blur(4px); align-items:center; justify-content:center; padding:24px; }
+        .modal-overlay.open { display:flex; }
+        .modal-box { background:white; border-radius:24px; padding:36px; width:100%; max-width:460px; box-shadow:0 32px 80px rgba(0,0,0,0.2); animation:popIn 0.3s cubic-bezier(0.22,1,0.36,1); }
+        @keyframes popIn { from{opacity:0;transform:scale(0.95) translateY(10px)} to{opacity:1;transform:scale(1) translateY(0)} }
+        .modal-title { font-family:'DM Serif Display',serif; font-size:1.4rem; color:var(--ink); margin-bottom:4px; }
+        .modal-sub   { color:var(--text-muted); font-size:0.85rem; margin-bottom:24px; }
+        .modal-info-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px; }
+        .modal-info-box { background:var(--mist); border-radius:12px; padding:12px 14px; }
+        .modal-info-label { font-size:0.72rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px; }
+        .modal-info-value { font-size:0.9rem; font-weight:700; color:var(--ink); }
+        .modal-field { margin-bottom:20px; }
+        .modal-field label { display:block; font-size:0.75rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px; }
+        .note-input-group { display:flex; align-items:center; gap:0; }
+        .note-input-group input { flex:1; background:var(--mist); border:1.5px solid var(--border); border-radius:12px 0 0 12px; padding:13px 14px; color:var(--ink); font-family:'DM Sans',sans-serif; font-size:1rem; font-weight:700; outline:none; transition:all 0.2s; border-right:none; }
+        .note-input-group input:focus { border-color:var(--gold); background:white; box-shadow:0 0 0 3px rgba(201,168,76,0.12); }
+        .note-input-group span { background:var(--ink); color:var(--gold); padding:13px 16px; border-radius:0 12px 12px 0; font-weight:700; font-size:0.9rem; }
+        .modal-warn { background:rgba(201,168,76,0.08); border:1px solid rgba(201,168,76,0.25); border-radius:12px; padding:12px 14px; font-size:0.82rem; color:#7a5c10; display:flex; align-items:center; gap:8px; margin-bottom:20px; }
+        .modal-footer-btns { display:flex; gap:10px; }
+        .btn-cancel  { flex:1; padding:13px; background:var(--mist); border:none; border-radius:12px; font-family:'DM Sans',sans-serif; font-size:0.9rem; font-weight:600; color:var(--text-muted); cursor:pointer; transition:background 0.2s; }
+        .btn-cancel:hover { background:var(--border); }
+        .btn-confirm { flex:2; padding:13px; background:var(--ink); border:none; border-radius:12px; font-family:'DM Sans',sans-serif; font-size:0.9rem; font-weight:600; color:var(--cream); cursor:pointer; transition:all 0.2s; display:flex; align-items:center; justify-content:center; gap:8px; }
+        .btn-confirm:hover { background:#1a2332; transform:translateY(-1px); }
+        .btn-confirm:disabled { opacity:0.6; cursor:not-allowed; transform:none; }
+
+        @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+
+        @media (max-width:900px) {
+            .navbar { padding:0 20px; }
+            .page-content { padding:24px 16px; }
+            .hero { padding:32px 24px; }
+            .top-controls { flex-direction:column; align-items:stretch; }
+            .form-card-body { padding:20px; }
+            .history-body { padding:16px; }
         }
     </style>
 </head>
-<body class="bg-light">
-    <div class="container mt-4">
-        <!-- En-tête -->
-        <div class="row mb-4">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-body">
-                        <h3><i class="fas fa-edit text-primary me-2"></i>Saisir les Notes – {{ classe.nom }}</h3>
-                        <p class="text-muted mb-0">{{ classe.annee_scolaire }}</p>
+<body>
+<div class="bg-decor"></div>
+<div class="grid-dots"></div>
+
+<!-- Navbar -->
+<nav class="navbar">
+    <a href="{{ url_for('main.dashboard') }}" class="nav-brand">
+        <span class="brand-icon"><i class="bi bi-mortarboard-fill"></i></span>
+        EduBulletin
+    </a>
+    <div class="nav-right">
+        <a href="{{ url_for('main.dashboard') }}" class="btn-back">
+            <i class="bi bi-arrow-left"></i> Dashboard
+        </a>
+    </div>
+</nav>
+
+<div class="page-content">
+
+    <!-- Flash -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}{% for category, msg in messages %}
+        <div class="flash-msg flash-{{ 'error' if category=='error' else 'success' if category=='success' else 'warning' }}">
+            <i class="bi bi-{{ 'exclamation-circle' if category=='error' else 'check-circle' if category=='success' else 'exclamation-triangle' }}"></i>
+            {{ msg }}
+            <button class="flash-close" onclick="this.parentElement.remove()"><i class="bi bi-x"></i></button>
+        </div>
+        {% endfor %}{% endif %}
+    {% endwith %}
+
+    <!-- Hero -->
+    <div class="hero">
+        <div class="hero-label"><i class="bi bi-pencil-square"></i> Saisie des notes</div>
+        <h1>{{ classe.nom }}<br><em>Année {{ classe.annee_scolaire }}</em></h1>
+        <p class="hero-sub">Enregistrez les notes par trimestre et consultez l'historique ci-dessous.</p>
+    </div>
+
+    <!-- Notice -->
+    <div class="notice-box">
+        <div class="notice-icon"><i class="bi bi-lightbulb"></i></div>
+        <div>
+            <div class="notice-title">Fonctionnement du formulaire</div>
+            <ul class="notice-list">
+                <li>Sélectionnez obligatoirement un trimestre avant la saisie</li>
+                <li>Les champs sont toujours vides pour une nouvelle saisie</li>
+                <li>Utilisez la recherche dans l'historique pour modifier des notes existantes</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Formulaire de saisie -->
+    <div class="form-card">
+        <div class="form-card-header">
+            <div class="form-card-header-icon"><i class="bi bi-plus-circle"></i></div>
+            <div class="form-card-title">Nouvelle saisie de notes</div>
+        </div>
+        <div class="form-card-body">
+            <form method="POST" id="notesForm">
+                <div class="top-controls">
+                    <div class="field">
+                        <label>Trimestre <span style="color:var(--rust)">*</span></label>
+                        <select name="trimestre" required>
+                            <option value="">— Sélectionner un trimestre —</option>
+                            <option value="T1" {{ 'selected' if trimestre_actuel == 'T1' else '' }}>1er Trimestre</option>
+                            <option value="T2" {{ 'selected' if trimestre_actuel == 'T2' else '' }}>2e Trimestre</option>
+                            <option value="T3" {{ 'selected' if trimestre_actuel == 'T3' else '' }}>3e Trimestre</option>
+                        </select>
+                    </div>
+                    <div class="actions-row">
+                        <button type="submit" class="btn-save-notes">
+                            <i class="bi bi-check-lg"></i> Enregistrer les notes
+                        </button>
+                        <button type="button" class="btn-clear" onclick="clearAllInputs()">
+                            <i class="bi bi-eraser"></i> Vider tout
+                        </button>
                     </div>
                 </div>
+
+                <div class="table-wrap">
+                    <table class="notes-table">
+                        <thead>
+                            <tr>
+                                <th>Élève / Matricule</th>
+                                {% for m in matieres %}
+                                <th>{{ m.nom }}</th>
+                                {% endfor %}
+                                <th>Moyenne</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for eleve in eleves %}
+                            <tr>
+                                <td>
+                                    <div class="eleve-cell">
+                                        <span class="eleve-name">{{ eleve.prenom }} {{ eleve.nom }}</span>
+                                        <span class="eleve-mat">{{ eleve.matricule }}</span>
+                                    </div>
+                                </td>
+                                {% for matiere in matieres %}
+                                <td>
+                                    <input type="number" step="0.25" min="0" max="20"
+                                           name="note_{{ eleve.id }}_{{ matiere.id }}"
+                                           value="" class="note-input"
+                                           placeholder="—"
+                                           data-eleve-id="{{ eleve.id }}"
+                                           autocomplete="off">
+                                </td>
+                                {% endfor %}
+                                <td>
+                                    <span class="avg-badge avg-neutral" id="moyenne_{{ eleve.id }}">—</span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="hint-bar">
+                    <i class="bi bi-info-circle" style="color:var(--gold);flex-shrink:0;"></i>
+                    Ce formulaire ne pré-remplit jamais les champs. Pour modifier des notes existantes, utilisez l'historique ci-dessous.
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Historique -->
+    <div class="history-card">
+        <div class="history-header">
+            <div class="history-title-row">
+                <div class="history-title">
+                    Historique par élève
+                    <span class="count-badge" id="statsNotes">{{ notes_enregistrees|length }}</span>
+                </div>
+                <div class="history-controls">
+                    <button class="btn-del-all" onclick="deleteAllNotes()">
+                        <i class="bi bi-trash"></i> Supprimer toutes
+                    </button>
+                    <div class="trim-filter">
+                        <button class="trim-btn active" data-trimestre-filter="all">Tous</button>
+                        <button class="trim-btn" data-trimestre-filter="T1">T1</button>
+                        <button class="trim-btn" data-trimestre-filter="T2">T2</button>
+                        <button class="trim-btn" data-trimestre-filter="T3">T3</button>
+                    </div>
+                    <span class="stats-text" id="statsLabel">{{ notes_enregistrees|length }} note(s)</span>
+                </div>
+            </div>
+            <div class="search-wrap">
+                <i class="bi bi-search"></i>
+                <input type="text" class="search-input" id="searchInHistory"
+                       placeholder="Rechercher un élève, matière, note…" autocomplete="off">
             </div>
         </div>
 
-        <!-- Messages Flash -->
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, msg in messages %}
-                    <div class="alert alert-{{ 'danger' if category=='error' else 'success' if category=='success' else 'warning' }} alert-dismissible fade show">
-                        <i class="fas fa-{{ 'exclamation-triangle' if category=='error' else 'check-circle' if category=='success' else 'info-circle' }} me-2"></i>
-                        {{ msg }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
+        <div class="history-body" id="notesHistoryContainer">
+            {% if notes_enregistrees %}
+                {% set notes_by_student = {} %}
+                {% for note in notes_enregistrees %}
+                    {% set key = note.eleve.matricule + " — " + note.eleve.prenom + " " + note.eleve.nom %}
+                    {% if key not in notes_by_student %}{% set _ = notes_by_student.update({key: []}) %}{% endif %}
+                    {% set _ = notes_by_student[key].append(note) %}
                 {% endfor %}
-            {% endif %}
-        {% endwith %}
 
-        <!-- Notice importante -->
-        <div class="empty-form-notice">
-            <div class="d-flex align-items-center">
-                <i class="fas fa-lightbulb text-primary me-3 fs-4"></i>
-                <div>
-                    <h6 class="mb-1">Fonctionnement du formulaire :</h6>
-                    <small class="text-muted">
-                        • Sélectionnez obligatoirement un trimestre avant la saisie<br>
-                        • Les champs sont toujours vides pour une nouvelle saisie<br>
-                        • Utilisez la recherche dans l'historique pour retrouver et modifier des notes
-                    </small>
-                </div>
-            </div>
-        </div>
-
-        <!-- Formulaire de saisie (TOUJOURS VIDE) -->
-        <div class="row mb-4">
-            <div class="col-12">
-                <div class="card border-primary">
-                    <div class="card-header bg-primary text-white">
-                        <h5 class="mb-0"><i class="fas fa-plus-circle me-2"></i>Nouvelle saisie de notes</h5>
-                    </div>
-                    <div class="card-body">
-                        <form method="POST" id="notesForm">
-                            <div class="row mb-3">
-                                <div class="col-md-4">
-                                    <label class="form-label">N'oublie pas de selectionner le Trimestre <span class="text-danger">*</span></label>
-                                    <select name="trimestre" class="form-select" required>
-                                        <option value="">-- Sélectionner un trimestre --</option>
-                                        <option value="T1" {{ 'selected' if trimestre_actuel == 'T1' else '' }}>1er Trimestre</option>
-                                        <option value="T2" {{ 'selected' if trimestre_actuel == 'T2' else '' }}>2e Trimestre</option>
-                                        <option value="T3" {{ 'selected' if trimestre_actuel == 'T3' else '' }}>3e Trimestre</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-8 d-flex align-items-end">
-                                    <button type="submit" class="btn btn-primary me-2">
-                                        <i class="fas fa-save me-1"></i>Enregistrer les Notes
-                                    </button>
-                                    <button type="button" class="btn btn-outline-secondary me-2" onclick="clearAllInputs()">
-                                        <i class="fas fa-eraser me-1"></i>Vider tout
-                                    </button>
-                                    <a href="{{ url_for('main.dashboard') }}" class="btn btn-secondary">
-                                        <i class="fas fa-arrow-left me-1"></i>Retour
-                                    </a>
-                                </div>
-                            </div>
-
-                            <div class="table-responsive">
-                                <table class="table table-bordered table-striped">
-                                    <thead class="table-dark">
-                                        <tr>
-                                            <th style="min-width: 150px;">Élève</th>
-                                            {% for m in matieres %}
-                                                <th class="text-center" style="min-width: 100px;">{{ m.nom }}</th>
-                                            {% endfor %}
-                                            <th class="text-center">Moyenne</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {% for eleve in eleves %}
-                                        <tr data-student-name="{{ eleve.prenom }} {{ eleve.nom }}" data-student-id="{{ eleve.id }}" data-class="{{ classe.nom }}">
-                                            <td><strong>{{ eleve.prenom }} {{ eleve.nom }}</strong></td>
-                                            {% for matiere in matieres %}
-                                            <td class="text-center">
-                                                <input type="number"
-                                                       step="0.25"
-                                                       min="0"
-                                                       max="20"
-                                                       name="note_{{ eleve.id }}_{{ matiere.id }}"
-                                                       value=""
-                                                       class="form-control note-input"
-                                                       placeholder="0-20"
-                                                       data-eleve-id="{{ eleve.id }}"
-                                                       autocomplete="off">
-                                            </td>
-                                            {% endfor %}
-                                            <td class="text-center">
-                                                <span class="badge bg-secondary" id="moyenne_{{ eleve.id }}">-</span>
-                                            </td>
-                                        </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
-                            </div>
-
-                            <div class="modification-notice">
-                                <strong>Note :</strong> Ce formulaire ne pré-remplit jamais les champs. Pour modifier des notes existantes, utilisez la recherche et les boutons dans l'historique ci-dessous.
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Historique des notes GROUPÉ PAR ÉLÈVE -->
-        <div class="row">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-header">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <h5><i class="fas fa-history me-2"></i>Historique des notes par élève</h5>
-                            <div class="d-flex gap-2 align-items-center">
-                                <!-- Actions groupées -->
-                                <button class="btn btn-danger btn-sm" onclick="deleteAllNotes()" title="Supprimer toutes les notes">
-                                    <i class="fas fa-trash-alt me-1"></i>Supprimer toutes
-                                </button>
-                                <!-- Filtre par trimestre -->
-                                <div class="btn-group btn-group-sm" role="group">
-                                    <button type="button" class="btn btn-outline-primary active" data-trimestre-filter="all">Tous</button>
-                                    <button type="button" class="btn btn-outline-primary" data-trimestre-filter="T1">T1</button>
-                                    <button type="button" class="btn btn-outline-primary" data-trimestre-filter="T2">T2</button>
-                                    <button type="button" class="btn btn-outline-primary" data-trimestre-filter="T3">T3</button>
-                                </div>
-                                <!-- Statistiques -->
-                                <div class="text-muted small">
-                                    <i class="fas fa-chart-bar"></i> 
-                                    <span id="statsNotes">{{ notes_enregistrees|length }} notes</span>
-                                </div>
-                            </div>
+                {% for student_key, student_notes in notes_by_student.items() %}
+                {% set student_mat  = student_notes[0].eleve.matricule %}
+                {% set student_name = student_notes[0].eleve.prenom + " " + student_notes[0].eleve.nom %}
+                <div class="student-group" data-student="{{ student_key }}">
+                    <div class="student-header">
+                        <div class="student-name">
+                            <i class="bi bi-person-circle"></i>
+                            {{ student_name }}
+                            <span style="font-size:0.72rem;font-weight:600;color:var(--gold);background:rgba(201,168,76,0.15);border-radius:6px;padding:2px 8px;">{{ student_mat }}</span>
                         </div>
-                        
-                        <!-- Barre de recherche intégrée -->
-                        <div class="search-in-history mt-3">
-                            <div class="input-group">
-                                <span class="input-group-text">
-                                    <i class="fas fa-search"></i>
+                        <span class="student-count">{{ student_notes|length }} note(s)</span>
+                    </div>
+                    <div class="notes-list">
+                        {% for note in student_notes %}
+                        <div class="note-item"
+                             data-trimestre="{{ note.trimestre }}"
+                             data-note-id="{{ note.id }}"
+                             data-searchable="{{ student_mat }} {{ student_name }} {{ note.matiere.nom }} {{ note.note }} {{ note.trimestre }}">
+                            <div class="note-details">
+                                <span class="chip chip-{{ note.trimestre|lower }}">{{ note.trimestre }}</span>
+                                <span class="note-matiere">{{ note.matiere.nom }}</span>
+                                <span class="score-chip {{ 'score-good' if note.note >= 10 else 'score-medium' if note.note >= 8 else 'score-bad' }}">
+                                    {{ note.note }}/20
                                 </span>
-                                <input type="text" id="searchInHistory" class="form-control" 
-                                       placeholder="Rechercher un élève, matière, note..." 
-                                       autocomplete="off">
-                                <button class="btn btn-outline-secondary" type="button" onclick="clearHistorySearch()">
-                                    <i class="fas fa-times"></i>
+                                <span class="status-dot {{ 'status-active' if note.statut == 'active' else 'status-suspended' }}" title="{{ 'Active' if note.statut == 'active' else 'Suspendue' }}"></span>
+                                <span class="note-date">{{ note.date_saisie.strftime('%d/%m %H:%M') if note.date_saisie else '—' }}</span>
+                            </div>
+                            <div class="note-actions">
+                                <button class="icon-btn edit btn-modifier"
+                                        data-note-id="{{ note.id }}"
+                                        data-eleve="{{ student_name|e }}"
+                                        data-matiere="{{ note.matiere.nom|e }}"
+                                        data-note="{{ note.note }}"
+                                        data-trimestre="{{ note.trimestre }}"
+                                        title="Modifier">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                {% if note.statut == 'active' %}
+                                <button class="icon-btn suspend btn-suspendre" data-note-id="{{ note.id }}" title="Suspendre">
+                                    <i class="bi bi-pause"></i>
+                                </button>
+                                {% else %}
+                                <button class="icon-btn activate btn-activer" data-note-id="{{ note.id }}" title="Réactiver">
+                                    <i class="bi bi-play"></i>
+                                </button>
+                                {% endif %}
+                                <button class="icon-btn del btn-supprimer"
+                                        data-note-id="{{ note.id }}"
+                                        data-eleve="{{ student_name|e }}"
+                                        data-matiere="{{ note.matiere.nom|e }}"
+                                        data-note="{{ note.note }}"
+                                        title="Supprimer">
+                                    <i class="bi bi-trash"></i>
                                 </button>
                             </div>
                         </div>
-                    </div>
-                    
-                    <div class="card-body">
-                        <div class="notes-history" id="notesHistoryContainer">
-                            {% if notes_enregistrees %}
-                                <!-- Grouper les notes par élève -->
-                                {% set notes_by_student = {} %}
-                                {% for note in notes_enregistrees %}
-                                    {% set student_key = note.eleve.prenom + " " + note.eleve.nom %}
-                                    {% if student_key not in notes_by_student %}
-                                        {% set _ = notes_by_student.update({student_key: []}) %}
-                                    {% endif %}
-                                    {% set _ = notes_by_student[student_key].append(note) %}
-                                {% endfor %}
-                                
-                                <!-- Afficher par élève -->
-                                {% for student_name, student_notes in notes_by_student.items() %}
-                                <div class="student-group" data-student="{{ student_name }}">
-                                    <div class="student-header">
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <span>
-                                                <i class="fas fa-user-graduate me-2"></i>
-                                                {{ student_name }}
-                                            </span>
-                                            <span class="badge bg-light text-dark">
-                                                {{ student_notes|length }} note(s)
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <div class="notes-list">
-                                        {% for note in student_notes %}
-                                        <div class="note-item" 
-                                             data-trimestre="{{ note.trimestre }}" 
-                                             data-note-id="{{ note.id }}"
-                                             data-searchable="{{ student_name }} {{ note.matiere.nom }} {{ note.note }} {{ note.trimestre }}">
-                                            <div class="note-details">
-                                                <div class="d-flex align-items-center gap-3">
-                                                    <span class="badge bg-{{ 'primary' if note.trimestre == 'T1' else 'warning' if note.trimestre == 'T2' else 'info' }}">
-                                                        {{ note.trimestre }}
-                                                    </span>
-                                                    <strong>{{ note.matiere.nom }}</strong>
-                                                    <span class="badge bg-{{ 'success' if note.note >= 10 else 'warning' if note.note >= 8 else 'danger' }} fs-6">
-                                                        {{ note.note }}/20
-                                                    </span>
-                                                    {% if note.statut == 'active' %}
-                                                        <span class="badge bg-success"><i class="fas fa-check"></i></span>
-                                                    {% else %}
-                                                        <span class="badge bg-danger"><i class="fas fa-pause"></i></span>
-                                                    {% endif %}
-                                                    <small class="text-muted">
-                                                        {{ note.date_saisie.strftime('%d/%m %H:%M') if note.date_saisie else 'N/A' }}
-                                                    </small>
-                                                </div>
-                                            </div>
-                                            <div class="note-actions">
-                                                <div class="btn-group btn-group-sm" role="group">
-                                                    <!-- Modifier -->
-                                                    <button type="button"
-                                                            class="btn btn-outline-primary btn-modifier"
-                                                            data-note-id="{{ note.id }}"
-                                                            data-eleve="{{ student_name | e }}"
-                                                            data-matiere="{{ note.matiere.nom | e }}"
-                                                            data-note="{{ note.note }}"
-                                                            data-trimestre="{{ note.trimestre }}"
-                                                            title="Modifier">
-                                                        <i class="fas fa-edit"></i>
-                                                    </button>
-
-                                                    <!-- Suspendre / Activer -->
-                                                    {% if note.statut == 'active' %}
-                                                        <button type="button"
-                                                                class="btn btn-outline-warning btn-suspendre"
-                                                                data-note-id="{{ note.id }}"
-                                                                title="Suspendre">
-                                                            <i class="fas fa-pause"></i>
-                                                        </button>
-                                                    {% else %}
-                                                        <button type="button"
-                                                                class="btn btn-outline-success btn-activer"
-                                                                data-note-id="{{ note.id }}"
-                                                                title="Réactiver">
-                                                            <i class="fas fa-play"></i>
-                                                        </button>
-                                                    {% endif %}
-
-                                                    <!-- Supprimer -->
-                                                    <button type="button"
-                                                            class="btn btn-outline-danger btn-supprimer"
-                                                            data-note-id="{{ note.id }}"
-                                                            data-eleve="{{ student_name | e }}"
-                                                            data-matiere="{{ note.matiere.nom | e }}"
-                                                            data-note="{{ note.note }}"
-                                                            title="Supprimer">
-                                                        <i class="fas fa-trash"></i>
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        {% endfor %}
-                                    </div>
-                                </div>
-                                {% endfor %}
-                            {% else %}
-                                <div class="text-center text-muted py-5">
-                                    <i class="fas fa-clipboard-list fa-4x mb-3 text-muted"></i>
-                                    <h5>Aucune note enregistrée</h5>
-                                    <p>Les notes apparaîtront ici après votre première saisie</p>
-                                </div>
-                            {% endif %}
-                        </div>
+                        {% endfor %}
                     </div>
                 </div>
-            </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <div class="empty-icon"><i class="bi bi-clipboard-data"></i></div>
+                    <h3>Aucune note enregistrée</h3>
+                    <p>Les notes apparaîtront ici après votre première saisie.</p>
+                </div>
+            {% endif %}
         </div>
     </div>
 
-    <!-- Modal de modification -->
-    <div class="modal fade" id="modifierNoteModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title"><i class="fas fa-edit me-2"></i>Modifier la note</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="modifierNoteForm">
-                        <input type="hidden" id="noteId">
-                        
-                        <div class="alert alert-info">
-                            <i class="fas fa-info-circle me-2"></i>
-                            Modification d'une note existante
-                        </div>
+</div>
 
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label class="form-label">Élève</label>
-                                    <input type="text" class="form-control" id="eleveNom" readonly>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label class="form-label">Trimestre</label>
-                                    <input type="text" class="form-control" id="trimestre" readonly>
-                                </div>
-                            </div>
-                        </div>
+<!-- Modal modifier note -->
+<div class="modal-overlay" id="modifierModal">
+    <div class="modal-box">
+        <h3 class="modal-title">Modifier la note</h3>
+        <p class="modal-sub">Modification d'une note existante</p>
+        <input type="hidden" id="noteId">
 
-                        <div class="mb-3">
-                            <label class="form-label">Matière</label>
-                            <input type="text" class="form-control" id="matiereNom" readonly>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="nouvelleNote" class="form-label">Nouvelle note</label>
-                            <div class="input-group">
-                                <input type="number" class="form-control" id="nouvelleNote" min="0" max="20" step="0.25" required>
-                                <span class="input-group-text">/20</span>
-                            </div>
-                            <div class="form-text">Note entre 0 et 20 (décimales autorisées)</div>
-                        </div>
-
-                        <div class="alert alert-warning">
-                            <i class="fas fa-exclamation-triangle me-2"></i>
-                            <strong>Attention :</strong> Cette modification sera immédiatement sauvegardée.
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                        <i class="fas fa-times me-1"></i>Annuler
-                    </button>
-                    <button type="button" class="btn btn-primary" id="btnSauvegarderModification">
-                        <i class="fas fa-save me-1"></i>Sauvegarder
-                    </button>
-                </div>
+        <div class="modal-info-row">
+            <div class="modal-info-box">
+                <div class="modal-info-label">Élève</div>
+                <div class="modal-info-value" id="eleveNom"></div>
+            </div>
+            <div class="modal-info-box">
+                <div class="modal-info-label">Trimestre</div>
+                <div class="modal-info-value" id="trimestreInfo"></div>
             </div>
         </div>
+        <div class="modal-info-box" style="margin-bottom:20px;">
+            <div class="modal-info-label">Matière</div>
+            <div class="modal-info-value" id="matiereNom"></div>
+        </div>
+
+        <div class="modal-field">
+            <label>Nouvelle note</label>
+            <div class="note-input-group">
+                <input type="number" id="nouvelleNote" min="0" max="20" step="0.25" placeholder="0 – 20" required>
+                <span>/20</span>
+            </div>
+        </div>
+
+        <div class="modal-warn">
+            <i class="bi bi-exclamation-triangle" style="color:var(--gold);flex-shrink:0;"></i>
+            Cette modification sera immédiatement sauvegardée.
+        </div>
+
+        <div class="modal-footer-btns">
+            <button type="button" class="btn-cancel" onclick="closeModal('modifierModal')">Annuler</button>
+            <button type="button" class="btn-confirm" id="btnSauvegarder">
+                <i class="bi bi-check-lg"></i> Sauvegarder
+            </button>
+        </div>
     </div>
+</div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        // Fonction pour vider tous les champs
-        function clearAllInputs() {
-            document.querySelectorAll('.note-input').forEach(input => {
-                input.value = '';
-            });
-            document.querySelectorAll('[id^="moyenne_"]').forEach(span => {
-                const eleveId = span.id.replace('moyenne_', '');
-                calculateAverage(eleveId);
-            });
-        }
+<script>
+    // ── Modals ──
+    function openModal(id) { document.getElementById(id).classList.add('open'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+    document.querySelectorAll('.modal-overlay').forEach(o => o.addEventListener('click', e => { if(e.target===o) o.classList.remove('open'); }));
+    document.addEventListener('keydown', e => { if(e.key==='Escape') document.querySelectorAll('.modal-overlay.open').forEach(m=>m.classList.remove('open')); });
 
-        // Calcul automatique de la moyenne
-        document.querySelectorAll('.note-input').forEach(input => {
-            input.addEventListener('input', function () {
-                const eleveId = this.getAttribute('data-eleve-id');
-                calculateAverage(eleveId);
-            });
+    // ── Vider champs ──
+    function clearAllInputs() {
+        document.querySelectorAll('.note-input').forEach(i => i.value = '');
+        document.querySelectorAll('[id^="moyenne_"]').forEach(s => {
+            s.textContent = '—'; s.className = 'avg-badge avg-neutral';
         });
+    }
 
-        function calculateAverage(eleveId) {
-            const inputs = document.querySelectorAll(`input[data-eleve-id="${eleveId}"]`);
-            let total = 0;
+    // ── Moyenne auto ──
+    document.querySelectorAll('.note-input').forEach(input => {
+        input.addEventListener('input', () => calculateAverage(input.dataset.eleveId));
+    });
+
+    function calculateAverage(eleveId) {
+        const inputs = document.querySelectorAll(`input[data-eleve-id="${eleveId}"]`);
+        let total = 0, count = 0;
+        inputs.forEach(i => { const v = parseFloat(i.value); if(!isNaN(v)) { total+=v; count++; } });
+        const span = document.getElementById(`moyenne_${eleveId}`);
+        if(count > 0) {
+            const avg = (total/count).toFixed(2);
+            span.textContent = avg;
+            span.className = `avg-badge ${avg >= 10 ? 'avg-good' : avg >= 8 ? 'avg-medium' : 'avg-bad'}`;
+        } else {
+            span.textContent = '—'; span.className = 'avg-badge avg-neutral';
+        }
+    }
+
+    // ── Recherche ──
+    document.getElementById('searchInHistory').addEventListener('input', function() {
+        const q = this.value.toLowerCase().trim();
+        document.querySelectorAll('.student-group').forEach(group => {
+            let visible = false;
+            group.querySelectorAll('.note-item').forEach(item => {
+                const match = !q || item.dataset.searchable.toLowerCase().includes(q);
+                item.style.display = match ? '' : 'none';
+                if(match) visible = true;
+            });
+            group.style.display = visible ? '' : 'none';
+        });
+    });
+
+    // ── Filtre trimestre ──
+    document.querySelectorAll('[data-trimestre-filter]').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('[data-trimestre-filter]').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            const t = this.dataset.trimestreFilter;
             let count = 0;
-
-            inputs.forEach(input => {
-                const value = parseFloat(input.value);
-                if (!isNaN(value) && value !== '') {
-                    total += value;
-                    count++;
-                }
-            });
-
-            const moyenneSpan = document.getElementById(`moyenne_${eleveId}`);
-            if (count > 0) {
-                const moyenne = (total / count).toFixed(2);
-                moyenneSpan.textContent = moyenne;
-                moyenneSpan.className = `badge fs-6 bg-${moyenne >= 10 ? 'success' : moyenne >= 8 ? 'warning' : 'danger'}`;
-            } else {
-                moyenneSpan.textContent = '-';
-                moyenneSpan.className = 'badge bg-secondary fs-6';
-            }
-        }
-
-        // Recherche dans l'historique
-        document.getElementById('searchInHistory').addEventListener('input', function() {
-            const query = this.value.toLowerCase().trim();
-            
-            if (query.length === 0) {
-                // Afficher tous les éléments
-                document.querySelectorAll('.student-group').forEach(group => {
-                    group.style.display = '';
-                });
-                document.querySelectorAll('.note-item').forEach(item => {
-                    item.style.display = '';
-                    item.innerHTML = item.innerHTML.replace(/<span class="search-highlight">(.*?)<\/span>/g, '$1');
-                });
-                return;
-            }
-
             document.querySelectorAll('.student-group').forEach(group => {
-                let hasVisibleNotes = false;
-                const noteItems = group.querySelectorAll('.note-item');
-                
-                noteItems.forEach(item => {
-                    const searchText = item.getAttribute('data-searchable').toLowerCase();
-                    if (searchText.includes(query)) {
-                        item.style.display = '';
-                        hasVisibleNotes = true;
-                        // Surligner le texte trouvé
-                        highlightSearchText(item, query);
-                    } else {
-                        item.style.display = 'none';
-                    }
+                let visible = false;
+                group.querySelectorAll('.note-item').forEach(item => {
+                    const show = t === 'all' || item.dataset.trimestre === t;
+                    item.style.display = show ? '' : 'none';
+                    if(show) { visible = true; count++; }
                 });
-
-                group.style.display = hasVisibleNotes ? '' : 'none';
+                group.style.display = visible ? '' : 'none';
             });
+            document.getElementById('statsNotes').textContent = count;
+            document.getElementById('statsLabel').textContent = `${count} note(s)`;
         });
+    });
 
-        function highlightSearchText(element, query) {
-            const regex = new RegExp(`(${query})`, 'gi');
-            const textNodes = getTextNodes(element);
-            
-            textNodes.forEach(node => {
-                if (node.textContent.toLowerCase().includes(query)) {
-                    const highlightedText = node.textContent.replace(regex, '<span class="search-highlight">$1</span>');
-                    const wrapper = document.createElement('span');
-                    wrapper.innerHTML = highlightedText;
-                    node.parentNode.replaceChild(wrapper, node);
-                }
-            });
-        }
-
-        function getTextNodes(element) {
-            let textNodes = [];
-            let walker = document.createTreeWalker(
-                element,
-                NodeFilter.SHOW_TEXT,
-                null,
-                false
-            );
-            
-            let node;
-            while (node = walker.nextNode()) {
-                textNodes.push(node);
-            }
-            return textNodes;
-        }
-
-        function clearHistorySearch() {
-            document.getElementById('searchInHistory').value = '';
-            document.getElementById('searchInHistory').dispatchEvent(new Event('input'));
-        }
-
-        // Filtrage par trimestre
-        document.querySelectorAll('[data-trimestre-filter]').forEach(btn => {
-            btn.addEventListener('click', function () {
-                document.querySelectorAll('[data-trimestre-filter]').forEach(b => b.classList.remove('active'));
-                this.classList.add('active');
-
-                const trimestre = this.getAttribute('data-trimestre-filter');
-                let visibleCount = 0;
-
-                document.querySelectorAll('.student-group').forEach(group => {
-                    let hasVisibleNotes = false;
-                    const noteItems = group.querySelectorAll('.note-item');
-                    
-                    noteItems.forEach(item => {
-                        if (trimestre === 'all' || item.dataset.trimestre === trimestre) {
-                            item.style.display = '';
-                            hasVisibleNotes = true;
-                            visibleCount++;
-                        } else {
-                            item.style.display = 'none';
-                        }
-                    });
-
-                    group.style.display = hasVisibleNotes ? '' : 'none';
-                });
-
-                document.getElementById('statsNotes').textContent = `${visibleCount} note${visibleCount > 1 ? 's' : ''}`;
-            });
+    // ── Modifier ──
+    document.querySelectorAll('.btn-modifier').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.getElementById('noteId').value = btn.dataset.noteId;
+            document.getElementById('eleveNom').textContent = btn.dataset.eleve;
+            document.getElementById('matiereNom').textContent = btn.dataset.matiere;
+            document.getElementById('trimestreInfo').textContent = btn.dataset.trimestre;
+            document.getElementById('nouvelleNote').value = btn.dataset.note;
+            openModal('modifierModal');
         });
+    });
 
-        // Supprimer toutes les notes
-        function deleteAllNotes() {
-            const classeId = {{ classe.id }};  // Récupérer l'ID depuis le serveur
-            
-            if (confirm('⚠️ SUPPRIMER TOUTES LES NOTES ?\n\nCette action supprimera définitivement toutes les notes de cette classe.\n\n🚨 CETTE ACTION EST IRRÉVERSIBLE !')) {
-                if (confirm('Êtes-vous absolument certain ? Cette action ne peut pas être annulée.')) {
-                    fetch('/ecole/supprimer_toutes_notes', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ classe_id: classeId })
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            alert(`✅ ${data.message}`);
-                            location.reload();
-                        } else {
-                            alert(`❌ Erreur : ${data.message}`);
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Erreur :', error);
-                        alert('❌ Erreur de connexion');
-                    });
-                }
+    // ── Sauvegarder modification ──
+    document.getElementById('btnSauvegarder').addEventListener('click', function() {
+        const noteId = document.getElementById('noteId').value;
+        const val = parseFloat(document.getElementById('nouvelleNote').value);
+        if(isNaN(val) || val < 0 || val > 20) { alert('La note doit être entre 0 et 20'); return; }
+        this.disabled = true;
+        this.innerHTML = '<i class="bi bi-hourglass-split"></i> Enregistrement…';
+        fetch('/ecole/modifier_note', {
+            method: 'POST',
+            headers: {'Content-Type':'application/json'},
+            body: JSON.stringify({note_id: noteId, nouvelle_note: val})
+        })
+        .then(r => r.json())
+        .then(data => {
+            if(data.success) { alert('✅ ' + data.message); location.reload(); }
+            else { alert('❌ ' + data.message); }
+        })
+        .finally(() => {
+            this.disabled = false;
+            this.innerHTML = '<i class="bi bi-check-lg"></i> Sauvegarder';
+        });
+    });
+
+    // ── Suspendre / Activer / Supprimer ──
+    document.querySelectorAll('.btn-suspendre').forEach(btn => {
+        btn.addEventListener('click', () => {
+            if(confirm('⚠️ Suspendre cette note ?\nElle sera exclue des calculs de moyenne.'))
+                actionNote('/ecole/suspendre_note', btn.dataset.noteId);
+        });
+    });
+    document.querySelectorAll('.btn-activer').forEach(btn => {
+        btn.addEventListener('click', () => actionNote('/ecole/activer_note', btn.dataset.noteId));
+    });
+    document.querySelectorAll('.btn-supprimer').forEach(btn => {
+        btn.addEventListener('click', () => {
+            if(confirm(`🗑️ Supprimer définitivement ?\n\nÉlève: ${btn.dataset.eleve}\nMatière: ${btn.dataset.matiere}\nNote: ${btn.dataset.note}/20\n\n⚠️ Action irréversible !`))
+                actionNote('/ecole/supprimer_note', btn.dataset.noteId);
+        });
+    });
+
+    function deleteAllNotes() {
+        const classeId = {{ classe.id }};
+        if(confirm('⚠️ SUPPRIMER TOUTES LES NOTES ?\n\nCette action est définitive et irréversible.')) {
+            if(confirm('Êtes-vous absolument certain ?')) {
+                fetch('/ecole/supprimer_toutes_notes', {
+                    method:'POST', headers:{'Content-Type':'application/json'},
+                    body: JSON.stringify({classe_id: classeId})
+                })
+                .then(r=>r.json())
+                .then(d => { if(d.success){alert('✅ '+d.message);location.reload();}else{alert('❌ '+d.message);} });
             }
         }
+    }
 
-        // Modal de modification
-        document.querySelectorAll('.btn-modifier').forEach(btn => {
-            btn.addEventListener('click', function () {
-                const noteId = this.getAttribute('data-note-id');
-                const eleveNom = this.getAttribute('data-eleve');
-                const matiereNom = this.getAttribute('data-matiere');
-                const note = this.getAttribute('data-note');
-                const trimestre = this.getAttribute('data-trimestre');
+    function actionNote(url, noteId) {
+        fetch(url, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({note_id:noteId})})
+        .then(r=>r.json())
+        .then(d => { if(d.success){alert('✅ '+d.message);location.reload();}else{alert('❌ '+d.message);} })
+        .catch(() => alert('❌ Erreur de connexion'));
+    }
 
-                document.getElementById('noteId').value = noteId;
-                document.getElementById('eleveNom').value = eleveNom;
-                document.getElementById('matiereNom').value = matiereNom;
-                document.getElementById('trimestre').value = trimestre;
-                document.getElementById('nouvelleNote').value = note;
-
-                const modal = new bootstrap.Modal(document.getElementById('modifierNoteModal'));
-                modal.show();
-            });
-        });
-
-        // Sauvegarder modification
-        document.getElementById('btnSauvegarderModification').addEventListener('click', function () {
-            const noteId = document.getElementById('noteId').value;
-            const nouvelleNote = parseFloat(document.getElementById('nouvelleNote').value);
-
-            if (isNaN(nouvelleNote) || nouvelleNote < 0 || nouvelleNote > 20) {
-                alert('La note doit être un nombre entre 0 et 20');
-                return;
-            }
-
-            this.disabled = true;
-            this.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Modification...';
-
-            fetch('/ecole/modifier_note', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ note_id: noteId, nouvelle_note: nouvelleNote })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert(`✅ ${data.message}`);
-                    location.reload();
-                } else {
-                    alert(`❌ Erreur : ${data.message}`);
-                }
-            })
-            .finally(() => {
-                this.disabled = false;
-                this.innerHTML = '<i class="fas fa-save me-1"></i>Sauvegarder';
-            });
-        });
-
-        // Actions sur les notes
-        document.querySelectorAll('.btn-suspendre').forEach(btn => {
-            btn.addEventListener('click', function () {
-                const noteId = this.getAttribute('data-note-id');
-                if (confirm('⚠️ Suspendre cette note ?\n\nElle sera exclue des calculs de moyenne.')) {
-                    actionNote('/ecole/suspendre_note', noteId);
-                }
-            });
-        });
-
-        document.querySelectorAll('.btn-activer').forEach(btn => {
-            btn.addEventListener('click', function () {
-                const noteId = this.getAttribute('data-note-id');
-                actionNote('/ecole/activer_note', noteId);
-            });
-        });
-
-        document.querySelectorAll('.btn-supprimer').forEach(btn => {
-            btn.addEventListener('click', function () {
-                const noteId = this.getAttribute('data-note-id');
-                const eleve = this.getAttribute('data-eleve');
-                const matiere = this.getAttribute('data-matiere');
-                const noteValue = this.getAttribute('data-note');
-
-                if (confirm(`🗑️ SUPPRIMER DÉFINITIVEMENT ?\n\nÉlève: ${eleve}\nMatière: ${matiere}\nNote: ${noteValue}/20\n\n⚠️ Cette action est irréversible !`)) {
-                    actionNote('/ecole/supprimer_note', noteId);
-                }
-            });
-        });
-
-        function actionNote(url, noteId) {
-            fetch(url, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ note_id: noteId })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert(`✅ ${data.message}`);
-                    location.reload();
-                } else {
-                    alert(`❌ Erreur : ${data.message}`);
-                }
-            })
-            .catch(error => {
-                console.error('Erreur :', error);
-                alert('❌ Erreur de connexion');
-            });
-        }
-
-        // Initialiser les champs vides au chargement
-        document.addEventListener('DOMContentLoaded', function() {
-            clearAllInputs();
-            
-            // Initialiser les moyennes
-            document.querySelectorAll('[id^="moyenne_"]').forEach(span => {
-                const eleveId = span.id.replace('moyenne_', '');
-                calculateAverage(eleveId);
-            });
-        });
-    </script>
+    // ── Init ──
+    document.addEventListener('DOMContentLoaded', () => {
+        clearAllInputs();
+    });
+</script>
 </body>
 </html>
-
