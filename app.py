@@ -51,6 +51,7 @@ def create_app():
 
     return app
 
+# ... tout le reste du code ...
 
 def register_routes(app):
     try:
@@ -74,7 +75,6 @@ def register_routes(app):
         app.register_blueprint(pdf_bp)
         app.register_blueprint(pdf_ar_bp)
         app.register_blueprint(language_bp)
-
         print("✅ Tous les blueprints enregistrés")
 
     except ImportError as e:
@@ -82,8 +82,9 @@ def register_routes(app):
         print("Vérifiez que tous les fichiers routes existent")
 
 
+# ── IMPORTANT : variable app accessible par gunicorn ──
+app = create_app()
+
 if __name__ == '__main__':
-    app = create_app()
     print("🚀 Application démarrée sur http://127.0.0.1:5000")
     app.run(debug=True)
-
