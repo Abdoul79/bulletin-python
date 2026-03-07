@@ -1,360 +1,403 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Gestion des Matières - {{ classe.nom }}</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matières — {{ classe.nom }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <style>
         :root {
-            --primary: #3b82f6;
-            --primary-light: #dbeafe;
-            --light-bg: #f9fafb;
-            --card-shadow: 0 4px 12px rgba(0,0,0,0.06);
+            --ink: #0d1117; --cream: #f5f0e8; --gold: #c9a84c;
+            --gold-light: #e8d5a3; --rust: #c4622d; --mist: #e8edf2;
+            --text-muted: #6b7685; --border: #e8edf2;
+            --success-color: #1a6b3c;
         }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'DM Sans',sans-serif; background:var(--cream); min-height:100vh; position:relative; overflow-x:hidden; }
+        .bg-decor { position:fixed; inset:0; z-index:0; pointer-events:none; }
+        .bg-decor::before { content:''; position:absolute; top:-200px; right:-200px; width:600px; height:600px; background:radial-gradient(circle,rgba(201,168,76,0.1) 0%,transparent 70%); border-radius:50%; }
+        .bg-decor::after  { content:''; position:absolute; bottom:-150px; left:-150px; width:500px; height:500px; background:radial-gradient(circle,rgba(196,98,45,0.07) 0%,transparent 70%); border-radius:50%; }
+        .grid-dots { position:fixed; inset:0; z-index:0; background-image:radial-gradient(circle,#c9a84c18 1px,transparent 1px); background-size:32px 32px; }
 
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: var(--light-bg);
-            color: #333;
-            padding: 20px 15px;
+        /* Navbar */
+        .navbar { position:sticky; top:0; z-index:100; background:rgba(245,240,232,0.92); backdrop-filter:blur(16px); border-bottom:1px solid rgba(201,168,76,0.2); padding:0 40px; height:64px; display:flex; align-items:center; justify-content:space-between; }
+        .nav-brand { display:flex; align-items:center; gap:10px; font-family:'DM Serif Display',serif; font-size:1.3rem; color:var(--ink); text-decoration:none; }
+        .nav-brand .brand-icon { width:36px; height:36px; background:var(--ink); border-radius:10px; display:flex; align-items:center; justify-content:center; color:var(--gold); font-size:1rem; }
+        .nav-right { display:flex; align-items:center; gap:10px; }
+        .btn-back { display:flex; align-items:center; gap:8px; padding:8px 18px; background:transparent; border:1.5px solid var(--border); border-radius:50px; font-size:0.85rem; font-weight:600; color:var(--text-muted); text-decoration:none; transition:all 0.2s; }
+        .btn-back:hover { border-color:var(--ink); color:var(--ink); }
+
+        /* Content */
+        .page-content { position:relative; z-index:1; padding:40px; max-width:1200px; margin:0 auto; }
+
+        /* Flash */
+        .flash-msg { padding:14px 18px; border-radius:14px; font-size:0.88rem; margin-bottom:16px; display:flex; align-items:center; gap:10px; animation:slideDown 0.4s ease; }
+        @keyframes slideDown { from{opacity:0;transform:translateY(-10px)} to{opacity:1;transform:translateY(0)} }
+        .flash-success { background:rgba(39,174,96,0.08); border:1px solid rgba(39,174,96,0.2); color:var(--success-color); }
+        .flash-error   { background:rgba(196,98,45,0.08); border:1px solid rgba(196,98,45,0.2); color:var(--rust); }
+        .flash-warning { background:rgba(201,168,76,0.1); border:1px solid rgba(201,168,76,0.3); color:#7a5c10; }
+        .flash-close   { margin-left:auto; background:none; border:none; cursor:pointer; color:inherit; opacity:0.6; }
+
+        /* Hero */
+        .hero { background:var(--ink); border-radius:24px; padding:40px 48px; margin-bottom:32px; position:relative; overflow:hidden; animation:fadeUp 0.6s ease both; }
+        .hero::before { content:''; position:absolute; top:-80px; right:-80px; width:300px; height:300px; background:radial-gradient(circle,rgba(201,168,76,0.1) 0%,transparent 70%); border-radius:50%; }
+        .hero-label { display:inline-flex; align-items:center; gap:8px; background:rgba(201,168,76,0.12); border:1px solid rgba(201,168,76,0.25); color:var(--gold); padding:6px 14px; border-radius:50px; font-size:0.75rem; font-weight:600; letter-spacing:0.5px; text-transform:uppercase; margin-bottom:14px; }
+        .hero h1 { font-family:'DM Serif Display',serif; font-size:2rem; color:#e8edf2; line-height:1.2; margin-bottom:6px; }
+        .hero h1 em { font-style:italic; color:var(--gold-light); }
+        .hero-sub { color:#4a5568; font-size:0.9rem; }
+
+        /* Form card */
+        .form-card { background:white; border:1px solid var(--border); border-radius:24px; padding:36px; margin-bottom:32px; animation:fadeUp 0.6s ease 0.1s both; }
+        .form-card-header { display:flex; align-items:center; gap:12px; margin-bottom:28px; }
+        .form-card-icon { width:42px; height:42px; background:var(--ink); border-radius:12px; display:flex; align-items:center; justify-content:center; color:var(--gold); font-size:1.1rem; }
+        .form-card-title { font-family:'DM Serif Display',serif; font-size:1.3rem; color:var(--ink); }
+        .form-card-sub { color:var(--text-muted); font-size:0.83rem; }
+
+        /* Fields */
+        .form-row { display:grid; gap:14px; grid-template-columns:2fr 1.5fr 1fr 1fr 1fr auto; align-items:end; }
+        .field label { display:block; font-size:0.75rem; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px; }
+        .field input, .field select { width:100%; background:var(--mist); border:1.5px solid var(--border); border-radius:12px; padding:12px 14px; color:var(--ink); font-family:'DM Sans',sans-serif; font-size:0.92rem; outline:none; transition:all 0.2s; appearance:none; }
+        .field input:focus, .field select:focus { border-color:var(--gold); background:white; box-shadow:0 0 0 3px rgba(201,168,76,0.12); }
+        .field input::placeholder { color:#c8d0da; }
+        .btn-save { display:flex; align-items:center; justify-content:center; gap:8px; background:var(--ink); color:var(--cream); padding:12px 22px; border-radius:12px; border:2px solid var(--ink); font-family:'DM Sans',sans-serif; font-size:0.9rem; font-weight:700; cursor:pointer; transition:all 0.25s; white-space:nowrap; }
+        .btn-save:hover { background:transparent; color:var(--ink); transform:translateY(-2px); }
+
+        /* Form reset row */
+        .form-meta-row { display:flex; justify-content:flex-end; margin-top:12px; }
+        .btn-reset { display:flex; align-items:center; gap:7px; background:var(--mist); color:var(--text-muted); padding:9px 18px; border-radius:10px; border:none; font-family:'DM Sans',sans-serif; font-size:0.83rem; font-weight:600; cursor:pointer; transition:background 0.2s; }
+        .btn-reset:hover { background:var(--border); color:var(--ink); }
+
+        /* Schedule section */
+        .schedule-section { animation:fadeUp 0.6s ease 0.2s both; }
+        .schedule-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:24px; flex-wrap:wrap; gap:12px; }
+        .schedule-title { font-family:'DM Serif Display',serif; font-size:1.6rem; color:var(--ink); }
+
+        .btn-export { display:flex; align-items:center; gap:8px; background:rgba(39,174,96,0.07); border:1.5px solid rgba(39,174,96,0.25); color:var(--success-color); padding:10px 20px; border-radius:12px; font-family:'DM Sans',sans-serif; font-size:0.85rem; font-weight:600; cursor:pointer; transition:all 0.2s; }
+        .btn-export:hover { background:rgba(39,174,96,0.14); }
+
+        /* Days grid */
+        .days-grid { display:grid; grid-template-columns:repeat(3, 1fr); gap:20px; }
+
+        /* Day card */
+        .day-card { background:white; border:1px solid var(--border); border-radius:20px; overflow:hidden; transition:all 0.3s ease; }
+        .day-card:hover { border-color:var(--gold); box-shadow:0 8px 24px rgba(13,17,23,0.06); transform:translateY(-2px); }
+        .day-header { background:var(--ink); padding:14px 20px; display:flex; align-items:center; justify-content:space-between; }
+        .day-name { font-family:'DM Serif Display',serif; font-size:1rem; color:var(--gold-light); }
+        .day-count { background:rgba(201,168,76,0.15); color:var(--gold); border-radius:50px; padding:2px 10px; font-size:0.72rem; font-weight:700; }
+
+        /* Matiere items */
+        .matiere-list { padding:8px; }
+        .matiere-item { display:flex; align-items:flex-start; justify-content:space-between; padding:12px 12px; border-radius:12px; transition:background 0.15s; gap:12px; }
+        .matiere-item:not(:last-child) { border-bottom:1px solid var(--mist); }
+        .matiere-item:hover { background:rgba(201,168,76,0.04); }
+        .matiere-info { flex:1; min-width:0; }
+        .matiere-name { font-weight:700; color:var(--ink); font-size:0.9rem; margin-bottom:3px; }
+        .matiere-prof { font-size:0.78rem; color:var(--text-muted); }
+        .matiere-right { display:flex; flex-direction:column; align-items:flex-end; gap:8px; flex-shrink:0; }
+        .time-badge { background:var(--ink); color:var(--gold); border-radius:8px; padding:4px 10px; font-size:0.78rem; font-weight:700; }
+        .dur-badge  { background:rgba(201,168,76,0.1); color:#7a5c10; border-radius:8px; padding:3px 8px; font-size:0.72rem; font-weight:600; }
+        .item-actions { display:flex; gap:5px; }
+        .icon-btn { width:28px; height:28px; border-radius:8px; display:flex; align-items:center; justify-content:center; border:1.5px solid var(--border); background:transparent; color:var(--text-muted); cursor:pointer; transition:all 0.2s; font-size:0.78rem; }
+        .icon-btn.edit:hover { background:var(--ink); border-color:var(--ink); color:var(--cream); }
+        .icon-btn.del:hover  { background:rgba(196,98,45,0.1); border-color:rgba(196,98,45,0.3); color:var(--rust); }
+
+        /* Empty day */
+        .day-empty { padding:24px; text-align:center; color:#c8d0da; font-size:0.82rem; font-style:italic; }
+
+        /* Modal */
+        .modal-overlay { display:none; position:fixed; inset:0; z-index:500; background:rgba(13,17,23,0.5); backdrop-filter:blur(4px); align-items:center; justify-content:center; padding:24px; }
+        .modal-overlay.open { display:flex; }
+        .modal-box { background:white; border-radius:24px; padding:36px; width:100%; max-width:460px; box-shadow:0 32px 80px rgba(0,0,0,0.2); animation:popIn 0.3s cubic-bezier(0.22,1,0.36,1); }
+        @keyframes popIn { from{opacity:0;transform:scale(0.95) translateY(10px)} to{opacity:1;transform:scale(1) translateY(0)} }
+        .modal-title { font-family:'DM Serif Display',serif; font-size:1.4rem; color:var(--ink); margin-bottom:4px; }
+        .modal-sub { color:var(--text-muted); font-size:0.85rem; margin-bottom:24px; }
+        .delete-info { background:rgba(196,98,45,0.06); border:1px solid rgba(196,98,45,0.18); border-radius:14px; padding:16px; margin-bottom:20px; }
+        .delete-name { font-family:'DM Serif Display',serif; font-size:1.1rem; color:var(--ink); margin-bottom:6px; }
+        .delete-warn { font-size:0.8rem; color:var(--text-muted); display:flex; align-items:center; gap:6px; }
+        .modal-footer-btns { display:flex; gap:10px; margin-top:24px; }
+        .btn-cancel  { flex:1; padding:13px; background:var(--mist); border:none; border-radius:12px; font-family:'DM Sans',sans-serif; font-size:0.9rem; font-weight:600; color:var(--text-muted); cursor:pointer; }
+        .btn-cancel:hover { background:var(--border); }
+        .btn-confirm { flex:2; padding:13px; background:var(--rust); border:none; border-radius:12px; font-family:'DM Sans',sans-serif; font-size:0.9rem; font-weight:600; color:white; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; transition:all 0.2s; }
+        .btn-confirm:hover { background:#a0522d; transform:translateY(-1px); }
+
+        @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+
+        @media (max-width:900px) {
+            .navbar { padding:0 20px; }
+            .page-content { padding:24px 16px; }
+            .hero { padding:32px 24px; }
+            .form-row { grid-template-columns:1fr 1fr; }
+            .days-grid { grid-template-columns:1fr 1fr; }
         }
-
-        .header-card {
-            background: white;
-            border-radius: 16px;
-            box-shadow: var(--card-shadow);
-            padding: 24px;
-            margin-bottom: 24px;
-        }
-
-        .form-card, .schedule-card {
-            background: white;
-            border-radius: 16px;
-            box-shadow: var(--card-shadow);
-            margin-bottom: 24px;
-            overflow: hidden;
-        }
-
-        .card-header {
-            padding: 18px 24px;
-            font-weight: 600;
-            font-size: 1.1rem;
-            background: #f8f9fa !important;
-            border-bottom: 1px solid #e9ecef;
-        }
-
-        .day-card .card-header {
-            background: var(--primary) !important;
-            color: white;
-            font-weight: 600;
-        }
-
-        .list-group-item {
-            border: none;
-            padding: 12px 10px;
-        }
-
-        .no-courses {
-            color: #9ca3af;
-            font-style: italic;
-        }
-
-        .action-btns .btn {
-            width: 32px;
-            height: 32px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0;
-            font-size: 0.8rem;
-        }
-
-        @media (max-width: 768px) {
-            .day-card {
-                margin-bottom: 16px;
-            }
+        @media (max-width:600px) {
+            .form-row { grid-template-columns:1fr; }
+            .days-grid { grid-template-columns:1fr; }
         }
     </style>
 </head>
 <body>
-<div class="container-fluid">
-    <div class="row justify-content-center">
-        <div class="col-12 col-lg-10">
-            <!-- En-tête -->
-            <div class="header-card">
-                <h3 class="d-flex align-items-center gap-2 mb-1">
-                    <i class="fas fa-book text-primary"></i>
-                    Gestion des Matières – <span class="text-primary fw-bold">{{ classe.nom }}</span>
-                </h3>
-                <p class="text-muted mb-0">{{ classe.annee_scolaire }}</p>
+<div class="bg-decor"></div>
+<div class="grid-dots"></div>
+
+<!-- Navbar -->
+<nav class="navbar">
+    <a href="{{ url_for('main.dashboard') }}" class="nav-brand">
+        <span class="brand-icon"><i class="bi bi-mortarboard-fill"></i></span>
+        EduBulletin
+    </a>
+    <div class="nav-right">
+        <a href="{{ url_for('main.voir_classe', classe_id=classe.id) }}" class="btn-back">
+            <i class="bi bi-arrow-left"></i> Retour à la classe
+        </a>
+        <a href="{{ url_for('main.dashboard') }}" class="btn-back">
+            <i class="bi bi-speedometer2"></i> Dashboard
+        </a>
+    </div>
+</nav>
+
+<div class="page-content">
+
+    <!-- Flash -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}{% for category, msg in messages %}
+        <div class="flash-msg flash-{{ 'error' if category=='error' else 'success' if category=='success' else 'warning' }}">
+            <i class="bi bi-{{ 'exclamation-circle' if category=='error' else 'check-circle' if category=='success' else 'exclamation-triangle' }}"></i>
+            {{ msg }}
+            <button class="flash-close" onclick="this.parentElement.remove()"><i class="bi bi-x"></i></button>
+        </div>
+        {% endfor %}{% endif %}
+    {% endwith %}
+
+    <!-- Hero -->
+    <div class="hero">
+        <div class="hero-label"><i class="bi bi-book"></i> Gestion des matières</div>
+        <h1>{{ classe.nom }}<br><em>Emploi du temps {{ classe.annee_scolaire }}</em></h1>
+        <p class="hero-sub">Configurez les matières, professeurs et horaires de la classe.</p>
+    </div>
+
+    <!-- Formulaire -->
+    <div class="form-card">
+        <div class="form-card-header">
+            <div class="form-card-icon"><i class="bi bi-plus-circle"></i></div>
+            <div>
+                <div class="form-card-title" id="form-title">Ajouter une matière</div>
+                <div class="form-card-sub">Remplissez les informations et choisissez un créneau horaire</div>
+            </div>
+        </div>
+
+        <form method="POST" id="matiereForm">
+            <input type="hidden" name="action" value="add">
+            <input type="hidden" name="matiere_id" id="matiereId">
+
+            <div class="form-row">
+                <div class="field">
+                    <label>Nom de la matière</label>
+                    <input type="text" name="nom" id="nom" placeholder="Ex: Mathématiques" required>
+                </div>
+                <div class="field">
+                    <label>Professeur</label>
+                    <input type="text" name="professeur" id="professeur" placeholder="M. Dupont">
+                </div>
+                <div class="field">
+                    <label>Jour</label>
+                    <select name="jour" id="jour" required>
+                        <option value="">— Choisir —</option>
+                        <option value="Lundi">Lundi</option>
+                        <option value="Mardi">Mardi</option>
+                        <option value="Mercredi">Mercredi</option>
+                        <option value="Jeudi">Jeudi</option>
+                        <option value="Vendredi">Vendredi</option>
+                        <option value="Samedi">Samedi</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label>Heure</label>
+                    <input type="time" name="heure" id="heure" required>
+                </div>
+                <div class="field">
+                    <label>Durée (h)</label>
+                    <select name="duree" id="duree">
+                        <option value="1">1h</option>
+                        <option value="1.5">1h30</option>
+                        <option value="2">2h</option>
+                        <option value="2.5">2h30</option>
+                        <option value="3">3h</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-save">
+                    <i class="bi bi-check-lg"></i> Enregistrer
+                </button>
             </div>
 
-            <!-- Messages Flash -->
-            {% with messages = get_flashed_messages(with_categories=true) %}
-                {% if messages %}
-                    {% for category, msg in messages %}
-                        <div class="alert alert-{{ 'danger' if category=='error' else 'success' if category=='success' else 'warning' }} alert-dismissible fade show" role="alert">
-                            {{ msg }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    {% endfor %}
-                {% endif %}
-            {% endwith %}
-
-            <!-- Formulaire d'ajout/modification -->
-            <div class="form-card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">
-                        <i class="fas fa-plus-circle me-2 text-primary"></i>
-                        <span id="form-title">Ajouter une matière</span>
-                    </h5>
-                </div>
-                <div class="card-body p-3 p-md-4">
-                    <form method="POST" id="matiereForm">
-                        <input type="hidden" name="action" value="add" />
-                        <input type="hidden" name="matiere_id" id="matiereId" />
-
-                        <div class="row g-3">
-                            <div class="col-md-4 col-sm-6">
-                                <label class="form-label fw-medium">Nom de la matière</label>
-                                <input type="text" name="nom" id="nom" class="form-control" placeholder="Ex: Mathématiques" required />
-                            </div>
-                            <div class="col-md-3 col-sm-6">
-                                <label class="form-label fw-medium">Professeur</label>
-                                <input type="text" name="professeur" id="professeur" class="form-control" placeholder="M. Dupont" />
-                            </div>
-                            <div class="col-md-2 col-sm-6">
-                                <label class="form-label fw-medium">Jour du cours</label>
-                                <select name="jour" id="jour" class="form-select" required>
-                                    <option value="">-- Choisir --</option>
-                                    <option value="Lundi">Lundi</option>
-                                    <option value="Mardi">Mardi</option>
-                                    <option value="Mercredi">Mercredi</option>
-                                    <option value="Jeudi">Jeudi</option>
-                                    <option value="Vendredi">Vendredi</option>
-                                    <option value="Samedi">Samedi</option>
-                                </select>
-                            </div>
-                            <div class="col-md-2 col-sm-6">
-                                <label class="form-label fw-medium">Heure</label>
-                                <input type="time" name="heure" id="heure" class="form-control" required />
-                            </div>
-                            <div class="col-md-1 d-flex align-items-end">
-                                <button type="submit" class="btn btn-primary w-100">Enregistrer</button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
+            <div class="form-meta-row">
+                <button type="button" id="resetFormBtn" class="btn-reset">
+                    <i class="bi bi-arrow-counterclockwise"></i> Annuler la modification
+                </button>
             </div>
+        </form>
+    </div>
 
-            <!-- Nouvel emploi du temps par jour -->
-            <div class="schedule-card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">
-                        <i class="fas fa-calendar-alt me-2 text-primary"></i>
-                        Emploi du temps de {{ classe.nom }}
-                    </h5>
-                    <button class="btn btn-outline-success btn-sm" id="exportPdf">
-                        <i class="fas fa-file-pdf me-1"></i>Exporter en PDF
-                    </button>
-                </div>
-                <div class="card-body p-3">
-                    <div class="row g-3">
-                        {% set jours = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"] %}
-                        {% for jour in jours %}
-                            {% set matieres_du_jour = matieres | selectattr('jour', 'equalto', jour) | list %}
-                            <div class="col-12 col-md-6 col-lg-4">
-                                <div class="card day-card h-100">
-                                    <div class="card-header text-center py-2">
-                                        {{ jour }}
-                                    </div>
-                                    <div class="card-body p-0">
-                                        {% if matieres_du_jour %}
-                                            <ul class="list-group list-group-flush">
-                                                {% for m in matieres_du_jour %}
-                                                    <li class="list-group-item">
-                                                        <div class="d-flex justify-content-between">
-                                                            <div>
-                                                                <strong>{{ m.nom }}</strong>
-                                                                {% if m.professeur %}
-                                                                    <br><small class="text-muted">{{ m.professeur }}</small>
-                                                                {% endif %}
-                                                            </div>
-                                                            <div class="text-end">
-                                                                <div>
-                                                                    <span class="badge bg-primary">{{ m.heure.strftime('%H:%M') }}</span>
-                                                                    {% if m.duree %}
-                                                                        <span class="badge bg-secondary ms-1">{{ m.duree }}h</span>
-                                                                    {% endif %}
-                                                                </div>
-                                                                <div class="mt-2 d-flex justify-content-end gap-1">
-                                                                    <button class="btn btn-sm btn-outline-primary btn-modifier action-btns"
-                                                                        data-id="{{ m.id }}"
-                                                                        data-nom="{{ m.nom }}"
-                                                                        data-professeur="{{ m.professeur or '' }}"
-                                                                        data-jour="{{ m.jour or '' }}"
-                                                                        data-heure="{{ m.heure.strftime('%H:%M') if m.heure else '' }}"
-                                                                        data-duree="{{ m.duree or 1 }}"
-                                                                        title="Modifier">
-                                                                        <i class="fas fa-edit"></i>
-                                                                    </button>
-                                                                    <button class="btn btn-sm btn-outline-danger btn-supprimer action-btns"
-                                                                        data-id="{{ m.id }}"
-                                                                        data-nom="{{ m.nom }}"
-                                                                        title="Supprimer">
-                                                                        <i class="fas fa-trash"></i>
-                                                                    </button>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </li>
-                                                {% endfor %}
-                                            </ul>
-                                        {% else %}
-                                            <div class="text-center py-3">
-                                                <em class="text-muted">Aucun cours</em>
-                                            </div>
-                                        {% endif %}
-                                    </div>
+    <!-- Emploi du temps -->
+    <div class="schedule-section">
+        <div class="schedule-header">
+            <h2 class="schedule-title">Emploi du temps</h2>
+            <button class="btn-export" id="exportPdf">
+                <i class="bi bi-file-earmark-pdf"></i> Exporter en PDF
+            </button>
+        </div>
+
+        <div class="days-grid">
+            {% set jours = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"] %}
+            {% for jour in jours %}
+                {% set mj = matieres | selectattr('jour', 'equalto', jour) | list %}
+                <div class="day-card">
+                    <div class="day-header">
+                        <span class="day-name">{{ jour }}</span>
+                        <span class="day-count">{{ mj|length }} cours</span>
+                    </div>
+                    {% if mj %}
+                    <div class="matiere-list">
+                        {% for m in mj %}
+                        <div class="matiere-item">
+                            <div class="matiere-info">
+                                <div class="matiere-name">{{ m.nom }}</div>
+                                {% if m.professeur %}
+                                <div class="matiere-prof"><i class="bi bi-person" style="color:var(--gold);font-size:0.7rem;"></i> {{ m.professeur }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="matiere-right">
+                                <div style="display:flex;gap:6px;align-items:center;">
+                                    <span class="time-badge">{{ m.heure.strftime('%H:%M') }}</span>
+                                    {% if m.duree %}<span class="dur-badge">{{ m.duree }}h</span>{% endif %}
+                                </div>
+                                <div class="item-actions">
+                                    <button class="icon-btn edit btn-modifier"
+                                            data-id="{{ m.id }}"
+                                            data-nom="{{ m.nom }}"
+                                            data-professeur="{{ m.professeur or '' }}"
+                                            data-jour="{{ m.jour or '' }}"
+                                            data-heure="{{ m.heure.strftime('%H:%M') if m.heure else '' }}"
+                                            data-duree="{{ m.duree or 1 }}"
+                                            title="Modifier">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                    <button class="icon-btn del btn-supprimer"
+                                            data-id="{{ m.id }}"
+                                            data-nom="{{ m.nom }}"
+                                            title="Supprimer">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
                                 </div>
                             </div>
+                        </div>
                         {% endfor %}
                     </div>
+                    {% else %}
+                    <div class="day-empty">Aucun cours ce jour</div>
+                    {% endif %}
                 </div>
-            </div>
+            {% endfor %}
+        </div>
+    </div>
 
-            <!-- Retour -->
-            <div class="text-center mt-3">
-                <a href="{{ url_for('main.dashboard') }}" class="btn btn-secondary">
-                    <i class="fas fa-arrow-left me-1"></i> Retour au tableau de bord
-                </a>
+</div>
+
+<!-- Modal suppression -->
+<div class="modal-overlay" id="deleteModal">
+    <div class="modal-box">
+        <h3 class="modal-title">Supprimer la matière ?</h3>
+        <p class="modal-sub">Cette action est irréversible</p>
+        <div class="delete-info">
+            <div class="delete-name" id="deleteNom"></div>
+            <div class="delete-warn">
+                <i class="bi bi-exclamation-triangle" style="color:var(--rust);"></i>
+                Les notes associées à cette matière seront également supprimées.
             </div>
         </div>
+        <form method="POST" id="deleteForm">
+            <input type="hidden" name="action" value="delete">
+            <input type="hidden" name="matiere_id" id="deleteMatiereId">
+            <div class="modal-footer-btns">
+                <button type="button" class="btn-cancel" onclick="closeModal('deleteModal')">Annuler</button>
+                <button type="submit" class="btn-confirm">
+                    <i class="bi bi-trash"></i> Supprimer
+                </button>
+            </div>
+        </form>
     </div>
 </div>
 
-<!-- Modal de suppression -->
-<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Confirmer la suppression</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <p>Supprimer la matière <strong id="deleteNom"></strong> ?</p>
-                <p class="text-danger"><small>Les notes associées seront aussi supprimées.</small></p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                <form method="POST" id="deleteForm">
-                    <input type="hidden" name="action" value="delete" />
-                    <input type="hidden" name="matiere_id" id="deleteMatiereId" />
-                    <button type="submit" class="btn btn-danger">Supprimer</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    // Modifier une matière
+    function openModal(id) { document.getElementById(id).classList.add('open'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+    document.querySelectorAll('.modal-overlay').forEach(o => o.addEventListener('click', e => { if(e.target===o) o.classList.remove('open'); }));
+    document.addEventListener('keydown', e => { if(e.key==='Escape') document.querySelectorAll('.modal-overlay.open').forEach(m=>m.classList.remove('open')); });
+
+    // Reset
+    document.getElementById('resetFormBtn').addEventListener('click', () => {
+        document.getElementById('matiereForm').reset();
+        document.getElementById('form-title').textContent = 'Ajouter une matière';
+        document.querySelector('#matiereForm input[name="action"]').value = 'add';
+        document.getElementById('matiereId').value = '';
+    });
+
+    // Modifier
     document.querySelectorAll('.btn-modifier').forEach(btn => {
-        btn.addEventListener('click', function () {
+        btn.addEventListener('click', () => {
             document.getElementById('form-title').textContent = 'Modifier la matière';
             document.querySelector('#matiereForm input[name="action"]').value = 'edit';
-            document.getElementById('matiereId').value = this.dataset.id;
-            document.getElementById('nom').value = this.dataset.nom;
-            document.getElementById('professeur').value = this.dataset.professeur;
-            document.getElementById('jour').value = this.dataset.jour;
-            document.getElementById('heure').value = this.dataset.heure;
+            document.getElementById('matiereId').value = btn.dataset.id;
+            document.getElementById('nom').value = btn.dataset.nom;
+            document.getElementById('professeur').value = btn.dataset.professeur;
+            document.getElementById('jour').value = btn.dataset.jour;
+            document.getElementById('heure').value = btn.dataset.heure;
+            document.getElementById('duree').value = btn.dataset.duree;
             document.getElementById('nom').focus();
+            document.getElementById('matiereForm').scrollIntoView({behavior:'smooth'});
         });
     });
 
-    // Réinitialiser le formulaire (optionnel, si vous ajoutez un bouton reset)
-    // Pas nécessaire ici, mais utile si vous en rajoutez un.
-
-    // Suppression
+    // Supprimer
     document.querySelectorAll('.btn-supprimer').forEach(btn => {
-        btn.addEventListener('click', function () {
-            const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
-            document.getElementById('deleteNom').textContent = this.dataset.nom;
-            document.getElementById('deleteMatiereId').value = this.dataset.id;
-            modal.show();
+        btn.addEventListener('click', () => {
+            document.getElementById('deleteNom').textContent = btn.dataset.nom;
+            document.getElementById('deleteMatiereId').value = btn.dataset.id;
+            openModal('deleteModal');
         });
     });
 
-    // Export PDF (maintenant basé sur l’affichage par jour)
-    document.getElementById('exportPdf').addEventListener('click', function () {
-        const class_name = "{{ classe.nom }}";
-        const annee = "{{ classe.annee_scolaire }}";
-        const jours = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"];
-        let content = `
-            <h2 style="text-align:center; font-family: Poppins, sans-serif;">Emploi du temps - ${class_name}</h2>
-            <p style="text-align:center; color:#666; font-family: Poppins, sans-serif;">Année scolaire: ${annee}</p>
-        `;
-
+    // Export PDF (fenêtre d'impression)
+    document.getElementById('exportPdf').addEventListener('click', () => {
+        const cn = "{{ classe.nom }}";
+        const an = "{{ classe.annee_scolaire }}";
+        const jours = ["Lundi","Mardi","Mercredi","Jeudi","Vendredi","Samedi"];
+        let content = `<h2 style="text-align:center;font-family:Georgia,serif;color:#0d1117;">Emploi du temps — ${cn}</h2><p style="text-align:center;color:#6b7685;margin-bottom:24px;">Année scolaire : ${an}</p>`;
         jours.forEach(jour => {
             const matieres = [];
-            document.querySelectorAll(`.day-card`).forEach(card => {
-                if (card.querySelector('.card-header').innerText.trim() === jour) {
-                    const items = card.querySelectorAll('.list-group-item');
-                    items.forEach(item => {
-                        const nom = item.querySelector('strong')?.innerText || '';
-                        const prof = item.querySelectorAll('small')[0]?.innerText || '';
-                        const badges = item.querySelectorAll('.badge');
-                        let heure = '—', duree = '1h';
-                        badges.forEach(b => {
-                            if (b.classList.contains('bg-primary')) heure = b.innerText;
-                            if (b.classList.contains('bg-secondary')) duree = b.innerText;
-                        });
-                        if (nom) matieres.push({ nom, prof, heure, duree });
+            document.querySelectorAll('.day-card').forEach(card => {
+                if(card.querySelector('.day-name')?.textContent.trim() === jour) {
+                    card.querySelectorAll('.matiere-item').forEach(item => {
+                        const nom  = item.querySelector('.matiere-name')?.textContent.trim() || '';
+                        const prof = item.querySelector('.matiere-prof')?.textContent.trim() || '–';
+                        const time = item.querySelector('.time-badge')?.textContent.trim() || '–';
+                        const dur  = item.querySelector('.dur-badge')?.textContent.trim() || '–';
+                        if(nom) matieres.push({nom,prof,time,dur});
                     });
                 }
             });
-
-            if (matieres.length > 0) {
-                content += `<h4 style="margin-top:20px; margin-bottom:10px; font-family: Poppins;">${jour}</h4>`;
-                content += `<table border="1" cellpadding="8" width="100%" style="border-collapse:collapse; margin-bottom:15px;">`;
-                content += `<thead><tr style="background:#f0f8ff;"><th>Matière</th><th>Professeur</th><th>Heure</th><th>Durée</th></tr></thead><tbody>`;
-                matieres.forEach(m => {
-                    content += `<tr>
-                        <td>${m.nom}</td>
-                        <td>${m.prof || '—'}</td>
-                        <td>${m.heure}</td>
-                        <td>${m.duree}</td>
-                    </tr>`;
-                });
+            if(matieres.length > 0) {
+                content += `<h4 style="margin-top:20px;margin-bottom:8px;font-family:Georgia,serif;color:#c9a84c;">${jour}</h4>`;
+                content += `<table border="1" cellpadding="8" width="100%" style="border-collapse:collapse;margin-bottom:16px;font-family:Arial,sans-serif;"><thead><tr style="background:#0d1117;color:white;"><th>Matière</th><th>Professeur</th><th>Heure</th><th>Durée</th></tr></thead><tbody>`;
+                matieres.forEach(m => { content += `<tr><td>${m.nom}</td><td>${m.prof}</td><td>${m.time}</td><td>${m.dur}</td></tr>`; });
                 content += `</tbody></table>`;
             }
         });
-
-        const printWin = window.open('', '', 'width=800,height=700');
-        printWin.document.write(`
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <title>Emploi du temps - ${class_name}</title>
-                <style>
-                    body { font-family: Poppins, Arial, sans-serif; padding: 20px; background: white; color: #333; }
-                    table { width: 100%; border: 1px solid #ccc; }
-                    th, td { padding: 10px; text-align: left; border: 1px solid #ddd; }
-                    @media print {
-                        body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-                    }
-                </style>
-            </head>
-            <body>${content}</body>
-            </html>
-        `);
-        printWin.document.close();
-        printWin.focus();
-        printWin.print();
+        const win = window.open('','','width=800,height=700');
+        win.document.write(`<!DOCTYPE html><html><head><title>Emploi du temps ${cn}</title><style>body{font-family:Arial,sans-serif;padding:20px;color:#333;}table{width:100%;}th,td{padding:10px;text-align:left;border:1px solid #ddd;}</style></head><body>${content}</body></html>`);
+        win.document.close();
+        win.focus();
+        win.print();
     });
 </script>
 </body>
