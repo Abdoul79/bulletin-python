@@ -2,203 +2,425 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Accueil | Système de Bulletins Scolaires</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <!-- Bootstrap -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- Icons -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduBulletin — Gestion Scolaire</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-
-    <!-- Google Font -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
     <style>
+        :root {
+            --ink: #0d1117;
+            --cream: #f5f0e8;
+            --gold: #c9a84c;
+            --gold-light: #e8d5a3;
+            --rust: #c4622d;
+            --mist: #e8edf2;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
         body {
-            font-family: 'Poppins', sans-serif;
+            font-family: 'DM Sans', sans-serif;
+            background: var(--cream);
             min-height: 100vh;
-            background: linear-gradient(135deg, #6a11cb, #2575fc);
-            padding: 40px 15px;
+            overflow-x: hidden;
         }
 
-        .main-card {
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(18px);
-            border-radius: 20px;
-            box-shadow: 0 15px 45px rgba(0,0,0,0.25);
-            padding: 3rem;
-            animation: fadeIn 0.8s ease;
+        /* ── Background décoratif ── */
+        .bg-decor {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            overflow: hidden;
+            pointer-events: none;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+        .bg-decor::before {
+            content: '';
+            position: absolute;
+            top: -200px; right: -200px;
+            width: 600px; height: 600px;
+            background: radial-gradient(circle, rgba(201,168,76,0.15) 0%, transparent 70%);
+            border-radius: 50%;
         }
 
-        .title {
-            color: #fff;
-            font-weight: 700;
-            text-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        .bg-decor::after {
+            content: '';
+            position: absolute;
+            bottom: -150px; left: -150px;
+            width: 500px; height: 500px;
+            background: radial-gradient(circle, rgba(196,98,45,0.1) 0%, transparent 70%);
+            border-radius: 50%;
         }
 
-        .subtitle {
-            color: rgba(255,255,255,0.85);
+        /* ── Grid dots ── */
+        .grid-dots {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            background-image: radial-gradient(circle, #c9a84c22 1px, transparent 1px);
+            background-size: 32px 32px;
         }
 
-        .notice {
-            background: linear-gradient(45deg, #ffeaa7, #fab1a0);
-            border-radius: 14px;
-            padding: 18px;
-            border-left: 6px solid #e17055;
+        /* ── Layout principal ── */
+        .wrapper {
+            position: relative;
+            z-index: 1;
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
         }
 
-        .btn-action {
+        /* ── Côté gauche ── */
+        .left-panel {
+            padding: 60px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+        }
+
+        .logo-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--ink);
+            color: var(--gold);
+            padding: 10px 20px;
             border-radius: 50px;
-            padding: 12px 28px;
+            font-size: 0.85rem;
             font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 48px;
+            width: fit-content;
+            animation: slideDown 0.6s ease both;
+        }
+
+        .logo-badge i { font-size: 1.1rem; }
+
+        .headline {
+            font-family: 'DM Serif Display', serif;
+            font-size: clamp(2.8rem, 5vw, 4.2rem);
+            line-height: 1.1;
+            color: var(--ink);
+            margin-bottom: 24px;
+            animation: slideUp 0.7s ease 0.1s both;
+        }
+
+        .headline em {
+            font-style: italic;
+            color: var(--rust);
+        }
+
+        .tagline {
+            font-size: 1.05rem;
+            color: #5a6372;
+            line-height: 1.7;
+            max-width: 420px;
+            margin-bottom: 48px;
+            animation: slideUp 0.7s ease 0.2s both;
+        }
+
+        /* ── Stats ── */
+        .stats {
+            display: flex;
+            gap: 32px;
+            margin-bottom: 56px;
+            animation: slideUp 0.7s ease 0.3s both;
+        }
+
+        .stat {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-num {
+            font-family: 'DM Serif Display', serif;
+            font-size: 2rem;
+            color: var(--ink);
+            line-height: 1;
+        }
+
+        .stat-label {
+            font-size: 0.78rem;
+            color: #8a94a0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 4px;
+        }
+
+        /* ── Bouton connexion ── */
+        .btn-connect {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--ink);
+            color: var(--cream);
+            padding: 18px 36px;
+            border-radius: 16px;
+            font-size: 1rem;
+            font-weight: 600;
+            text-decoration: none;
             transition: all 0.3s ease;
+            width: fit-content;
+            animation: slideUp 0.7s ease 0.4s both;
+            border: 2px solid var(--ink);
         }
 
-        .btn-action:hover {
+        .btn-connect:hover {
+            background: transparent;
+            color: var(--ink);
             transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.25);
+            box-shadow: 0 12px 30px rgba(13,17,23,0.15);
         }
 
-        .feature-card {
+        .btn-connect .arrow {
+            width: 32px; height: 32px;
+            background: var(--gold);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s ease;
+        }
+
+        .btn-connect:hover .arrow { transform: translateX(4px); }
+
+        /* ── Côté droit ── */
+        .right-panel {
+            background: var(--ink);
+            padding: 60px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .right-panel::before {
+            content: '';
+            position: absolute;
+            top: -100px; right: -100px;
+            width: 400px; height: 400px;
+            background: radial-gradient(circle, rgba(201,168,76,0.12) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .features-title {
+            font-family: 'DM Serif Display', serif;
+            font-size: 1.6rem;
+            color: var(--gold-light);
+            margin-bottom: 40px;
+            animation: fadeIn 0.8s ease 0.3s both;
+        }
+
+        /* ── Feature cards ── */
+        .feature-list {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 20px;
+            padding: 24px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
             border-radius: 16px;
             transition: all 0.3s ease;
+            animation: fadeIn 0.6s ease both;
         }
 
-        .feature-card:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+        .feature-item:nth-child(1) { animation-delay: 0.4s; }
+        .feature-item:nth-child(2) { animation-delay: 0.5s; }
+        .feature-item:nth-child(3) { animation-delay: 0.6s; }
+        .feature-item:nth-child(4) { animation-delay: 0.7s; }
+
+        .feature-item:hover {
+            background: rgba(201,168,76,0.08);
+            border-color: rgba(201,168,76,0.25);
+            transform: translateX(6px);
         }
 
         .feature-icon {
-            font-size: 2.2rem;
-            margin-bottom: 10px;
+            width: 44px; height: 44px;
+            background: rgba(201,168,76,0.12);
+            border: 1px solid rgba(201,168,76,0.25);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--gold);
+            font-size: 1.2rem;
+            flex-shrink: 0;
         }
 
-        footer {
-            color: rgba(255,255,255,0.7);
-            font-size: 0.9rem;
+        .feature-text h4 {
+            color: #e8edf2;
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 4px;
         }
 
-        @media (max-width: 576px) {
-            .main-card {
-                padding: 2rem 1.5rem;
-            }
+        .feature-text p {
+            color: #6b7685;
+            font-size: 0.82rem;
+            line-height: 1.5;
+        }
+
+        /* ── Footer discret ── */
+        .footer-link {
+            position: fixed;
+            bottom: 24px;
+            right: 32px;
+            z-index: 10;
+            font-size: 0.75rem;
+            color: #8a94a0;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: color 0.2s;
+        }
+
+        .footer-link:hover { color: var(--ink); }
+
+        /* ── Animations ── */
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to   { opacity: 1; }
+        }
+
+        /* ── Responsive ── */
+        @media (max-width: 900px) {
+            .wrapper { grid-template-columns: 1fr; }
+            .left-panel { padding: 48px 32px; }
+            .right-panel { padding: 48px 32px; }
+            .stats { gap: 24px; }
+        }
+
+        @media (max-width: 480px) {
+            .left-panel { padding: 40px 24px; }
+            .right-panel { padding: 40px 24px; }
+            .headline { font-size: 2.4rem; }
+            .stats { flex-wrap: wrap; gap: 20px; }
         }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="main-card">
+<div class="bg-decor"></div>
+<div class="grid-dots"></div>
 
-        <!-- Header -->
-        <div class="text-center mb-5">
-            <div class="mb-3 fs-1">🎓</div>
-            <h1 class="title mb-2">Système de Gestion des Bulletins</h1>
-            <p class="subtitle">
-                Automatisez la gestion des notes et bulletins scolaires
-            </p>
+<div class="wrapper">
+
+    <!-- ── Panneau gauche ── -->
+    <div class="left-panel">
+
+        <div class="logo-badge">
+            <i class="bi bi-mortarboard-fill"></i>
+            EduBulletin
         </div>
 
-        <!-- Auth notice -->
-        <div class="notice text-center mb-5">
-            <div class="d-flex justify-content-center align-items-center mb-2">
-                <i class="bi bi-shield-lock-fill me-2"></i>
-                <strong>Connexion requise</strong>
+        <h1 class="headline">
+            Gérez vos<br>
+            bulletins <em>scolaires</em><br>
+            simplement.
+        </h1>
+
+        <p class="tagline">
+            Plateforme complète pour la gestion des élèves, matières, notes
+            et la génération automatique de bulletins — accessible partout.
+        </p>
+
+        <div class="stats">
+            <div class="stat">
+                <span class="stat-num">100%</span>
+                <span class="stat-label">En ligne</span>
             </div>
-            <p class="mb-0">
-                Connectez-vous pour accéder aux fonctionnalités et gérer votre établissement scolaire.
-            </p>
-        </div>
-
-        <!-- Action buttons -->
-        <div class="text-center mb-5">
-            <a href="{{ url_for('auth.login') }}" class="btn btn-primary btn-action me-3 mb-2">
-                <i class="bi bi-mortarboard-fill"></i> Connexion École
-            </a>
-            <a href="{{ url_for('auth.admin_login') }}" class="btn btn-warning btn-action mb-2">
-                <i class="bi bi-person-badge-fill"></i> Admin – Enregistrer une école
-            </a>
-        </div>
-
-        <!-- Features -->
-        <div class="row g-4 mb-4">
-            <div class="col-md-6">
-                <div class="card feature-card h-100 text-center border-primary">
-                    <div class="card-body">
-                        <div class="feature-icon text-primary">
-                            <i class="bi bi-building"></i>
-                        </div>
-                        <h5 class="card-title">Gestion des Écoles</h5>
-                        <p class="card-text">
-                            Enregistrez et administrez les établissements scolaires facilement.
-                        </p>
-                    </div>
-                </div>
+            <div class="stat">
+                <span class="stat-num">PDF</span>
+                <span class="stat-label">Bulletins auto</span>
             </div>
-
-            <div class="col-md-6">
-                <div class="card feature-card h-100 text-center border-success">
-                    <div class="card-body">
-                        <div class="feature-icon text-success">
-                            <i class="bi bi-graph-up-arrow"></i>
-                        </div>
-                        <h5 class="card-title">Bulletins Automatiques</h5>
-                        <p class="card-text">
-                            Générez les bulletins de notes de manière rapide et fiable.
-                        </p>
-                    </div>
-                </div>
+            <div class="stat">
+                <span class="stat-num">AR/FR</span>
+                <span class="stat-label">Bilingue</span>
             </div>
         </div>
 
-        <!-- About -->
-        <div class="card feature-card border-info text-center mb-4">
-            <div class="card-body">
-                <div class="feature-icon text-info">
-                    <i class="bi bi-info-circle-fill"></i>
-                </div>
-                <h5 class="card-title">À propos du système</h5>
-                <p class="card-text">
-                    Une plateforme complète pour la gestion des élèves, des matières, des notes
-                    et la génération automatique des bulletins scolaires.
-                </p>
+        <a href="{{ url_for('auth.login') }}" class="btn-connect">
+            <span>Connexion École</span>
+            <span class="arrow"><i class="bi bi-arrow-right"></i></span>
+        </a>
 
-                <div class="row mt-4">
-                    <div class="col-sm-3 col-6 mb-3">
-                        <i class="bi bi-people-fill text-primary fs-4"></i>
-                        <p class="small mb-0">Élèves</p>
-                    </div>
-                    <div class="col-sm-3 col-6 mb-3">
-                        <i class="bi bi-book-fill text-danger fs-4"></i>
-                        <p class="small mb-0">Matières</p>
-                    </div>
-                    <div class="col-sm-3 col-6 mb-3">
-                        <i class="bi bi-bar-chart-fill text-success fs-4"></i>
-                        <p class="small mb-0">Notes</p>
-                    </div>
-                    <div class="col-sm-3 col-6 mb-3">
-                        <i class="bi bi-file-earmark-text-fill text-warning fs-4"></i>
-                        <p class="small mb-0">Bulletins</p>
-                    </div>
+    </div>
+
+    <!-- ── Panneau droit ── -->
+    <div class="right-panel">
+
+        <p class="features-title">Tout ce dont vous avez besoin</p>
+
+        <div class="feature-list">
+            <div class="feature-item">
+                <div class="feature-icon">
+                    <i class="bi bi-people-fill"></i>
+                </div>
+                <div class="feature-text">
+                    <h4>Gestion des élèves</h4>
+                    <p>Ajoutez, modifiez et organisez vos élèves par classe avec matricule unique.</p>
+                </div>
+            </div>
+
+            <div class="feature-item">
+                <div class="feature-icon">
+                    <i class="bi bi-book-fill"></i>
+                </div>
+                <div class="feature-text">
+                    <h4>Matières & Emploi du temps</h4>
+                    <p>Configurez les matières, professeurs et horaires par classe.</p>
+                </div>
+            </div>
+
+            <div class="feature-item">
+                <div class="feature-icon">
+                    <i class="bi bi-bar-chart-fill"></i>
+                </div>
+                <div class="feature-text">
+                    <h4>Saisie des notes</h4>
+                    <p>Enregistrez les notes par trimestre et calculez automatiquement les moyennes.</p>
+                </div>
+            </div>
+
+            <div class="feature-item">
+                <div class="feature-icon">
+                    <i class="bi bi-file-earmark-pdf-fill"></i>
+                </div>
+                <div class="feature-text">
+                    <h4>Bulletins PDF automatiques</h4>
+                    <p>Générez et imprimez les bulletins officiels en un seul clic.</p>
                 </div>
             </div>
         </div>
 
     </div>
-
-    <!-- Footer -->
-    <footer class="text-center mt-4">
-        © 2025 — Système de Bulletins Scolaires
-    </footer>
 </div>
+
+<!-- Lien admin discret -->
+<a href="{{ url_for('auth.admin_login') }}" class="footer-link">
+    <i class="bi bi-shield-lock"></i> Espace administrateur
+</a>
 
 </body>
 </html>
-

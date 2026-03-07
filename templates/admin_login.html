@@ -2,191 +2,346 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Connexion Administrateur | Bulletins Scolaires</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <!-- Bootstrap -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- Bootstrap Icons -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administration — EduBulletin</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-
-    <!-- Google Font -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
     <style>
+        :root {
+            --ink: #0d1117;
+            --red: #c0392b;
+            --red-dark: #922b21;
+            --red-glow: rgba(192,57,43,0.2);
+            --cream: #f5f0e8;
+            --gold: #c9a84c;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
         body {
-            font-family: 'Poppins', sans-serif;
+            font-family: 'DM Sans', sans-serif;
+            background: var(--ink);
             min-height: 100vh;
-            background: linear-gradient(135deg, #667eea, #764ba2);
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            padding: 24px;
+            position: relative;
+            overflow: hidden;
         }
 
+        /* ── Fond décoratif ── */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -200px; left: 50%;
+            transform: translateX(-50%);
+            width: 800px; height: 800px;
+            background: radial-gradient(circle, rgba(192,57,43,0.08) 0%, transparent 60%);
+            pointer-events: none;
+        }
+
+        .grid {
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+            background-size: 40px 40px;
+            pointer-events: none;
+        }
+
+        /* ── Card principale ── */
         .admin-card {
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(18px);
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            position: relative;
+            z-index: 1;
+            background: #161b22;
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 24px;
+            padding: 48px 44px;
             width: 100%;
-            max-width: 450px;
-            animation: fadeIn 0.8s ease;
-            color: #fff;
+            max-width: 460px;
+            box-shadow: 0 32px 80px rgba(0,0,0,0.6);
+            animation: appear 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+        @keyframes appear {
+            from { opacity: 0; transform: translateY(24px) scale(0.97); }
+            to   { opacity: 1; transform: translateY(0) scale(1); }
         }
 
-        .admin-header {
-            padding: 30px;
-            text-align: center;
-            background: linear-gradient(135deg, #ff6b6b, #feca57);
-            border-radius: 20px 20px 0 0;
-        }
-
-        .admin-header h3 {
-            font-weight: 700;
-            margin-bottom: 5px;
-        }
-
-        .admin-body {
-            padding: 35px 30px;
-        }
-
-        .form-control {
-            border-radius: 12px;
-            padding-left: 45px;
-        }
-
-        .input-icon {
-            position: absolute;
-            top: 50%;
-            left: 15px;
-            transform: translateY(-50%);
-            color: #6c757d;
-        }
-
-        .btn-admin {
+        /* ── Badge danger ── */
+        .danger-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(192,57,43,0.12);
+            border: 1px solid rgba(192,57,43,0.3);
+            color: #e74c3c;
+            padding: 8px 16px;
             border-radius: 50px;
-            padding: 12px;
+            font-size: 0.75rem;
             font-weight: 600;
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 32px;
+        }
+
+        .danger-badge .dot {
+            width: 6px; height: 6px;
+            background: #e74c3c;
+            border-radius: 50%;
+            animation: pulse 1.5s ease infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50%       { opacity: 0.4; transform: scale(0.8); }
+        }
+
+        /* ── Titre ── */
+        .card-title {
+            font-family: 'DM Serif Display', serif;
+            font-size: 2rem;
+            color: #e8edf2;
+            margin-bottom: 8px;
+            line-height: 1.2;
+        }
+
+        .card-sub {
+            color: #4a5568;
+            font-size: 0.88rem;
+            margin-bottom: 36px;
+        }
+
+        /* ── Divider ── */
+        .divider {
+            height: 1px;
+            background: rgba(255,255,255,0.06);
+            margin-bottom: 32px;
+        }
+
+        /* ── Flash messages ── */
+        .flash-msg {
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .flash-error {
+            background: rgba(192,57,43,0.12);
+            border: 1px solid rgba(192,57,43,0.25);
+            color: #e74c3c;
+        }
+
+        .flash-success {
+            background: rgba(39,174,96,0.1);
+            border: 1px solid rgba(39,174,96,0.2);
+            color: #2ecc71;
+        }
+
+        /* ── Formulaire ── */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #6b7685;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .input-wrap {
+            position: relative;
+        }
+
+        .input-wrap i {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #3a4250;
+            font-size: 1rem;
+            pointer-events: none;
+            transition: color 0.2s;
+        }
+
+        input {
+            width: 100%;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px;
+            padding: 14px 16px 14px 44px;
+            color: #e8edf2;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: rgba(192,57,43,0.5);
+            background: rgba(192,57,43,0.04);
+            box-shadow: 0 0 0 3px rgba(192,57,43,0.1);
+        }
+
+        input:focus + i,
+        .input-wrap:focus-within i {
+            color: #e74c3c;
+        }
+
+        input::placeholder { color: #3a4250; }
+
+        /* ── Bouton submit ── */
+        .btn-admin {
+            width: 100%;
+            background: var(--red);
             border: none;
+            border-radius: 12px;
+            padding: 16px;
+            color: white;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
         }
 
         .btn-admin:hover {
+            background: var(--red-dark);
             transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            box-shadow: 0 8px 25px var(--red-glow);
         }
 
-        .security-box {
-            background: linear-gradient(45deg, #ff9a9e, #fecfef);
-            color: #2d3436;
-            border-radius: 14px;
-            padding: 15px;
-            margin-bottom: 25px;
-            text-align: center;
-        }
+        .btn-admin:active { transform: translateY(0); }
 
-        .back-btn {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            background: rgba(255,255,255,0.2);
-            color: #fff;
-            padding: 8px 18px;
-            border-radius: 30px;
+        /* ── Retour ── */
+        .back-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 28px;
+            color: #3a4250;
+            font-size: 0.85rem;
             text-decoration: none;
-            font-weight: 500;
-            transition: 0.3s;
+            transition: color 0.2s;
         }
 
-        .back-btn:hover {
-            background: rgba(255,255,255,0.35);
-            color: #fff;
+        .back-link:hover { color: #6b7685; }
+
+        /* ── Warning box ── */
+        .warning-box {
+            background: rgba(201,168,76,0.06);
+            border: 1px solid rgba(201,168,76,0.15);
+            border-radius: 12px;
+            padding: 14px 16px;
+            margin-top: 24px;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+
+        .warning-box i {
+            color: var(--gold);
+            font-size: 1rem;
+            margin-top: 2px;
+            flex-shrink: 0;
+        }
+
+        .warning-box p {
+            color: #5a6372;
+            font-size: 0.8rem;
+            line-height: 1.5;
         }
     </style>
 </head>
 <body>
 
-<!-- Bouton retour -->
-<a href="{{ url_for('auth.index') }}" class="back-btn">
-    ← Accueil
-</a>
+<div class="grid"></div>
 
 <div class="admin-card">
 
-    <!-- Header -->
-    <div class="admin-header">
-        <div class="fs-1 mb-2">🔐</div>
-        <h3>Accès Administrateur</h3>
-        <small>Gestion & enregistrement des écoles</small>
+    <div class="danger-badge">
+        <span class="dot"></span>
+        Zone restreinte
     </div>
 
-    <!-- Body -->
-    <div class="admin-body">
+    <h1 class="card-title">Espace<br>Administrateur</h1>
+    <p class="card-sub">Accès réservé à la gestion du système</p>
 
-        <!-- Flash messages -->
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ 'danger' if category == 'error' else category }} py-2">
-                        {{ message }}
-                    </div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
+    <div class="divider"></div>
 
-        <!-- Security warning -->
-        <div class="security-box">
-            <strong>⚠ Zone sécurisée</strong><br>
-            <small>Réservée aux administrateurs autorisés uniquement</small>
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, msg in messages %}
+                <div class="flash-msg flash-{{ 'error' if category == 'error' else 'success' }}">
+                    <i class="bi bi-{{ 'exclamation-circle' if category == 'error' else 'check-circle' }}"></i>
+                    {{ msg }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- Formulaire -->
+    <form method="POST">
+        <div class="form-group">
+            <label>Adresse e-mail</label>
+            <div class="input-wrap">
+                <input
+                    type="email"
+                    name="email"
+                    placeholder="admin@example.com"
+                    autocomplete="email"
+                    required>
+                <i class="bi bi-envelope"></i>
+            </div>
         </div>
 
-        <!-- Form -->
-        <form method="POST">
-
-            <div class="mb-3 position-relative">
-                <i class="bi bi-envelope-fill input-icon"></i>
-                <input type="email"
-                       name="email"
-                       class="form-control"
-                       placeholder="Email administrateur"
-                       required>
+        <div class="form-group">
+            <label>Mot de passe</label>
+            <div class="input-wrap">
+                <input
+                    type="password"
+                    name="password"
+                    placeholder="••••••••••"
+                    autocomplete="current-password"
+                    required>
+                <i class="bi bi-lock"></i>
             </div>
-
-            <div class="mb-4 position-relative">
-                <i class="bi bi-lock-fill input-icon"></i>
-                <input type="password"
-                       name="password"
-                       class="form-control"
-                       placeholder="Mot de passe"
-                       required>
-            </div>
-
-            <button type="submit" class="btn btn-admin w-100 text-white">
-                🚀 Accéder à l'administration
-            </button>
-        </form>
-
-        <!-- Info -->
-        <div class="text-center mt-4">
-            <hr class="opacity-25">
-            <small class="opacity-75">
-                Les écoles utilisent la
-                <a href="{{ url_for('auth.login') }}" class="text-white text-decoration-underline">
-                    connexion standard
-                </a>
-            </small>
         </div>
 
+        <button type="submit" class="btn-admin">
+            <i class="bi bi-shield-lock-fill"></i>
+            Accéder au panneau admin
+        </button>
+    </form>
+
+    <div class="warning-box">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        <p>Cet espace est réservé aux administrateurs autorisés. Toute tentative d'accès non autorisée est enregistrée.</p>
     </div>
+
+    <a href="{{ url_for('auth.index') }}" class="back-link">
+        <i class="bi bi-arrow-left"></i>
+        Retour à l'accueil
+    </a>
+
 </div>
 
 </body>
 </html>
-
