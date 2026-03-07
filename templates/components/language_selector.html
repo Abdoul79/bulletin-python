@@ -1,0 +1,12 @@
+<!-- templates/components/language_selector.html -->
+<div class="position-fixed top-0 end-0 p-3" style="z-index: 1000;">
+    <div class="btn-group">
+        <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+            🌐 {{ current_lang.upper() }}
+        </button>
+        <ul class="dropdown-menu">
+          <li><a class="dropdown-item" href="{{ url_for('language.set_language', language='fr', next=request.path) }}">Français</a></li>
+          <li><a class="dropdown-item" href="{{ url_for('language.set_language', language='en', next=request.path) }}">English</a></li>
+          <li><a class="dropdown-item" href="{{ url_for('language.set_language', language='ar', next=request.path) }}">العربية</a></li>
+    </div>
+</div>

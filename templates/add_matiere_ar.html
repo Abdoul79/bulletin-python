@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إدارة المواد - {{ classe.nom }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Cairo', 'Tahoma', sans-serif;
+        }
+        .action-btns { font-size: 0.9rem; }
+        .card-header { background-color: #f8f9fa; border-bottom: 1px solid #dee2e6; }
+        .form-control, .form-select { font-size: 0.9rem; }
+        .table th, .table td { vertical-align: middle; }
+        .no-cours { color: #6c757d; font-style: italic; }
+        /* RTL fixes */
+        .me-1 { margin-left: 0.25rem !important; margin-right: 0 !important; }
+        .me-2 { margin-left: 0.5rem !important; margin-right: 0 !important; }
+        .text-end { text-align: left !important; }
+        .text-start { text-align: right !important; }
+    </style>
+</head>
+<body class="bg-light">
+<div class="container mt-4">
+    <!-- En-tête -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h3 class="mb-1"><i class="fas fa-book text-primary ms-2"></i>إدارة المواد – {{ classe.nom }}</h3>
+                    <p class="text-muted mb-0">{{ classe.annee_scolaire }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Messages Flash -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, msg in messages %}
+                <div class="alert alert-{{ 'danger' if category=='error' else 'success' if category=='success' else 'warning' }} alert-dismissible fade show">
+                    {{ msg }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- Formulaire d'ajout/modification -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-plus-circle ms-2"></i>
+                        <span id="form-title">إضافة مادة</span>
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" id="matiereForm">
+                        <input type="hidden" name="action" value="add">
+                        <input type="hidden" name="matiere_id" id="matiereId">
+
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label">اسم المادة</label>
+                                <input type="text" name="nom" id="nom" class="form-control" placeholder="مثال: الرياضيات" required>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">الأستاذ</label>
+                                <input type="text" name="professeur" id="professeur" class="form-control" placeholder="الأستاذ عبد الله">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">يوم الدرس</label>
+                                <select name="jour" id="jour" class="form-select">
+                                    <option value="">-- اختر اليوم --</option>
+                                    <option value="الاثنين">الاثنين</option>
+                                    <option value="الثلاثاء">الثلاثاء</option>
+                                    <option value="الأربعاء">الأربعاء</option>
+                                    <option value="الخميس">الخميس</option>
+                                    <option value="الجمعة">الجمعة</option>
+                                    <option value="السبت">السبت</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">الساعة</label>
+                                <input type="time" name="heure" id="heure" class="form-control">
+                            </div>
+                            <div class="col-md-1 d-flex align-items-end">
+                                <button type="submit" class="btn btn-primary w-100">حفظ</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Liste des matières -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-th-list ms-2"></i>مواد القسم {{ classe.nom }}</h5>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-outline-success btn-sm" id="exportPdf">
+                            <i class="fas fa-file-pdf ms-1"></i>تصدير PDF
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    {% if matieres %}
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>المادة</th>
+                                        <th>الأستاذ</th>
+                                        <th>الجدول الزمني</th>
+                                        <th class="text-start">الإجراءات</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for m in matieres %}
+                                        <tr data-matiere-id="{{ m.id }}">
+                                            <td><strong>{{ m.nom }}</strong></td>
+                                            <td>{{ m.professeur or '<span class="text-muted no-cours">غير معين</span>'|safe }}</td>
+                                            <td>
+                                                {% if m.jour and m.heure %}
+                                                    <span class="badge bg-primary">{{ m.jour }}</span>
+                                                    {{ m.heure.strftime('%H:%M') }} ({{ m.duree }}ساعة)
+                                                {% else %}
+                                                    <span class="text-muted no-cours">لا يوجد درس مبرمج</span>
+                                                {% endif %}
+                                            </td>
+                                            <td class="text-start action-btns">
+                                                <div class="btn-group btn-group-sm">
+                                                    <button class="btn btn-outline-primary btn-modifier"
+                                                            data-id="{{ m.id }}"
+                                                            data-nom="{{ m.nom }}"
+                                                            data-professeur="{{ m.professeur or '' }}"
+                                                            data-jour="{{ m.jour or '' }}"
+                                                            data-heure="{{ m.heure.strftime('%H:%M') if m.heure else '' }}"
+                                                            title="تعديل">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                                    <button class="btn btn-outline-danger btn-supprimer"
+                                                            data-id="{{ m.id }}"
+                                                            data-nom="{{ m.nom }}"
+                                                            title="حذف">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-book-open fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">لا توجد مواد مضبوطة لهذا القسم.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Retour -->
+    <div class="mt-4 text-center">
+        <a href="{{ url_for('main.dashboard_ar') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-right ms-1"></i>العودة إلى لوحة التحكم
+        </a>
+    </div>
+</div>
+
+<!-- Modal de suppression -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">تأكيد الحذف</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>هل تريد حذف المادة <strong id="deleteNom"></strong>؟</p>
+                <p class="text-danger"><small>سيتم حذف النقاط المرتبطة بها أيضاً.</small></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                <form method="POST" id="deleteForm" style="display:inline;">
+                    <input type="hidden" name="action" value="delete">
+                    <input type="hidden" name="matiere_id" id="deleteMatiereId">
+                    <button type="submit" class="btn btn-danger">حذف</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Remplir le formulaire pour modification
+    document.querySelectorAll('.btn-modifier').forEach(btn => {
+        btn.addEventListener('click', function () {
+            document.getElementById('form-title').textContent = 'تعديل المادة';
+            document.getElementById('matiereForm').action.value = 'edit';
+            document.getElementById('matiereId').value = this.getAttribute('data-id');
+            document.getElementById('nom').value = this.getAttribute('data-nom');
+            document.getElementById('professeur').value = this.getAttribute('data-professeur');
+            document.getElementById('jour').value = this.getAttribute('data-jour');
+            document.getElementById('heure').value = this.getAttribute('data-heure');
+            document.getElementById('nom').focus();
+        });
+    });
+
+    // Réinitialiser le formulaire pour "Ajouter"
+    document.getElementById('matiereForm').addEventListener('reset', function () {
+        this.reset();
+        document.getElementById('form-title').textContent = 'إضافة مادة';
+        document.getElementById('matiereForm').action.value = 'add';
+        document.getElementById('matiereId').value = '';
+    });
+
+    // Ouvrir la modal de suppression
+    document.querySelectorAll('.btn-supprimer').forEach(btn => {
+        btn.addEventListener('click', function () {
+            const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
+            document.getElementById('deleteNom').textContent = this.getAttribute('data-nom');
+            document.getElementById('deleteMatiereId').value = this.getAttribute('data-id');
+            modal.show();
+        });
+    });
+
+    // Exporter en PDF
+    document.getElementById('exportPdf').addEventListener('click', function () {
+        const class_name = "{{ classe.nom }}";
+        const annee = "{{ classe.annee_scolaire }}";
+        let content = `
+            <h2 style="text-align:center;">الجدول الزمني - ${class_name}</h2>
+            <p style="text-align:center; color:#666;">السنة الدراسية: ${annee}</p>
+            <table border="1" cellpadding="8" width="100%" style="border-collapse:collapse; margin:20px 0;">
+                <thead>
+                    <tr style="background-color:#f0f0f0;">
+                        <th>المادة</th>
+                        <th>الأستاذ</th>
+                        <th>اليوم</th>
+                        <th>الساعة</th>
+                        <th>المدة</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+
+        document.querySelectorAll('tbody tr').forEach(tr => {
+            const tds = tr.querySelectorAll('td');
+            const nom = tds[0].innerText;
+            const prof = tds[1].innerText;
+            const emploi = tds[2].innerText;
+            const jourMatch = emploi.match(/(الاثنين|الثلاثاء|الأربعاء|الخميس|الجمعة|السبت)/);
+            const heureMatch = emploi.match(/\d{2}:\d{2}/);
+            const dureeMatch = emploi.match(/\((\d+) ساعة\)/);
+            const jour = jourMatch ? jourMatch[1] : '-';
+            const heure = heureMatch ? heureMatch[0] : '-';
+            const duree = dureeMatch ? dureeMatch[1] : '1';
+
+            content += `
+                <tr>
+                    <td>${nom}</td>
+                    <td>${prof}</td>
+                    <td>${jour}</td>
+                    <td>${heure}</td>
+                    <td>${duree} ساعة</td>
+                </tr>
+            `;
+        });
+
+        content += `</tbody></table>`;
+
+        const printWindow = window.open('', '', 'width=800,height=600');
+        printWindow.document.write(`
+            <html dir="rtl">
+                <head>
+                    <title>الجدول الزمني - ${class_name}</title>
+                    <style>
+                        body { font-family: 'Cairo', 'Tahoma', sans-serif; padding: 20px; }
+                        table { border: 1px solid #ccc; }
+                        th, td { text-align: right; }
+                        @media print {
+                            body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+                        }
+                    </style>
+                </head>
+                <body>${content}</body>
+            </html>
+        `);
+        printWindow.document.close();
+        printWindow.focus();
+        printWindow.print();
+    });
+</script>
+</body>
+</html>

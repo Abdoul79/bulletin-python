@@ -1,0 +1,424 @@
+<!-- Barre de recherche universelle -->
+<div class="search-container mb-4">
+    <div class="card border-primary">
+        <div class="card-header bg-light">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <div class="input-group">
+                        <span class="input-group-text bg-primary text-white">
+                            <i class="fas fa-search"></i>
+                        </span>
+                        <input type="text" 
+                               id="globalSearch" 
+                               class="form-control form-control-lg" 
+                               placeholder="Rechercher élèves, matières, notes..." 
+                               autocomplete="off">
+                        <button class="btn btn-outline-secondary" type="button" id="clearSearch">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="d-flex gap-2">
+                        <!-- Filtres rapides -->
+                        <select id="searchType" class="form-select">
+                            <option value="all">Tout rechercher</option>
+                            <option value="students">Élèves uniquement</option>
+                            <option value="subjects">Matières uniquement</option>
+                            <option value="notes">Notes uniquement</option>
+                        </select>
+                        <button class="btn btn-outline-primary" data-bs-toggle="collapse" data-bs-target="#advancedSearch">
+                            <i class="fas fa-filter"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Recherche avancée (repliable) -->
+        <div class="collapse" id="advancedSearch">
+            <div class="card-body border-top">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <label class="form-label small">Classe</label>
+                        <select id="filterClass" class="form-select form-select-sm">
+                            <option value="">Toutes les classes</option>
+                            <!-- Options dynamiques selon le contexte -->
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label small">Trimestre</label>
+                        <select id="filterTrimester" class="form-select form-select-sm">
+                            <option value="">Tous les trimestres</option>
+                            <option value="T1">1er Trimestre</option>
+                            <option value="T2">2e Trimestre</option>
+                            <option value="T3">3e Trimestre</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label small">Note minimum</label>
+                        <input type="number" id="minGrade" class="form-control form-control-sm" min="0" max="20" step="0.5" placeholder="0">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label small">Note maximum</label>
+                        <input type="number" id="maxGrade" class="form-control form-control-sm" min="0" max="20" step="0.5" placeholder="20">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Résultats de recherche -->
+    <div id="searchResults" class="mt-3" style="display: none;">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span>Résultats de recherche</span>
+                <span id="resultCount" class="badge bg-primary">0</span>
+            </div>
+            <div class="card-body">
+                <div id="resultsContent">
+                    <!-- Les résultats apparaîtront ici -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.search-container {
+    position: sticky;
+    top: 10px;
+    z-index: 100;
+}
+
+.search-highlight {
+    background-color: yellow;
+    font-weight: bold;
+    padding: 1px 3px;
+    border-radius: 3px;
+}
+
+.result-item {
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.result-item:hover {
+    background-color: #f8f9fa;
+}
+
+.result-item:last-child {
+    border-bottom: none;
+}
+
+.result-type {
+    font-size: 0.8em;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 5px;
+}
+
+.no-results {
+    text-align: center;
+    color: #6c757d;
+    padding: 40px;
+}
+</style>
+
+<script>
+class UniversalSearch {
+    constructor() {
+        this.searchInput = document.getElementById('globalSearch');
+        this.searchType = document.getElementById('searchType');
+        this.resultsContainer = document.getElementById('searchResults');
+        this.resultsContent = document.getElementById('resultsContent');
+        this.resultCount = document.getElementById('resultCount');
+        this.clearBtn = document.getElementById('clearSearch');
+        
+        this.currentData = this.collectPageData();
+        this.initializeEvents();
+    }
+
+    initializeEvents() {
+        // Recherche en temps réel
+        this.searchInput.addEventListener('input', () => {
+            clearTimeout(this.searchTimeout);
+            this.searchTimeout = setTimeout(() => {
+                this.performSearch();
+            }, 300);
+        });
+
+        // Changement de type de recherche
+        this.searchType.addEventListener('change', () => {
+            this.performSearch();
+        });
+
+        // Filtres avancés
+        ['filterClass', 'filterTrimester', 'minGrade', 'maxGrade'].forEach(id => {
+            const element = document.getElementById(id);
+            if (element) {
+                element.addEventListener('change', () => {
+                    this.performSearch();
+                });
+            }
+        });
+
+        // Bouton clear
+        this.clearBtn.addEventListener('click', () => {
+            this.clearSearch();
+        });
+
+        // Recherche au focus
+        this.searchInput.addEventListener('focus', () => {
+            if (this.searchInput.value.trim()) {
+                this.performSearch();
+            }
+        });
+    }
+
+    collectPageData() {
+        const data = {
+            students: [],
+            subjects: [],
+            notes: []
+        };
+
+        // Collecter les données des élèves
+        document.querySelectorAll('[data-student-name]').forEach(element => {
+            data.students.push({
+                name: element.getAttribute('data-student-name'),
+                class: element.getAttribute('data-class') || '',
+                id: element.getAttribute('data-student-id') || '',
+                element: element
+            });
+        });
+
+        // Collecter depuis les tableaux d'élèves
+        document.querySelectorAll('table tbody tr').forEach(row => {
+            const nameCell = row.querySelector('td strong');
+            if (nameCell) {
+                const name = nameCell.textContent.trim();
+                if (name && !data.students.find(s => s.name === name)) {
+                    data.students.push({
+                        name: name,
+                        class: '',
+                        id: '',
+                        element: row
+                    });
+                }
+            }
+        });
+
+        // Collecter les matières
+        document.querySelectorAll('th').forEach(th => {
+            const text = th.textContent.trim();
+            if (text && text !== 'Élève' && text !== 'Moyenne' && text !== 'Actions') {
+                data.subjects.push({
+                    name: text,
+                    element: th
+                });
+            }
+        });
+
+        // Collecter les notes depuis l'historique
+        document.querySelectorAll('.note-row').forEach(row => {
+            const cells = row.querySelectorAll('td');
+            if (cells.length >= 5) {
+                data.notes.push({
+                    student: cells[2]?.textContent.trim() || '',
+                    subject: cells[3]?.textContent.trim() || '',
+                    grade: cells[4]?.textContent.trim() || '',
+                    trimester: row.getAttribute('data-trimestre') || '',
+                    element: row
+                });
+            }
+        });
+
+        return data;
+    }
+
+    performSearch() {
+        const query = this.searchInput.value.trim().toLowerCase();
+        const searchType = this.searchType.value;
+
+        if (query.length < 2) {
+            this.hideResults();
+            return;
+        }
+
+        // Collecter les données mises à jour
+        this.currentData = this.collectPageData();
+
+        let results = [];
+
+        // Recherche selon le type
+        if (searchType === 'all' || searchType === 'students') {
+            results = results.concat(this.searchStudents(query));
+        }
+        if (searchType === 'all' || searchType === 'subjects') {
+            results = results.concat(this.searchSubjects(query));
+        }
+        if (searchType === 'all' || searchType === 'notes') {
+            results = results.concat(this.searchNotes(query));
+        }
+
+        // Appliquer les filtres avancés
+        results = this.applyAdvancedFilters(results);
+
+        this.displayResults(results, query);
+    }
+
+    searchStudents(query) {
+        return this.currentData.students
+            .filter(student => student.name.toLowerCase().includes(query))
+            .map(student => ({
+                type: 'student',
+                title: student.name,
+                subtitle: student.class ? `Classe: ${student.class}` : '',
+                element: student.element
+            }));
+    }
+
+    searchSubjects(query) {
+        return this.currentData.subjects
+            .filter(subject => subject.name.toLowerCase().includes(query))
+            .map(subject => ({
+                type: 'subject',
+                title: subject.name,
+                subtitle: 'Matière',
+                element: subject.element
+            }));
+    }
+
+    searchNotes(query) {
+        return this.currentData.notes
+            .filter(note => 
+                note.student.toLowerCase().includes(query) ||
+                note.subject.toLowerCase().includes(query) ||
+                note.grade.includes(query)
+            )
+            .map(note => ({
+                type: 'note',
+                title: `${note.student} - ${note.subject}`,
+                subtitle: `${note.grade} (${note.trimester})`,
+                element: note.element,
+                trimester: note.trimester,
+                grade: parseFloat(note.grade.replace('/20', ''))
+            }));
+    }
+
+    applyAdvancedFilters(results) {
+        const classFilter = document.getElementById('filterClass')?.value;
+        const trimesterFilter = document.getElementById('filterTrimester')?.value;
+        const minGrade = parseFloat(document.getElementById('minGrade')?.value);
+        const maxGrade = parseFloat(document.getElementById('maxGrade')?.value);
+
+        return results.filter(result => {
+            // Filtre de trimestre
+            if (trimesterFilter && result.trimester && result.trimester !== trimesterFilter) {
+                return false;
+            }
+
+            // Filtre de note
+            if (!isNaN(minGrade) && result.grade !== undefined && result.grade < minGrade) {
+                return false;
+            }
+            if (!isNaN(maxGrade) && result.grade !== undefined && result.grade > maxGrade) {
+                return false;
+            }
+
+            return true;
+        });
+    }
+
+    displayResults(results, query) {
+        if (results.length === 0) {
+            this.resultsContent.innerHTML = `
+                <div class="no-results">
+                    <i class="fas fa-search fa-2x mb-3"></i>
+                    <p>Aucun résultat pour "<strong>${query}</strong>"</p>
+                    <small>Essayez avec d'autres mots-clés</small>
+                </div>
+            `;
+        } else {
+            this.resultsContent.innerHTML = results.map(result => `
+                <div class="result-item" onclick="universalSearch.highlightResult(this, '${result.element ? 'true' : 'false'}')">
+                    <div class="result-type text-${this.getTypeColor(result.type)}">${this.getTypeLabel(result.type)}</div>
+                    <div class="fw-bold">${this.highlightText(result.title, query)}</div>
+                    ${result.subtitle ? `<small class="text-muted">${result.subtitle}</small>` : ''}
+                </div>
+            `).join('');
+        }
+
+        this.resultCount.textContent = results.length;
+        this.showResults();
+    }
+
+    getTypeColor(type) {
+        const colors = {
+            student: 'primary',
+            subject: 'success',
+            note: 'warning'
+        };
+        return colors[type] || 'secondary';
+    }
+
+    getTypeLabel(type) {
+        const labels = {
+            student: 'Élève',
+            subject: 'Matière',
+            note: 'Note'
+        };
+        return labels[type] || type;
+    }
+
+    highlightText(text, query) {
+        const regex = new RegExp(`(${query})`, 'gi');
+        return text.replace(regex, '<span class="search-highlight">$1</span>');
+    }
+
+    highlightResult(resultElement, hasElement) {
+        if (hasElement === 'true') {
+            // Faire défiler vers l'élément et le mettre en surbrillance
+            const targetElement = this.findTargetElement(resultElement);
+            if (targetElement) {
+                targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                targetElement.classList.add('table-warning');
+                setTimeout(() => {
+                    targetElement.classList.remove('table-warning');
+                }, 3000);
+            }
+        }
+    }
+
+    findTargetElement(resultElement) {
+        // Logique pour trouver l'élément correspondant dans la page
+        // Cette partie peut être adaptée selon votre structure HTML
+        return null;
+    }
+
+    showResults() {
+        this.resultsContainer.style.display = 'block';
+    }
+
+    hideResults() {
+        this.resultsContainer.style.display = 'none';
+    }
+
+    clearSearch() {
+        this.searchInput.value = '';
+        document.getElementById('filterClass').value = '';
+        document.getElementById('filterTrimester').value = '';
+        document.getElementById('minGrade').value = '';
+        document.getElementById('maxGrade').value = '';
+        this.hideResults();
+    }
+}
+
+// Initialiser la recherche quand la page est chargée
+document.addEventListener('DOMContentLoaded', () => {
+    window.universalSearch = new UniversalSearch();
+});
+</script>

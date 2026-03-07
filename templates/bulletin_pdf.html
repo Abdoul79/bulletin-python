@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prévisualisation du Bulletin - {{ eleve.prenom }} {{ eleve.nom }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        @page {
+            size: A4;
+            margin: 15mm;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Times New Roman', serif;
+            line-height: 1.4;
+            color: #000;
+            background: white;
+        }
+        
+        .page {
+            width: 100%;
+            min-height: 100vh;
+            page-break-after: always;
+            position: relative;
+        }
+        
+        .page:last-child {
+            page-break-after: avoid;
+        }
+        
+        /* PAGE 1 - PAGE DE GARDE */
+        .page-1 {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 50px 20px;
+        }
+        
+        .flag-container {
+            margin-bottom: 30px;
+        }
+        
+        .flag-img {
+            width: 200px;
+            height: 133px;
+            object-fit: cover;
+            border: 2px solid #000;
+            display: inline-block;
+        }
+        
+        .devise {
+            font-size: 10px;
+            font-weight: bold;
+            margin-top: 5px;
+            color: #000;
+            text-transform: lowercase;
+            letter-spacing: 0.5px;
+        }
+        .devise::first-letter {
+            text-transform: uppercase;
+        }
+
+        .president {
+            font-size: 16px;
+            margin: 35px 0;
+            font-weight: bold;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            gap: 20px;
+            max-width: 600px;
+        }
+        .president img {
+            width: 120px;
+            height: auto;
+            border-radius: 10px;
+            border: 2px solid #000;
+        }
+        .president .texte {
+            line-height: 1.5;
+            text-align: left;
+            margin-top: 20px;
+        }
+        
+        .hymne-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin: 40px 0 20px 0;
+            text-decoration: underline;
+        }
+        
+        .hymne-content {
+            font-size: 14px;
+            line-height: 1.6;
+            max-width: 600px;
+            text-align: justify;
+            font-style: italic;
+        }
+        
+        /* PAGE 2 - BULLETIN */
+        .page-2 {
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 3px solid #FF8C00;
+            padding-bottom: 20px;
+        }
+        
+        .school-name {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #228B22;
+        }
+        
+        .bulletin-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin: 15px 0;
+            color: #000;
+        }
+        
+        .academic-year {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .content-section {
+            margin-bottom: 25px;
+            border: 1px solid #ddd;
+            padding: 15px;
+        }
+        
+        .section-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #FF8C00;
+            border-bottom: 1px solid #FF8C00;
+            padding-bottom: 5px;
+        }
+        
+        .info-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .info-table td {
+            padding: 8px;
+            border: 1px solid #ddd;
+        }
+        
+        .info-table .label {
+            font-weight: bold;
+            background-color: #f8f9fa;
+            width: 30%;
+        }
+        
+        .results-summary {
+            text-align: center;
+            padding: 20px;
+            background-color: #f0f8f0;
+            border: 2px solid #228B22;
+        }
+        
+        .moyenne-generale {
+            font-size: 28px;
+            font-weight: bold;
+            color: #228B22;
+            margin: 10px 0;
+        }
+        
+        .mention {
+            font-size: 18px;
+            font-weight: bold;
+            color: #FF8C00;
+        }
+        
+        .notes-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        
+        .notes-table th,
+        .notes-table td {
+            border: 1px solid #000;
+            padding: 10px;
+            text-align: center;
+        }
+        
+        .notes-table th {
+            background-color: #228B22;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .note-value {
+            font-weight: bold;
+            font-size: 16px;
+        }
+        
+        .observations {
+            text-align: justify;
+            line-height: 1.6;
+            margin: 15px 0;
+        }
+        
+        .signatures {
+            margin-top: 40px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 50px;
+        }
+        
+        .signature-box {
+            text-align: center;
+        }
+        
+        .signature-line {
+            border-bottom: 1px solid #000;
+            height: 60px;
+            margin-top: 20px;
+        }
+        
+        .signature-label {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .preview-controls {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        @media print {
+            .preview-controls {
+                display: none !important;
+            }
+            .page {
+                margin: 0;
+                box-shadow: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Contrôles de prévisualisation (non imprimés) -->
+    <div class="preview-controls">
+        <div class="d-flex flex-column gap-2">
+            {% if weasyprint_available %}
+            <a href="{{ url_for('pdf.generer_bulletin_pdf', eleve_id=eleve.id) }}" 
+               class="btn btn-primary btn-sm" target="_blank">
+                📄 Télécharger PDF
+            </a>
+            {% else %}
+            <button class="btn btn-outline-secondary btn-sm" disabled>
+                📄 PDF non disponible
+            </button>
+            {% endif %}
+            <button onclick="window.print()" class="btn btn-success btn-sm">
+                🖨️ Imprimer
+            </button>
+            <a href="{{ url_for('main.voir_classe', classe_id=classe.id) }}" 
+               class="btn btn-secondary btn-sm">
+                ← Retour
+            </a>
+        </div>
+    </div>
+
+    <!-- PAGE 1 - PAGE DE GARDE OFFICIELLE -->
+    <div class="page page-1">
+        <div class="flag-container">
+            <img src="https://avatars.mds.yandex.net/i?id=ba53368c724d45deeabced32099b291c_l-5887379-images-thumbs&ref=rim&n=13&w=2560&h=1600" 
+                 alt="Drapeau de la Côte d'Ivoire" 
+                 class="flag-img">
+            <div class="devise">Union - Discipline - Travail</div>
+        </div>
+
+        <div class="president">
+            <img src="https://cdn.modernghana.com/content/600/360/felix_houphouet_boigny.jpg" alt="Félix Houphouët-Boigny">
+            <div class="texte">
+                Le Fondateur de la Côte d'Ivoire<br>
+                <strong>Félix HOUPHOUËT-BOIGNY</strong>
+            </div>
+        </div>
+
+        <div class="hymne-title">HYMNE NATIONAL DE LA CÔTE D'IVOIRE</div>
+        <div class="hymne-content">
+            <strong>L'Abidjanaise</strong><br><br>
+            Salut ô terre d'espérance<br>
+            Pays de l'hospitalité<br>
+            Tes légions remplies de vaillance<br>
+            Ont relevé ta dignité<br>
+            <p>
+            Tes fils, chère Côte d'Ivoire,<br>
+            Fiers artisans de ta grandeur,<br>
+            Tous rassemblés pour ta gloire<br>
+            Te bâtiront dans le bonheur.<br>
+           </p>
+            Fiers Ivoiriens, le pays nous appelle<br>
+            Si nous avons dans la paix ramené la liberté<br>
+            Notre devoir sera d'être un modèle<br>
+            De l'espérance promise à l'humanité,<br>
+            En forgeant, unis dans la foi nouvelle,<br>
+            La patrie de la vraie fraternité.
+        </div>
+    </div>
+    
+    <!-- PAGE 2 - BULLETIN SCOLAIRE -->
+    <div class="page page-2">
+        <div class="header">
+            <div class="school-name">{{ ecole.nom }}</div>
+            <div class="bulletin-title">BULLETIN SCOLAIRE ANNUEL</div>
+            <div class="academic-year">{{ classe.annee_scolaire }}</div>
+        </div>
+        
+        <!-- INFORMATIONS ÉLÈVE -->
+        <div class="content-section">
+            <div class="section-title">INFORMATIONS ÉLÈVE</div>
+            <table class="info-table">
+                <tr>
+                    <td class="label">Nom et Prénoms :</td>
+                    <td>{{ eleve.nom }} {{ eleve.prenom }}</td>
+                    <td class="label">Sexe :</td>
+                    <td>{{ 'Masculin' if eleve.sexe == 'M' else 'Féminin' }}</td>
+                </tr>
+                <tr>
+                    <td class="label">Date de naissance :</td>
+                    <td>{{ eleve.date_naissance.strftime('%d/%m/%Y') if eleve.date_naissance else 'Non renseignée' }}</td>
+                    <td class="label">Classe :</td>
+                    <td>{{ classe.nom }}</td>
+                </tr>
+                <tr>
+                    <td class="label">Classement :</td>
+                    <td>{{ rang }} sur {{ total_eleves }}</td>
+                    <td class="label">Moy. générale :</td>
+                    <td><strong>{{ "%.2f"|format(moyenne) }}/20</strong></td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- MOYENNE GLOBALE -->
+        <div class="content-section">
+            <div class="results-summary">
+                <div>MOYENNE GÉNÉRALE ANNUELLE</div>
+                <div class="moyenne-generale">{{ "%.2f"|format(moyenne) }}/20</div>
+                <div class="mention">
+                    {% if moyenne >= 16 %}TRÈS BIEN
+                    {% elif moyenne >= 14 %}BIEN
+                    {% elif moyenne >= 12 %}ASSEZ BIEN
+                    {% elif moyenne >= 10 %}PASSABLE
+                    {% else %}INSUFFISANT{% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- TRIMESTRE 1 -->
+        <div class="content-section">
+            <div class="section-title">TRIMESTRE 1 (T1)</div>
+            <div class="results-summary">
+                Moyenne T1 : <strong>{{ "%.2f"|format(moyennes['T1']) }}/20</strong>
+            </div>
+            <table class="notes-table">
+                <thead>
+                    <tr>
+                        <th>MATIÈRE</th>
+                        <th>NOTE</th>
+                        <th>APPRÉCIATION</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in matieres_notes_t1 %}
+                    <tr>
+                        <td style="text-align: left;">{{ item.matiere }}</td>
+                        <td class="note-value">
+                            {{ "%.2f"|format(item.note) if item.note is not none else "–" }}
+                        </td>
+                        <td>
+                            {% if item.note is not none %}
+                                {% if item.note >= 16 %}Très bien
+                                {% elif item.note >= 14 %}Bien
+                                {% elif item.note >= 12 %}Assez bien
+                                {% elif item.note >= 10 %}Passable
+                                {% elif item.note >= 8 %}Insuffisant
+                                {% else %}Très insuffisant{% endif %}
+                            {% else %}–{% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- TRIMESTRE 2 -->
+        <div class="content-section">
+            <div class="section-title">TRIMESTRE 2 (T2)</div>
+            <div class="results-summary">
+                Moyenne T2 : <strong>{{ "%.2f"|format(moyennes['T2']) }}/20</strong>
+            </div>
+            <table class="notes-table">
+                <thead>
+                    <tr>
+                        <th>MATIÈRE</th>
+                        <th>NOTE</th>
+                        <th>APPRÉCIATION</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in matieres_notes_t2 %}
+                    <tr>
+                        <td style="text-align: left;">{{ item.matiere }}</td>
+                        <td class="note-value">
+                            {{ "%.2f"|format(item.note) if item.note is not none else "–" }}
+                        </td>
+                        <td>
+                            {% if item.note is not none %}
+                                {% if item.note >= 16 %}Très bien
+                                {% elif item.note >= 14 %}Bien
+                                {% elif item.note >= 12 %}Assez bien
+                                {% elif item.note >= 10 %}Passable
+                                {% elif item.note >= 8 %}Insuffisant
+                                {% else %}Très insuffisant{% endif %}
+                            {% else %}–{% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- TRIMESTRE 3 -->
+        <div class="content-section">
+            <div class="section-title">TRIMESTRE 3 (T3)</div>
+            <div class="results-summary">
+                Moyenne T3 : <strong>{{ "%.2f"|format(moyennes['T3']) }}/20</strong>
+            </div>
+            <table class="notes-table">
+                <thead>
+                    <tr>
+                        <th>MATIÈRE</th>
+                        <th>NOTE</th>
+                        <th>APPRÉCIATION</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in matieres_notes_t3 %}
+                    <tr>
+                        <td style="text-align: left;">{{ item.matiere }}</td>
+                        <td class="note-value">
+                            {{ "%.2f"|format(item.note) if item.note is not none else "–" }}
+                        </td>
+                        <td>
+                            {% if item.note is not none %}
+                                {% if item.note >= 16 %}Très bien
+                                {% elif item.note >= 14 %}Bien
+                                {% elif item.note >= 12 %}Assez bien
+                                {% elif item.note >= 10 %}Passable
+                                {% elif item.note >= 8 %}Insuffisant
+                                {% else %}Très insuffisant{% endif %}
+                            {% else %}–{% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- OBSERVATIONS GÉNÉRALES -->
+        <div class="content-section">
+            <div class="section-title">OBSERVATIONS GÉNÉRALES</div>
+            <div class="observations">
+                {% if moyenne >= 16 %}
+                    <strong>EXCELLENTS RÉSULTATS !</strong> L'élève fait preuve d'un très bon niveau dans l'ensemble des matières. 
+                    Il/Elle démontre une excellente maîtrise des compétences attendues. Continuez sur cette voie ! 
+                    Félicitations pour ce parcours exemplaire.
+                {% elif moyenne >= 14 %}
+                    <strong>BONS RÉSULTATS.</strong> L'élève montre de bonnes capacités et une bonne compréhension des notions enseignées. 
+                    Quelques efforts supplémentaires dans certaines matières permettraient d'atteindre l'excellence. 
+                    Continuez à travailler avec sérieux.
+                {% elif moyenne >= 12 %}
+                    <strong>RÉSULTATS SATISFAISANTS.</strong> L'élève travaille correctement et assimile les connaissances de base. 
+                    Il faut maintenir les efforts et approfondir certaines notions pour progresser davantage. 
+                    Avec plus de régularité, de meilleurs résultats sont possibles.
+                {% elif moyenne >= 10 %}
+                    <strong>RÉSULTATS PASSABLES.</strong> L'élève doit fournir plus d'efforts pour améliorer ses résultats. 
+                    Il est nécessaire de revoir les méthodes de travail et de consacrer plus de temps aux études. 
+                    Un accompagnement renforcé est recommandé.
+                {% else %}
+                    <strong>RÉSULTATS INSUFFISANTS.</strong> Un accompagnement particulier est nécessaire pour aider l'élève à progresser. 
+                    Il est urgent de revoir les bases et de mettre en place un soutien adapté. 
+                    Une collaboration étroite entre l'école et la famille est indispensable.
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- SIGNATURES -->
+        <div class="signatures">
+            <div class="signature-box">
+                <div class="signature-label">LE DIRECTEUR</div>
+                <div>{{ ecole.directeur or 'Directeur' }}</div>
+                <div class="signature-line"></div>
+            </div>
+            <div class="signature-box">
+                <div class="signature-label">LES PARENTS</div>
+                <div>Signature des parents ou tuteur</div>
+                <div class="signature-line"></div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

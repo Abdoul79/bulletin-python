@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة التحكم - {{ ecole.nom }}</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary-color: #8b5cf6;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --info-color: #06b6d4;
+            --dark-color: #1f2937;
+            --light-bg: #f8fafc;
+            --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --card-shadow-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --glass-bg: rgba(255, 255, 255, 0.8);
+            --glass-border: rgba(255, 255, 255, 0.2);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Cairo', 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            position: relative;
+            direction: rtl;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml,<svg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><g fill="none" fill-rule="evenodd"><g fill="%23ffffff" fill-opacity="0.05"><circle cx="30" cy="30" r="1"/></g></g></svg>');
+            z-index: -1;
+        }
+
+        /* Navigation moderne */
+        .navbar {
+            background: var(--glass-bg) !important;
+            border-bottom: 1px solid var(--glass-border);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--primary-color) !important;
+            transition: transform 0.3s ease;
+        }
+
+        .navbar-brand:hover {
+            transform: scale(1.05);
+        }
+
+        .navbar-text {
+            color: var(--dark-color) !important;
+            font-weight: 500;
+        }
+
+        .nav-link {
+            color: var(--dark-color) !important;
+            font-weight: 500;
+            padding: 0.5rem 1rem !important;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--primary-color) !important;
+        }
+
+        .dropdown-menu {
+            background: white !important;
+            border: 1px solid rgba(0,0,0,0.15);
+            box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.175);
+            z-index: 1050 !important;
+            overflow: visible !important;
+            min-width: 200px !important;
+        }
+
+        .dropdown-item {
+            color: var(--dark-color) !important;
+        }
+
+        .dropdown-item:hover {
+            background: rgba(99, 102, 241, 0.1) !important;
+            color: var(--primary-color) !important;
+        }
+
+        .dropdown-item.text-danger:hover {
+            background: rgba(239, 68, 68, 0.1) !important;
+            color: var(--danger-color) !important;
+        }
+
+        .container {
+            margin-top: 2rem;
+        }
+
+        /* Cards modernes */
+        .card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 1rem;
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
+        }
+
+        .card:hover {
+            box-shadow: var(--card-shadow-hover);
+            transform: translateY(-2px);
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+            border-bottom: 1px solid rgba(99, 102, 241, 0.2);
+            padding: 1.5rem;
+            border-radius: 1rem 1rem 0 0;
+        }
+
+        .card-header h5 {
+            color: var(--dark-color);
+            font-weight: 600;
+            margin: 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .card-header h5 i {
+            color: var(--primary-color);
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        /* Hero card */
+        .hero-card .card-body {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.9) 0%, rgba(139, 92, 246, 0.9) 100%);
+            color: white;
+            text-align: center;
+            padding: 3rem 2rem;
+        }
+
+        .hero-card h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            animation: fadeInUp 0.8s ease;
+        }
+
+        .hero-card p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            animation: fadeInUp 0.8s ease 0.2s both;
+        }
+
+        /* Boutons modernes */
+        .btn {
+            border-radius: 0.75rem;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            border: none;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
+        }
+
+        .btn-outline-primary {
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            background: transparent;
+        }
+
+        .btn-outline-primary:hover {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .btn-outline-success {
+            border: 2px solid var(--success-color);
+            color: var(--success-color);
+            background: transparent;
+        }
+
+        .btn-outline-success:hover {
+            background: var(--success-color);
+            border-color: var(--success-color);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .btn-outline-info {
+            border: 2px solid var(--info-color);
+            color: var(--info-color);
+            background: transparent;
+        }
+
+        .btn-outline-info:hover {
+            background: var(--info-color);
+            border-color: var(--info-color);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .btn-outline-warning {
+            border: 2px solid var(--warning-color);
+            color: var(--warning-color);
+            background: transparent;
+        }
+
+        .btn-outline-warning:hover {
+            background: var(--warning-color);
+            border-color: var(--warning-color);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        /* Classe cards */
+        .border-left-primary {
+            border-right: 4px solid var(--primary-color) !important;
+        }
+
+        .shadow-sm {
+            box-shadow: var(--card-shadow) !important;
+        }
+
+        .card.h-100:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--card-shadow-hover);
+        }
+
+        .card-title {
+            color: var(--primary-color);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .text-muted {
+            color: #64748b !important;
+        }
+
+        .text-muted.small {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: #f8fafc;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+        }
+
+        .btn-group-vertical .btn {
+            margin-bottom: 0.5rem;
+            border-radius: 0.5rem !important;
+            transition: all 0.3s ease;
+        }
+
+        .btn-group-vertical .btn:hover {
+            transform: translateX(-5px);
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-fade-in {
+            animation: fadeInUp 0.6s ease;
+        }
+
+        @media (max-width: 768px) {
+            .hero-card h2 {
+                font-size: 2rem;
+            }
+            
+            .hero-card p {
+                font-size: 1rem;
+            }
+            
+            .container {
+                margin-top: 1rem;
+            }
+
+            .btn-group-vertical .btn {
+                font-size: 0.875rem;
+            }
+        }
+
+        .alert {
+            border: none;
+            border-radius: 0.75rem;
+            padding: 1rem 1.5rem;
+            font-weight: 500;
+            border-right: 4px solid;
+            backdrop-filter: blur(10px);
+            animation: fadeInUp 0.6s ease;
+        }
+
+        .alert-success {
+            background: rgba(16, 185, 129, 0.1);
+            color: #065f46;
+            border-right-color: var(--success-color);
+        }
+
+        .alert-danger {
+            background: rgba(239, 68, 68, 0.1);
+            color: #991b1b;
+            border-right-color: var(--danger-color);
+        }
+
+        .alert-warning {
+            background: rgba(245, 158, 11, 0.1);
+            color: #92400e;
+            border-right-color: var(--warning-color);
+        }
+
+        .row > div {
+            animation: fadeInUp 0.6s ease;
+        }
+
+        .row > div:nth-child(1) { animation-delay: 0.1s; }
+        .row > div:nth-child(2) { animation-delay: 0.2s; }
+        .row > div:nth-child(3) { animation-delay: 0.3s; }
+        .row > div:nth-child(4) { animation-delay: 0.4s; }
+        .row > div:nth-child(5) { animation-delay: 0.5s; }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-graduation-cap ms-2"></i>{{ ecole.nom }}
+            </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" 
+                    aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarContent">
+                <ul class="navbar-nav me-auto align-items-center">
+                    <li class="nav-item ms-3">
+                        <span class="navbar-text">
+                            مرحبا، {{ ecole.directeur or 'المدير' }}
+                        </span>
+                    </li>
+
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userMenu" role="button"
+                           data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-user-circle ms-2"></i> حسابي
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-start shadow" aria-labelledby="userMenu" style="z-index: 1050; min-width: 200px; overflow: visible;">
+                            <li>
+                                <a class="dropdown-item" href="{{ url_for('main.changer_mot_de_passe') }}">
+                                    <i class="fas fa-key ms-2"></i>تغيير كلمة المرور
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider my-1"></li>
+                            <li>
+                                <a class="dropdown-item text-danger" href="{{ url_for('auth.logout') }}">
+                                    <i class="fas fa-sign-out-alt ms-2"></i>تسجيل الخروج
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <!-- Messages Flash -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ 'danger' if category == 'error' else 'success' if category == 'success' else 'warning' }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card hero-card">
+                    <div class="card-body text-center">
+                        <i class="fas fa-school fa-3x mb-3" style="opacity: 0.8;"></i>
+                        <h2>{{ ecole.nom }}</h2>
+                        <p class="text-white">نظام إدارة البطاقات المدرسية</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions rapides -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-bolt ms-2"></i>إجراءات سريعة</h5>
+                    </div>
+                    <div class="card-body">
+                        <a href="{{ url_for('classe.add_classe_ar') }}" class="btn btn-primary ms-2 mb-2">
+                            <i class="fas fa-chalkboard ms-2"></i>إضافة قسم
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Liste des classes -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5><i class="fas fa-list ms-2"></i>أقسامي ({{ classes|length }})</h5>
+                        <a href="{{ url_for('classe.add_classe_ar') }}" class="btn btn-sm btn-outline-primary">
+                            <i class="fas fa-plus ms-1"></i>قسم جديد
+                        </a>
+                    </div>
+                    <div class="card-body">
+                        {% if classes %}
+                            <div class="row">
+                                {% for classe in classes %}
+                                <div class="col-lg-4 col-md-6 mb-3">
+                                    <div class="card h-100 border-left-primary shadow-sm">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                                <h5 class="card-title text-primary mb-0">
+                                                    <i class="fas fa-chalkboard-teacher ms-2"></i>{{ classe.nom }}
+                                                </h5>
+                                            </div>
+                                            <p class="text-muted small mb-3">
+                                                <i class="fas fa-calendar ms-1"></i>{{ classe.annee_scolaire }}
+                                            </p>
+                                            
+                                            <!-- Actions pour la classe -->
+                                            <div class="btn-group-vertical w-100" role="group">
+                                                <a href="{{ url_for('main.gestion_classe_ar', classe_id=classe.id) }}" 
+                                                   class="btn btn-outline-primary btn-sm mb-1">
+                                                    <i class="fas fa-cogs ms-2"></i>إدارة القسم
+                                                </a>
+                                                <a href="{{ url_for('eleve.add_eleve_ar', classe_id=classe.id) }}" 
+                                                   class="btn btn-outline-success btn-sm mb-1">
+                                                    <i class="fas fa-user-plus ms-2"></i>إضافة تلاميذ
+                                                </a>
+                                                <a href="{{ url_for('matiere.add_matiere_ar', classe_id=classe.id) }}" 
+                                                   class="btn btn-outline-info btn-sm mb-1">
+                                                    <i class="fas fa-book-plus ms-2"></i>إضافة مواد
+                                                </a>
+                                                <a href="{{ url_for('notes.saisir_notes_ar', classe_id=classe.id) }}" 
+                                                   class="btn btn-outline-warning btn-sm">
+                                                    <i class="fas fa-edit ms-2"></i>إدخال النقاط
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="text-center text-muted py-5">
+                                <i class="fas fa-chalkboard fa-4x mb-3"></i>
+                                <h5>لا توجد أقسام</h5>
+                                <p>ابدأ بإضافة قسمك الأول</p>
+                                <a href="{{ url_for('classe.add_classe_ar') }}" class="btn btn-primary">
+                                    <i class="fas fa-plus ms-2"></i>إنشاء قسمي الأول
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.card').forEach(card => {
+                if (!card.classList.contains('hero-card')) {
+                    card.addEventListener('mouseenter', function() {
+                        this.style.transform = 'translateY(-2px)';
+                    });
+                    card.addEventListener('mouseleave', function() {
+                        this.style.transform = 'translateY(0)';
+                    });
+                }
+            });
+
+            document.querySelectorAll('.h-100').forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-8px)';
+                });
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                });
+            });
+
+            document.querySelectorAll('.btn-group-vertical .btn').forEach(btn => {
+                btn.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateX(-5px)';
+                });
+                btn.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateX(0)';
+                });
+            });
+
+            document.querySelectorAll('.btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    const ripple = document.createElement('span');
+                    const rect = this.getBoundingClientRect();
+                    const size = Math.max(rect.width, rect.height);
+                    const x = e.clientX - rect.left - size / 2;
+                    const y = e.clientY - rect.top - size / 2;
+                    
+                    ripple.style.width = ripple.style.height = size + 'px';
+                    ripple.style.left = x + 'px';
+                    ripple.style.top = y + 'px';
+                    ripple.style.position = 'absolute';
+                    ripple.style.borderRadius = '50%';
+                    ripple.style.background = 'rgba(255, 255, 255, 0.5)';
+                    ripple.style.transform = 'scale(0)';
+                    ripple.style.animation = 'ripple 0.6s linear';
+                    ripple.style.pointerEvents = 'none';
+                    
+                    this.appendChild(ripple);
+                    
+                    setTimeout(() => {
+                        ripple.remove();
+                    }, 600);
+                });
+            });
+        });
+
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes ripple {
+                to {
+                    transform: scale(4);
+                    opacity: 0;
+                }
+            }
+            
+            .btn {
+                position: relative;
+                overflow: hidden;
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
+

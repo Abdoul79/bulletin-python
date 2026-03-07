@@ -1,0 +1,28 @@
+# docker-compose.yml
+
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_ENV=development
+    volumes:
+      - .:/app
+    depends_on:
+      - weasyprint-pdf
+    networks:
+      - pdfnet
+
+  weasyprint-pdf:
+    image: luca/veasyprint
+    ports:
+      - "5001:5001"
+    networks:
+      - pdfnet
+
+networks:
+  pdfnet:
+    driver: bridge

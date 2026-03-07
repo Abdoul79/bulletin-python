@@ -1,0 +1,1066 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Classe {{ classe.nom }}</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary-color: #8b5cf6;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --info-color: #06b6d4;
+            --dark-color: #1f2937;
+            --light-bg: #f8fafc;
+            --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --card-shadow-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --glass-bg: rgba(255, 255, 255, 0.9);
+            --glass-border: rgba(255, 255, 255, 0.2);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml,<svg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><g fill="none" fill-rule="evenodd"><g fill="%23ffffff" fill-opacity="0.05"><circle cx="30" cy="30" r="1"/></g></g></svg>');
+            z-index: -1;
+        }
+
+        /* Navigation moderne */
+        .navbar {
+            background: var(--glass-bg) !important;
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--primary-color) !important;
+            transition: transform 0.3s ease;
+        }
+
+        .navbar-brand:hover {
+            transform: scale(1.05);
+        }
+
+        .nav-link {
+            color: var(--dark-color) !important;
+            font-weight: 500;
+            padding: 0.5rem 1rem !important;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--primary-color) !important;
+        }
+
+        /* Container principal */
+        .container {
+            margin-top: 2rem;
+        }
+
+        /* Cards modernes */
+        .card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 1rem;
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
+        }
+
+        .card:hover {
+            box-shadow: var(--card-shadow-hover);
+            transform: translateY(-2px);
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+            border-bottom: 1px solid rgba(99, 102, 241, 0.2);
+            padding: 1.5rem;
+            border-radius: 1rem 1rem 0 0;
+        }
+
+        .card-header h5 {
+            color: var(--dark-color);
+            font-weight: 600;
+            margin: 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .card-header h5 i {
+            color: var(--primary-color);
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        /* Hero card */
+        .hero-card .card-body {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.95) 0%, rgba(139, 92, 246, 0.95) 100%);
+            color: white;
+            text-align: center;
+            padding: 3rem 2rem;
+        }
+
+        .hero-card h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            animation: fadeInUp 0.8s ease;
+        }
+
+        .hero-card p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            animation: fadeInUp 0.8s ease 0.2s both;
+            margin-bottom: 2rem;
+        }
+
+        /* Badges modernes */
+        .badge {
+            padding: 0.7rem 1.2rem;
+            border-radius: 0.6rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .badge.bg-info {
+            background: linear-gradient(135deg, var(--info-color), #0891b2) !important;
+        }
+
+        .badge.bg-success {
+            background: linear-gradient(135deg, var(--success-color), #059669) !important;
+        }
+
+        .badge.bg-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark)) !important;
+        }
+
+        /* Boutons modernes */
+        .btn {
+            border-radius: 0.75rem;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            position: relative;
+            overflow: hidden;
+            border: none;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--success-color), #059669);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, var(--warning-color), #d97706);
+        }
+
+        .btn-info {
+            background: linear-gradient(135deg, var(--info-color), #0891b2);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-outline-info {
+            border: 2px solid var(--info-color);
+            color: var(--info-color);
+            background: transparent;
+        }
+
+        .btn-outline-info:hover {
+            background: var(--info-color);
+            border-color: var(--info-color);
+            color: white;
+        }
+
+        /* Dropdown moderne */
+        .dropdown-menu {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 1rem;
+            box-shadow: var(--card-shadow-hover);
+            padding: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .dropdown-item {
+            border-radius: 0.5rem;
+            padding: 0.8rem 1rem;
+            transition: all 0.3s ease;
+            border: none;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .dropdown-item:hover {
+            background: rgba(99, 102, 241, 0.1);
+            transform: translateX(3px);
+        }
+
+        .dropdown-divider {
+            margin: 0.5rem 0;
+            border-top: 1px solid rgba(99, 102, 241, 0.2);
+        }
+
+        /* List group moderne */
+        .list-group-item {
+            border: none;
+            border-radius: 0.75rem !important;
+            margin-bottom: 0.5rem;
+            background: rgba(248, 250, 252, 0.8);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .list-group-item:hover {
+            background: rgba(99, 102, 241, 0.05);
+            transform: translateX(5px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .list-group-flush .list-group-item {
+            border-radius: 0.75rem !important;
+        }
+
+        /* Stats cards */
+        .stats-card {
+            background: white;
+            border: none;
+            border-radius: 1rem;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            height: 100%;
+        }
+
+        .stats-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+        }
+
+        .stats-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--card-shadow-hover);
+        }
+
+        .stats-card h3 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .stats-card.primary h3 { color: var(--primary-color); }
+        .stats-card.success h3 { color: var(--success-color); }
+        .stats-card.warning h3 { color: var(--warning-color); }
+        .stats-card.info h3 { color: var(--info-color); }
+
+        /* Empty states */
+        .empty-state {
+            text-align: center;
+            padding: 3rem 2rem;
+            color: #64748b;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            color: #d1d5db;
+            margin-bottom: 1rem;
+        }
+
+        .empty-state h6 {
+            color: var(--dark-color);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Loading overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 2rem 3rem;
+            border-radius: 1rem;
+            box-shadow: var(--card-shadow-hover);
+            z-index: 9999;
+            text-align: center;
+            backdrop-filter: blur(20px);
+        }
+
+        .loading-overlay .spinner-border {
+            width: 2rem;
+            height: 2rem;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        .animate-fade-in {
+            animation: fadeInUp 0.6s ease;
+        }
+
+        .animate-slide-in {
+            animation: slideInLeft 0.6s ease;
+        }
+
+        .animate-pulse {
+            animation: pulse 2s infinite;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero-card h2 {
+                font-size: 2rem;
+            }
+            
+            .hero-card p {
+                font-size: 1rem;
+            }
+            
+            .container {
+                margin-top: 1rem;
+            }
+
+            .badge {
+                font-size: 0.8rem;
+                padding: 0.5rem 0.8rem;
+                margin: 0.2rem;
+            }
+
+            .stats-card {
+                padding: 1.5rem;
+                margin-bottom: 1rem;
+            }
+
+            .card-body {
+                padding: 1rem;
+            }
+        }
+
+        /* Alert moderne */
+        .alert {
+            border: none;
+            border-radius: 0.75rem;
+            padding: 1rem 1.5rem;
+            font-weight: 500;
+            border-left: 4px solid;
+            backdrop-filter: blur(10px);
+            animation: fadeInUp 0.6s ease;
+        }
+
+        .alert-success {
+            background: rgba(16, 185, 129, 0.1);
+            color: #065f46;
+            border-left-color: var(--success-color);
+        }
+
+        .alert-danger {
+            background: rgba(239, 68, 68, 0.1);
+            color: #991b1b;
+            border-left-color: var(--danger-color);
+        }
+
+        .alert-warning {
+            background: rgba(245, 158, 11, 0.1);
+            color: #92400e;
+            border-left-color: var(--warning-color);
+        }
+
+        /* Animation d'entrée */
+        .row > div {
+            animation: fadeInUp 0.6s ease;
+        }
+
+        .row > div:nth-child(1) { animation-delay: 0.1s; }
+        .row > div:nth-child(2) { animation-delay: 0.2s; }
+        .row > div:nth-child(3) { animation-delay: 0.3s; }
+        .row > div:nth-child(4) { animation-delay: 0.4s; }
+
+        /* Status indicators */
+        .status-ready {
+            color: var(--success-color);
+            animation: pulse 2s infinite;
+        }
+
+        .status-incomplete {
+            color: var(--warning-color);
+        }
+
+        /* Corrige les dropdowns dans les cartes avec overflow:hidden */
+        .card {
+            overflow: visible !important; /* Temporairement pour les dropdowns */
+        }
+
+/* Ou mieux : cibler uniquement les cartes qui contiennent des dropdowns */
+       .card:has(.dropdown) {
+           overflow: visible !important;
+    }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('main.dashboard') }}">
+                <i class="fas fa-graduation-cap me-2"></i>Bulletin Scolaire
+            </a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="{{ url_for('main.dashboard') }}">
+                    <i class="fas fa-arrow-left me-1"></i>Dashboard
+                </a>
+                <a class="nav-link" href="{{ url_for('auth.logout') }}">
+                    <i class="fas fa-sign-out-alt me-1"></i>Déconnexion
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <!-- Messages Flash -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ 'danger' if category == 'error' else 'success' if category == 'success' else 'warning' }} alert-dismissible fade show" role="alert">
+                        <i class="fas fa-{{ 'check-circle' if category == 'success' else 'exclamation-triangle' if category == 'warning' else 'times-circle' }} me-2"></i>
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- En-tête -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card hero-card">
+                    <div class="card-body text-center">
+                        <i class="fas fa-chalkboard-teacher fa-3x mb-3" style="opacity: 0.8;"></i>
+                        <h2>{{ classe.nom }}</h2>
+                        <p class="text-muted">Année scolaire : {{ classe.annee_scolaire }}</p>
+                        <div class="row justify-content-center">
+                            <div class="col-md-6 col-lg-4 mb-2">
+                                <span class="badge bg-info fs-6">
+                                    <i class="fas fa-users me-1"></i>
+                                    {{ nb_eleves if nb_eleves is defined else eleves|length }} élève(s)
+                                </span>
+                            </div>
+                            <div class="col-md-6 col-lg-4 mb-2">
+                                <span class="badge bg-success fs-6">
+                                    <i class="fas fa-book me-1"></i>
+                                    {{ nb_matieres if nb_matieres is defined else matieres|length }} matière(s)
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions rapides -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-bolt me-2"></i>Actions rapides</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-lg-3 col-md-6">
+                                <a href="{{ url_for('eleve.add_eleve', classe_id=classe.id) }}" 
+                                   class="btn btn-primary w-100 h-100 d-flex flex-column justify-content-center">
+                                    <i class="fas fa-user-plus mb-1" style="font-size: 1.5rem;"></i>
+                                    <span>Gérer élèves</span>
+                                </a>
+                            </div>
+                            <div class="col-lg-3 col-md-6">
+                                <a href="{{ url_for('matiere.add_matiere', classe_id=classe.id) }}" 
+                                   class="btn btn-success w-100 h-100 d-flex flex-column justify-content-center">
+                                    <i class="fas fa-book-plus mb-1" style="font-size: 1.5rem;"></i>
+                                    <span>Gérer matières</span>
+                                </a>
+                            </div>
+                            <div class="col-lg-3 col-md-6">
+                                <a href="{{ url_for('notes.saisir_notes', classe_id=classe.id) }}" 
+                                   class="btn btn-warning w-100 h-100 d-flex flex-column justify-content-center">
+                                    <i class="fas fa-edit mb-1" style="font-size: 1.5rem;"></i>
+                                    <span>Saisir notes</span>
+                                </a>
+                            </div>
+                            <div class="col-lg-3 col-md-6">
+    <div class="dropdown h-100">
+        <button class="btn btn-info w-100 h-100 dropdown-toggle d-flex flex-column justify-content-center"
+                type="button"
+                data-bs-toggle="dropdown"
+                data-bs-boundary="viewport"
+                data-bs-reference="parent"
+                aria-expanded="false">
+            <i class="fas fa-print mb-1" style="font-size: 1.5rem;"></i>
+            <span>Bulletins</span>
+        </button>
+        <ul class="dropdown-menu w-100 shadow" 
+            style="z-index: 1050; position: absolute; overflow: visible;">
+            <li>
+                <a class="dropdown-item" href="#" onclick="telechargerBulletinsClasses(); return false;">
+                    <div class="d-flex align-items-center mb-1">
+                        <i class="fas fa-trophy me-2 text-warning"></i>
+                        <strong>Télécharger par classement</strong>
+                    </div>
+                    <small class="text-muted">ZIP ordonné du 1er au dernier</small>
+                </a>
+            </li>
+            <li>
+                <a class="dropdown-item" href="#" onclick="telechargerBulletinsAlpha(); return false;">
+                    <div class="d-flex align-items-center mb-1">
+                        <i class="fas fa-sort-alpha-down me-2 text-info"></i>
+                        <span>Télécharger par ordre alphabétique</span>
+                    </div>
+                    <small class="text-muted">ZIP ordonné A→Z</small>
+                </a>
+            </li>
+            <li><hr class="dropdown-divider my-1"></li>
+            <li>
+                <a class="dropdown-item" href="#" onclick="imprimerTousBulletins(); return false;">
+                    <div class="d-flex align-items-center mb-1">
+                        <i class="fas fa-external-link-alt me-2 text-secondary"></i>
+                        <span>Ouvrir pour impression</span>
+                    </div>
+                    <small class="text-muted">Prévisualisation HTML</small>
+                </a>
+            </li>
+        </ul>
+    </div>                             
+</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Liste des élèves -->
+            <div class="col-lg-6 mb-4">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5><i class="fas fa-users me-2"></i>Élèves</h5>
+                        <span class="badge bg-primary">{{ eleves|length }}</span>
+                    </div>
+                    <div class="card-body">
+                        {% if eleves %}
+                            <div class="list-group list-group-flush">
+                                {% for eleve in eleves %}
+                                <div class="list-group-item d-flex justify-content-between align-items-center" data-eleve-id="{{ eleve.id }}">
+                                    <div class="d-flex align-items-center">
+                                        <div class="me-3">
+                                            <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" 
+                                                 style="width: 40px; height: 40px; font-weight: 600;">
+                                                {{ eleve.prenom[0] }}{{ eleve.nom[0] }}
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <strong class="d-block">{{ eleve.prenom }} {{ eleve.nom }}</strong>
+                                            <small class="text-muted d-flex align-items-center gap-2">
+                                                {% if eleve.date_naissance %}
+                                                    <span><i class="fas fa-calendar me-1"></i>{{ eleve.date_naissance.strftime('%d/%m/%Y') }}</span>
+                                                {% endif %}
+                                                {% if eleve.sexe %}
+                                                    <span><i class="fas fa-{{ 'mars' if eleve.sexe == 'M' else 'venus' }} me-1"></i>{{ eleve.sexe }}</span>
+                                                {% endif %}
+                                            </small>
+                                        </div>
+                                    </div>
+                                    <div class="btn-group btn-group-sm">
+                                        <a href="{{ url_for('pdf.preview_bulletin', eleve_id=eleve.id) }}" 
+                                           class="btn btn-outline-info" target="_blank" title="Voir le bulletin">
+                                            <i class="fas fa-file-alt"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="empty-state">
+                                <i class="fas fa-user-slash"></i>
+                                <h6>Aucun élève inscrit</h6>
+                                <p class="text-muted mb-3">Commencez par ajouter des élèves à cette classe</p>
+                                <a href="{{ url_for('eleve.add_eleve', classe_id=classe.id) }}" 
+                                   class="btn btn-primary">
+                                    <i class="fas fa-plus me-1"></i>Ajouter des élèves
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Liste des matières -->
+            <div class="col-lg-6 mb-4">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5><i class="fas fa-book me-2"></i>Matières</h5>
+                        <span class="badge bg-success">{{ matieres|length }}</span>
+                    </div>
+                    <div class="card-body">
+                        {% if matieres %}
+                            <div class="list-group list-group-flush">
+                                {% for matiere in matieres %}
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div class="d-flex align-items-center">
+                                        <div class="me-3">
+                                            <div class="rounded-circle bg-success text-white d-flex align-items-center justify-content-center" 
+                                                 style="width: 35px; height: 35px;">
+                                                <i class="fas fa-book-open"></i>
+                                            </div>
+                                        </div>
+                                        <span class="fw-medium">{{ matiere.nom }}</span>
+                                    </div>
+                                    <span class="badge bg-success">Active</span>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="empty-state">
+                                <i class="fas fa-book-dead"></i>
+                                <h6>Aucune matière configurée</h6>
+                                <p class="text-muted mb-3">Ajoutez les matières enseignées dans cette classe</p>
+                                <a href="{{ url_for('matiere.add_matiere', classe_id=classe.id) }}" 
+                                   class="btn btn-success">
+                                    <i class="fas fa-plus me-1"></i>Ajouter des matières
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statut de la classe -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-chart-line me-2"></i>Statistiques de la classe</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-lg-4 col-md-6 mb-3">
+                                <div class="stats-card primary">
+                                    <div class="mb-3">
+                                        <i class="fas fa-users fa-2x text-primary"></i>
+                                    </div>
+                                    <h3>{{ eleves|length }}</h3>
+                                    <p class="mb-0 text-muted">Élèves inscrits</p>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-md-6 mb-3">
+                                <div class="stats-card success">
+                                    <div class="mb-3">
+                                        <i class="fas fa-book fa-2x text-success"></i>
+                                    </div>
+                                    <h3>{{ matieres|length }}</h3>
+                                    <p class="mb-0 text-muted">Matières configurées</p>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-md-12 mb-3">
+                                <div class="stats-card {% if eleves|length > 0 and matieres|length > 0 %}success{% else %}warning{% endif %}">
+                                    <div class="mb-3">
+                                        {% if eleves|length > 0 and matieres|length > 0 %}
+                                            <i class="fas fa-check-circle fa-2x text-success status-ready"></i>
+                                        {% else %}
+                                            <i class="fas fa-exclamation-circle fa-2x text-warning status-incomplete"></i>
+                                        {% endif %}
+                                    </div>
+                                    <h3>
+                                        {% if eleves|length > 0 and matieres|length > 0 %}
+                                            <i class="fas fa-check"></i>
+                                        {% else %}
+                                            <i class="fas fa-times"></i>
+                                        {% endif %}
+                                    </h3>
+                                    <p class="mb-0 text-muted">
+                                        {% if eleves|length > 0 and matieres|length > 0 %}
+                                            Prête pour les notes
+                                        {% else %}
+                                            Configuration incomplète
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Variables globales
+        const classeId = {{ classe.id }};
+        const nombreEleves = {{ eleves|length }};
+        const nombreMatieres = {{ matieres|length }};
+
+        // Fonction pour télécharger les bulletins par classement
+        function telechargerBulletinsClasses() {
+            if (nombreEleves === 0) {
+                showAlert('Aucun élève dans cette classe', 'warning');
+                return;
+            }
+            
+            if (nombreMatieres === 0) {
+                showAlert('Aucune matière configurée', 'warning');
+                return;
+            }
+
+            if (confirm(`TÉLÉCHARGER LES BULLETINS PAR CLASSEMENT ?\n\n${nombreEleves} bulletin(s) seront générés\nOrdre : 1er → Dernier (par moyenne générale)\nFormat : ZIP avec PDFs nommés par rang\n\nCette opération peut prendre quelques minutes...`)) {
+                const loadingMsg = showLoadingMessage('Génération des bulletins par classement...');
+                
+                window.location.href = `/bulletin/classe_classee/${classeId}`;
+                
+                setTimeout(() => {
+                    hideLoadingMessage(loadingMsg);
+                }, 3000);
+            }
+        }
+
+        // Fonction pour télécharger les bulletins par ordre alphabétique
+        function telechargerBulletinsAlpha() {
+            if (nombreEleves === 0) {
+                showAlert('Aucun élève dans cette classe', 'warning');
+                return;
+            }
+            
+            if (nombreMatieres === 0) {
+                showAlert('Aucune matière configurée', 'warning');
+                return;
+            }
+
+            if (confirm(`TÉLÉCHARGER LES BULLETINS ALPHABÉTIQUES ?\n\n${nombreEleves} bulletin(s) seront générés\nOrdre : A → Z (par nom de famille)\nFormat : ZIP avec PDFs\n\nCette opération peut prendre quelques minutes...`)) {
+                const loadingMsg = showLoadingMessage('Génération des bulletins alphabétiques...');
+                
+                window.location.href = `/bulletin/classe/${classeId}`;
+                
+                setTimeout(() => {
+                    hideLoadingMessage(loadingMsg);
+                }, 3000);
+            }
+        }
+
+        // Fonction pour impression HTML
+        function imprimerTousBulletins() {
+            const elevesElements = document.querySelectorAll('[data-eleve-id]');
+            
+            if (elevesElements.length === 0) {
+                showAlert('Aucun élève dans cette classe', 'warning');
+                return;
+            }
+            
+            if (confirm(`OUVRIR LES BULLETINS POUR IMPRESSION ?\n\n${elevesElements.length} onglet(s) s'ouvriront\nFormat : Prévisualisation HTML\nVous pourrez imprimer depuis votre navigateur\n\nAssurez-vous d'autoriser les popups`)) {
+                elevesElements.forEach((element, index) => {
+                    setTimeout(() => {
+                        const eleveId = element.getAttribute('data-eleve-id');
+                        const url = `/bulletin/preview/${eleveId}`;
+                        window.open(url, '_blank');
+                    }, index * 300);
+                });
+            }
+        }
+
+        // Fonction pour afficher des alertes modernes
+        function showAlert(message, type = 'info') {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+            alertDiv.style.top = '100px';
+            alertDiv.style.right = '20px';
+            alertDiv.style.zIndex = '9999';
+            alertDiv.style.maxWidth = '400px';
+            
+            const icon = type === 'success' ? 'check-circle' : 
+                        type === 'warning' ? 'exclamation-triangle' : 
+                        type === 'danger' ? 'times-circle' : 'info-circle';
+            
+            alertDiv.innerHTML = `
+                <i class="fas fa-${icon} me-2"></i>
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            
+            document.body.appendChild(alertDiv);
+            
+            setTimeout(() => {
+                if (alertDiv.parentNode) {
+                    alertDiv.parentNode.removeChild(alertDiv);
+                }
+            }, 5000);
+        }
+
+        // Fonction pour afficher le message de chargement
+        function showLoadingMessage(message) {
+            const loadingDiv = document.createElement('div');
+            loadingDiv.className = 'loading-overlay';
+            loadingDiv.innerHTML = `
+                <div class="d-flex align-items-center mb-3">
+                    <div class="spinner-border spinner-border-sm me-3" role="status">
+                        <span class="visually-hidden">Chargement...</span>
+                    </div>
+                    <div>
+                        <strong>${message}</strong>
+                        <div><small>Veuillez patienter...</small></div>
+                    </div>
+                </div>
+                <div class="progress" style="height: 4px;">
+                    <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" 
+                         style="width: 100%; background: rgba(255, 255, 255, 0.3);"></div>
+                </div>
+            `;
+            document.body.appendChild(loadingDiv);
+            return loadingDiv;
+        }
+
+        // Fonction pour masquer le message de chargement
+        function hideLoadingMessage(loadingDiv) {
+            if (loadingDiv && loadingDiv.parentNode) {
+                loadingDiv.style.opacity = '0';
+                loadingDiv.style.transform = 'translate(-50%, -50%) scale(0.8)';
+                setTimeout(() => {
+                    if (loadingDiv.parentNode) {
+                        loadingDiv.parentNode.removeChild(loadingDiv);
+                    }
+                }, 300);
+            }
+        }
+
+        // Initialisation au chargement
+        document.addEventListener('DOMContentLoaded', function() {
+            // Vérifier les prérequis et désactiver les options si nécessaire
+            if (nombreEleves === 0 || nombreMatieres === 0) {
+                const dropdown = document.querySelector('.dropdown-menu');
+                if (dropdown) {
+                    const items = dropdown.querySelectorAll('.dropdown-item');
+                    items.forEach((item, index) => {
+                        if (index < 2) { // Les deux premières options (téléchargements)
+                            item.classList.add('disabled');
+                            item.style.opacity = '0.6';
+                            item.onclick = function(e) {
+                                e.preventDefault();
+                                showAlert(nombreEleves === 0 ? 
+                                    'Ajoutez des élèves avant de générer les bulletins' : 
+                                    'Configurez des matières avant de générer les bulletins', 
+                                    'warning'
+                                );
+                            };
+                        }
+                    });
+                }
+            }
+
+            // Animation des cartes
+            const cards = document.querySelectorAll('.card');
+            cards.forEach((card, index) => {
+                card.style.animationDelay = `${index * 0.1}s`;
+            });
+
+            // Animation des éléments de liste au survol
+            const listItems = document.querySelectorAll('.list-group-item');
+            listItems.forEach(item => {
+                item.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateX(8px)';
+                    this.style.boxShadow = '0 8px 25px rgba(99, 102, 241, 0.15)';
+                });
+                
+                item.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateX(0)';
+                    this.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.1)';
+                });
+            });
+
+            // Animation des boutons d'action
+            const actionButtons = document.querySelectorAll('.btn');
+            actionButtons.forEach(btn => {
+                btn.addEventListener('mouseenter', function() {
+                    if (!this.classList.contains('dropdown-toggle')) {
+                        this.style.transform = 'translateY(-3px) scale(1.02)';
+                    }
+                });
+                
+                btn.addEventListener('mouseleave', function() {
+                    if (!this.classList.contains('dropdown-toggle')) {
+                        this.style.transform = 'translateY(0) scale(1)';
+                    }
+                });
+            });
+
+            // Animation des stats cards
+            const statsCards = document.querySelectorAll('.stats-card');
+            statsCards.forEach((card, index) => {
+                setTimeout(() => {
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 200);
+                
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                card.style.transition = 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
+            });
+
+            // Effet de ripple sur les boutons
+            actionButtons.forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    const ripple = document.createElement('span');
+                    const rect = this.getBoundingClientRect();
+                    const size = Math.max(rect.width, rect.height);
+                    const x = e.clientX - rect.left - size / 2;
+                    const y = e.clientY - rect.top - size / 2;
+                    
+                    ripple.style.width = ripple.style.height = size + 'px';
+                    ripple.style.left = x + 'px';
+                    ripple.style.top = y + 'px';
+                    ripple.style.position = 'absolute';
+                    ripple.style.borderRadius = '50%';
+                    ripple.style.background = 'rgba(255, 255, 255, 0.5)';
+                    ripple.style.transform = 'scale(0)';
+                    ripple.style.animation = 'ripple 0.6s linear';
+                    ripple.style.pointerEvents = 'none';
+                    
+                    this.appendChild(ripple);
+                    
+                    setTimeout(() => {
+                        ripple.remove();
+                    }, 600);
+                });
+            });
+
+            // Notification de bienvenue
+            setTimeout(() => {
+                if (nombreEleves > 0 && nombreMatieres > 0) {
+                    showAlert('Classe configurée et prête pour la saisie des notes !', 'success');
+                } else {
+                    const missing = [];
+                    if (nombreEleves === 0) missing.push('élèves');
+                    if (nombreMatieres === 0) missing.push('matières');
+                    showAlert(`Configuration incomplète : ajoutez des ${missing.join(' et des ')}`, 'warning');
+                }
+            }, 1000);
+        });
+
+        // CSS pour l'effet ripple
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes ripple {
+                to {
+                    transform: scale(4);
+                    opacity: 0;
+                }
+            }
+            
+            .btn {
+                position: relative;
+                overflow: hidden;
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+
+</body>
+</html>

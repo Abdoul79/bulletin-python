@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saisir les Notes - {{ classe.nom }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .note-input {
+            width: 80px;
+            text-align: center;
+        }
+        .table-responsive {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .notes-history {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        .note-status-active {
+            background-color: #d4edda !important;
+        }
+        .note-status-suspended {
+            background-color: #f8d7da !important;
+        }
+        .btn-sm i {
+            font-size: 0.875rem;
+        }
+        
+        /* Style pour les champs vides */
+        .note-input:focus {
+            border-color: #0d6efd;
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+        }
+        
+        .note-input:valid {
+            border-color: #198754;
+        }
+        
+        .empty-form-notice {
+            background: linear-gradient(45deg, #e3f2fd, #f3e5f5);
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        
+        .modification-notice {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 10px 15px;
+            margin: 10px 0;
+            border-radius: 3px;
+        }
+
+        /* Styles pour l'historique groupé */
+        .student-group {
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            overflow: hidden;
+        }
+
+        .student-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 15px;
+            font-weight: bold;
+        }
+
+        .notes-list {
+            padding: 10px 15px;
+            background: #f8f9fa;
+        }
+
+        .note-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .note-item:last-child {
+            border-bottom: none;
+        }
+
+        .note-details {
+            flex-grow: 1;
+        }
+
+        .note-actions {
+            flex-shrink: 0;
+            margin-left: 10px;
+        }
+
+        /* Barre de recherche intégrée */
+        .search-in-history {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            background: white;
+            padding: 10px;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        .search-highlight {
+            background-color: yellow;
+            font-weight: bold;
+            padding: 1px 3px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <div class="container mt-4">
+        <!-- En-tête -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h3><i class="fas fa-edit text-primary me-2"></i>Saisir les Notes – {{ classe.nom }}</h3>
+                        <p class="text-muted mb-0">{{ classe.annee_scolaire }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Messages Flash -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, msg in messages %}
+                    <div class="alert alert-{{ 'danger' if category=='error' else 'success' if category=='success' else 'warning' }} alert-dismissible fade show">
+                        <i class="fas fa-{{ 'exclamation-triangle' if category=='error' else 'check-circle' if category=='success' else 'info-circle' }} me-2"></i>
+                        {{ msg }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- Notice importante -->
+        <div class="empty-form-notice">
+            <div class="d-flex align-items-center">
+                <i class="fas fa-lightbulb text-primary me-3 fs-4"></i>
+                <div>
+                    <h6 class="mb-1">Fonctionnement du formulaire :</h6>
+                    <small class="text-muted">
+                        • Sélectionnez obligatoirement un trimestre avant la saisie<br>
+                        • Les champs sont toujours vides pour une nouvelle saisie<br>
+                        • Utilisez la recherche dans l'historique pour retrouver et modifier des notes
+                    </small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Formulaire de saisie (TOUJOURS VIDE) -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card border-primary">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="fas fa-plus-circle me-2"></i>Nouvelle saisie de notes</h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="POST" id="notesForm">
+                            <div class="row mb-3">
+                                <div class="col-md-4">
+                                    <label class="form-label">N'oublie pas de selectionner le Trimestre <span class="text-danger">*</span></label>
+                                    <select name="trimestre" class="form-select" required>
+                                        <option value="">-- Sélectionner un trimestre --</option>
+                                        <option value="T1" {{ 'selected' if trimestre_actuel == 'T1' else '' }}>1er Trimestre</option>
+                                        <option value="T2" {{ 'selected' if trimestre_actuel == 'T2' else '' }}>2e Trimestre</option>
+                                        <option value="T3" {{ 'selected' if trimestre_actuel == 'T3' else '' }}>3e Trimestre</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-8 d-flex align-items-end">
+                                    <button type="submit" class="btn btn-primary me-2">
+                                        <i class="fas fa-save me-1"></i>Enregistrer les Notes
+                                    </button>
+                                    <button type="button" class="btn btn-outline-secondary me-2" onclick="clearAllInputs()">
+                                        <i class="fas fa-eraser me-1"></i>Vider tout
+                                    </button>
+                                    <a href="{{ url_for('main.dashboard') }}" class="btn btn-secondary">
+                                        <i class="fas fa-arrow-left me-1"></i>Retour
+                                    </a>
+                                </div>
+                            </div>
+
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-striped">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th style="min-width: 150px;">Élève</th>
+                                            {% for m in matieres %}
+                                                <th class="text-center" style="min-width: 100px;">{{ m.nom }}</th>
+                                            {% endfor %}
+                                            <th class="text-center">Moyenne</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for eleve in eleves %}
+                                        <tr data-student-name="{{ eleve.prenom }} {{ eleve.nom }}" data-student-id="{{ eleve.id }}" data-class="{{ classe.nom }}">
+                                            <td><strong>{{ eleve.prenom }} {{ eleve.nom }}</strong></td>
+                                            {% for matiere in matieres %}
+                                            <td class="text-center">
+                                                <input type="number"
+                                                       step="0.25"
+                                                       min="0"
+                                                       max="20"
+                                                       name="note_{{ eleve.id }}_{{ matiere.id }}"
+                                                       value=""
+                                                       class="form-control note-input"
+                                                       placeholder="0-20"
+                                                       data-eleve-id="{{ eleve.id }}"
+                                                       autocomplete="off">
+                                            </td>
+                                            {% endfor %}
+                                            <td class="text-center">
+                                                <span class="badge bg-secondary" id="moyenne_{{ eleve.id }}">-</span>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="modification-notice">
+                                <strong>Note :</strong> Ce formulaire ne pré-remplit jamais les champs. Pour modifier des notes existantes, utilisez la recherche et les boutons dans l'historique ci-dessous.
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Historique des notes GROUPÉ PAR ÉLÈVE -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5><i class="fas fa-history me-2"></i>Historique des notes par élève</h5>
+                            <div class="d-flex gap-2 align-items-center">
+                                <!-- Actions groupées -->
+                                <button class="btn btn-danger btn-sm" onclick="deleteAllNotes()" title="Supprimer toutes les notes">
+                                    <i class="fas fa-trash-alt me-1"></i>Supprimer toutes
+                                </button>
+                                <!-- Filtre par trimestre -->
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <button type="button" class="btn btn-outline-primary active" data-trimestre-filter="all">Tous</button>
+                                    <button type="button" class="btn btn-outline-primary" data-trimestre-filter="T1">T1</button>
+                                    <button type="button" class="btn btn-outline-primary" data-trimestre-filter="T2">T2</button>
+                                    <button type="button" class="btn btn-outline-primary" data-trimestre-filter="T3">T3</button>
+                                </div>
+                                <!-- Statistiques -->
+                                <div class="text-muted small">
+                                    <i class="fas fa-chart-bar"></i> 
+                                    <span id="statsNotes">{{ notes_enregistrees|length }} notes</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Barre de recherche intégrée -->
+                        <div class="search-in-history mt-3">
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="fas fa-search"></i>
+                                </span>
+                                <input type="text" id="searchInHistory" class="form-control" 
+                                       placeholder="Rechercher un élève, matière, note..." 
+                                       autocomplete="off">
+                                <button class="btn btn-outline-secondary" type="button" onclick="clearHistorySearch()">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card-body">
+                        <div class="notes-history" id="notesHistoryContainer">
+                            {% if notes_enregistrees %}
+                                <!-- Grouper les notes par élève -->
+                                {% set notes_by_student = {} %}
+                                {% for note in notes_enregistrees %}
+                                    {% set student_key = note.eleve.prenom + " " + note.eleve.nom %}
+                                    {% if student_key not in notes_by_student %}
+                                        {% set _ = notes_by_student.update({student_key: []}) %}
+                                    {% endif %}
+                                    {% set _ = notes_by_student[student_key].append(note) %}
+                                {% endfor %}
+                                
+                                <!-- Afficher par élève -->
+                                {% for student_name, student_notes in notes_by_student.items() %}
+                                <div class="student-group" data-student="{{ student_name }}">
+                                    <div class="student-header">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <span>
+                                                <i class="fas fa-user-graduate me-2"></i>
+                                                {{ student_name }}
+                                            </span>
+                                            <span class="badge bg-light text-dark">
+                                                {{ student_notes|length }} note(s)
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="notes-list">
+                                        {% for note in student_notes %}
+                                        <div class="note-item" 
+                                             data-trimestre="{{ note.trimestre }}" 
+                                             data-note-id="{{ note.id }}"
+                                             data-searchable="{{ student_name }} {{ note.matiere.nom }} {{ note.note }} {{ note.trimestre }}">
+                                            <div class="note-details">
+                                                <div class="d-flex align-items-center gap-3">
+                                                    <span class="badge bg-{{ 'primary' if note.trimestre == 'T1' else 'warning' if note.trimestre == 'T2' else 'info' }}">
+                                                        {{ note.trimestre }}
+                                                    </span>
+                                                    <strong>{{ note.matiere.nom }}</strong>
+                                                    <span class="badge bg-{{ 'success' if note.note >= 10 else 'warning' if note.note >= 8 else 'danger' }} fs-6">
+                                                        {{ note.note }}/20
+                                                    </span>
+                                                    {% if note.statut == 'active' %}
+                                                        <span class="badge bg-success"><i class="fas fa-check"></i></span>
+                                                    {% else %}
+                                                        <span class="badge bg-danger"><i class="fas fa-pause"></i></span>
+                                                    {% endif %}
+                                                    <small class="text-muted">
+                                                        {{ note.date_saisie.strftime('%d/%m %H:%M') if note.date_saisie else 'N/A' }}
+                                                    </small>
+                                                </div>
+                                            </div>
+                                            <div class="note-actions">
+                                                <div class="btn-group btn-group-sm" role="group">
+                                                    <!-- Modifier -->
+                                                    <button type="button"
+                                                            class="btn btn-outline-primary btn-modifier"
+                                                            data-note-id="{{ note.id }}"
+                                                            data-eleve="{{ student_name | e }}"
+                                                            data-matiere="{{ note.matiere.nom | e }}"
+                                                            data-note="{{ note.note }}"
+                                                            data-trimestre="{{ note.trimestre }}"
+                                                            title="Modifier">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+
+                                                    <!-- Suspendre / Activer -->
+                                                    {% if note.statut == 'active' %}
+                                                        <button type="button"
+                                                                class="btn btn-outline-warning btn-suspendre"
+                                                                data-note-id="{{ note.id }}"
+                                                                title="Suspendre">
+                                                            <i class="fas fa-pause"></i>
+                                                        </button>
+                                                    {% else %}
+                                                        <button type="button"
+                                                                class="btn btn-outline-success btn-activer"
+                                                                data-note-id="{{ note.id }}"
+                                                                title="Réactiver">
+                                                            <i class="fas fa-play"></i>
+                                                        </button>
+                                                    {% endif %}
+
+                                                    <!-- Supprimer -->
+                                                    <button type="button"
+                                                            class="btn btn-outline-danger btn-supprimer"
+                                                            data-note-id="{{ note.id }}"
+                                                            data-eleve="{{ student_name | e }}"
+                                                            data-matiere="{{ note.matiere.nom | e }}"
+                                                            data-note="{{ note.note }}"
+                                                            title="Supprimer">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            {% else %}
+                                <div class="text-center text-muted py-5">
+                                    <i class="fas fa-clipboard-list fa-4x mb-3 text-muted"></i>
+                                    <h5>Aucune note enregistrée</h5>
+                                    <p>Les notes apparaîtront ici après votre première saisie</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de modification -->
+    <div class="modal fade" id="modifierNoteModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title"><i class="fas fa-edit me-2"></i>Modifier la note</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="modifierNoteForm">
+                        <input type="hidden" id="noteId">
+                        
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Modification d'une note existante
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Élève</label>
+                                    <input type="text" class="form-control" id="eleveNom" readonly>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Trimestre</label>
+                                    <input type="text" class="form-control" id="trimestre" readonly>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Matière</label>
+                            <input type="text" class="form-control" id="matiereNom" readonly>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="nouvelleNote" class="form-label">Nouvelle note</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="nouvelleNote" min="0" max="20" step="0.25" required>
+                                <span class="input-group-text">/20</span>
+                            </div>
+                            <div class="form-text">Note entre 0 et 20 (décimales autorisées)</div>
+                        </div>
+
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            <strong>Attention :</strong> Cette modification sera immédiatement sauvegardée.
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-1"></i>Annuler
+                    </button>
+                    <button type="button" class="btn btn-primary" id="btnSauvegarderModification">
+                        <i class="fas fa-save me-1"></i>Sauvegarder
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Fonction pour vider tous les champs
+        function clearAllInputs() {
+            document.querySelectorAll('.note-input').forEach(input => {
+                input.value = '';
+            });
+            document.querySelectorAll('[id^="moyenne_"]').forEach(span => {
+                const eleveId = span.id.replace('moyenne_', '');
+                calculateAverage(eleveId);
+            });
+        }
+
+        // Calcul automatique de la moyenne
+        document.querySelectorAll('.note-input').forEach(input => {
+            input.addEventListener('input', function () {
+                const eleveId = this.getAttribute('data-eleve-id');
+                calculateAverage(eleveId);
+            });
+        });
+
+        function calculateAverage(eleveId) {
+            const inputs = document.querySelectorAll(`input[data-eleve-id="${eleveId}"]`);
+            let total = 0;
+            let count = 0;
+
+            inputs.forEach(input => {
+                const value = parseFloat(input.value);
+                if (!isNaN(value) && value !== '') {
+                    total += value;
+                    count++;
+                }
+            });
+
+            const moyenneSpan = document.getElementById(`moyenne_${eleveId}`);
+            if (count > 0) {
+                const moyenne = (total / count).toFixed(2);
+                moyenneSpan.textContent = moyenne;
+                moyenneSpan.className = `badge fs-6 bg-${moyenne >= 10 ? 'success' : moyenne >= 8 ? 'warning' : 'danger'}`;
+            } else {
+                moyenneSpan.textContent = '-';
+                moyenneSpan.className = 'badge bg-secondary fs-6';
+            }
+        }
+
+        // Recherche dans l'historique
+        document.getElementById('searchInHistory').addEventListener('input', function() {
+            const query = this.value.toLowerCase().trim();
+            
+            if (query.length === 0) {
+                // Afficher tous les éléments
+                document.querySelectorAll('.student-group').forEach(group => {
+                    group.style.display = '';
+                });
+                document.querySelectorAll('.note-item').forEach(item => {
+                    item.style.display = '';
+                    item.innerHTML = item.innerHTML.replace(/<span class="search-highlight">(.*?)<\/span>/g, '$1');
+                });
+                return;
+            }
+
+            document.querySelectorAll('.student-group').forEach(group => {
+                let hasVisibleNotes = false;
+                const noteItems = group.querySelectorAll('.note-item');
+                
+                noteItems.forEach(item => {
+                    const searchText = item.getAttribute('data-searchable').toLowerCase();
+                    if (searchText.includes(query)) {
+                        item.style.display = '';
+                        hasVisibleNotes = true;
+                        // Surligner le texte trouvé
+                        highlightSearchText(item, query);
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+
+                group.style.display = hasVisibleNotes ? '' : 'none';
+            });
+        });
+
+        function highlightSearchText(element, query) {
+            const regex = new RegExp(`(${query})`, 'gi');
+            const textNodes = getTextNodes(element);
+            
+            textNodes.forEach(node => {
+                if (node.textContent.toLowerCase().includes(query)) {
+                    const highlightedText = node.textContent.replace(regex, '<span class="search-highlight">$1</span>');
+                    const wrapper = document.createElement('span');
+                    wrapper.innerHTML = highlightedText;
+                    node.parentNode.replaceChild(wrapper, node);
+                }
+            });
+        }
+
+        function getTextNodes(element) {
+            let textNodes = [];
+            let walker = document.createTreeWalker(
+                element,
+                NodeFilter.SHOW_TEXT,
+                null,
+                false
+            );
+            
+            let node;
+            while (node = walker.nextNode()) {
+                textNodes.push(node);
+            }
+            return textNodes;
+        }
+
+        function clearHistorySearch() {
+            document.getElementById('searchInHistory').value = '';
+            document.getElementById('searchInHistory').dispatchEvent(new Event('input'));
+        }
+
+        // Filtrage par trimestre
+        document.querySelectorAll('[data-trimestre-filter]').forEach(btn => {
+            btn.addEventListener('click', function () {
+                document.querySelectorAll('[data-trimestre-filter]').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+
+                const trimestre = this.getAttribute('data-trimestre-filter');
+                let visibleCount = 0;
+
+                document.querySelectorAll('.student-group').forEach(group => {
+                    let hasVisibleNotes = false;
+                    const noteItems = group.querySelectorAll('.note-item');
+                    
+                    noteItems.forEach(item => {
+                        if (trimestre === 'all' || item.dataset.trimestre === trimestre) {
+                            item.style.display = '';
+                            hasVisibleNotes = true;
+                            visibleCount++;
+                        } else {
+                            item.style.display = 'none';
+                        }
+                    });
+
+                    group.style.display = hasVisibleNotes ? '' : 'none';
+                });
+
+                document.getElementById('statsNotes').textContent = `${visibleCount} note${visibleCount > 1 ? 's' : ''}`;
+            });
+        });
+
+        // Supprimer toutes les notes
+        function deleteAllNotes() {
+            const classeId = {{ classe.id }};  // Récupérer l'ID depuis le serveur
+            
+            if (confirm('⚠️ SUPPRIMER TOUTES LES NOTES ?\n\nCette action supprimera définitivement toutes les notes de cette classe.\n\n🚨 CETTE ACTION EST IRRÉVERSIBLE !')) {
+                if (confirm('Êtes-vous absolument certain ? Cette action ne peut pas être annulée.')) {
+                    fetch('/ecole/supprimer_toutes_notes', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ classe_id: classeId })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert(`✅ ${data.message}`);
+                            location.reload();
+                        } else {
+                            alert(`❌ Erreur : ${data.message}`);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Erreur :', error);
+                        alert('❌ Erreur de connexion');
+                    });
+                }
+            }
+        }
+
+        // Modal de modification
+        document.querySelectorAll('.btn-modifier').forEach(btn => {
+            btn.addEventListener('click', function () {
+                const noteId = this.getAttribute('data-note-id');
+                const eleveNom = this.getAttribute('data-eleve');
+                const matiereNom = this.getAttribute('data-matiere');
+                const note = this.getAttribute('data-note');
+                const trimestre = this.getAttribute('data-trimestre');
+
+                document.getElementById('noteId').value = noteId;
+                document.getElementById('eleveNom').value = eleveNom;
+                document.getElementById('matiereNom').value = matiereNom;
+                document.getElementById('trimestre').value = trimestre;
+                document.getElementById('nouvelleNote').value = note;
+
+                const modal = new bootstrap.Modal(document.getElementById('modifierNoteModal'));
+                modal.show();
+            });
+        });
+
+        // Sauvegarder modification
+        document.getElementById('btnSauvegarderModification').addEventListener('click', function () {
+            const noteId = document.getElementById('noteId').value;
+            const nouvelleNote = parseFloat(document.getElementById('nouvelleNote').value);
+
+            if (isNaN(nouvelleNote) || nouvelleNote < 0 || nouvelleNote > 20) {
+                alert('La note doit être un nombre entre 0 et 20');
+                return;
+            }
+
+            this.disabled = true;
+            this.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Modification...';
+
+            fetch('/ecole/modifier_note', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ note_id: noteId, nouvelle_note: nouvelleNote })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(`✅ ${data.message}`);
+                    location.reload();
+                } else {
+                    alert(`❌ Erreur : ${data.message}`);
+                }
+            })
+            .finally(() => {
+                this.disabled = false;
+                this.innerHTML = '<i class="fas fa-save me-1"></i>Sauvegarder';
+            });
+        });
+
+        // Actions sur les notes
+        document.querySelectorAll('.btn-suspendre').forEach(btn => {
+            btn.addEventListener('click', function () {
+                const noteId = this.getAttribute('data-note-id');
+                if (confirm('⚠️ Suspendre cette note ?\n\nElle sera exclue des calculs de moyenne.')) {
+                    actionNote('/ecole/suspendre_note', noteId);
+                }
+            });
+        });
+
+        document.querySelectorAll('.btn-activer').forEach(btn => {
+            btn.addEventListener('click', function () {
+                const noteId = this.getAttribute('data-note-id');
+                actionNote('/ecole/activer_note', noteId);
+            });
+        });
+
+        document.querySelectorAll('.btn-supprimer').forEach(btn => {
+            btn.addEventListener('click', function () {
+                const noteId = this.getAttribute('data-note-id');
+                const eleve = this.getAttribute('data-eleve');
+                const matiere = this.getAttribute('data-matiere');
+                const noteValue = this.getAttribute('data-note');
+
+                if (confirm(`🗑️ SUPPRIMER DÉFINITIVEMENT ?\n\nÉlève: ${eleve}\nMatière: ${matiere}\nNote: ${noteValue}/20\n\n⚠️ Cette action est irréversible !`)) {
+                    actionNote('/ecole/supprimer_note', noteId);
+                }
+            });
+        });
+
+        function actionNote(url, noteId) {
+            fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ note_id: noteId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(`✅ ${data.message}`);
+                    location.reload();
+                } else {
+                    alert(`❌ Erreur : ${data.message}`);
+                }
+            })
+            .catch(error => {
+                console.error('Erreur :', error);
+                alert('❌ Erreur de connexion');
+            });
+        }
+
+        // Initialiser les champs vides au chargement
+        document.addEventListener('DOMContentLoaded', function() {
+            clearAllInputs();
+            
+            // Initialiser les moyennes
+            document.querySelectorAll('[id^="moyenne_"]').forEach(span => {
+                const eleveId = span.id.replace('moyenne_', '');
+                calculateAverage(eleveId);
+            });
+        });
+    </script>
+</body>
+</html>
+

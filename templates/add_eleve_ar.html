@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-bs-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إدارة التلاميذ - {{ classe.nom }}</title>
+    <!-- Bootstrap 5.3 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #6e8efb, #a777e3);
+            --danger-gradient: linear-gradient(135deg, #ff6b6b, #ee5a52);
+            --success-gradient: linear-gradient(135deg, #56ab2f, #a8e6cf);
+        }
+        body {
+            font-family: 'Cairo', 'Tahoma', sans-serif;
+            background-color: #f8f9fa;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            padding-bottom: 80px;
+        }
+        .card {
+            border: none;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            margin-bottom: 24px;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+        }
+        .btn {
+            border-radius: 12px;
+            font-weight: 500;
+            padding: 10px 20px;
+            transition: all 0.3s ease;
+        }
+        .btn-primary { background: var(--primary-gradient); border: none; }
+        .btn-danger   { background: var(--danger-gradient); border: none; }
+        .btn-success  { background: var(--success-gradient); border: none; }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .form-control, .form-select {
+            border-radius: 12px;
+            padding: 12px 16px;
+            border: 2px solid #e9ecef;
+            transition: border-color 0.3s ease;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: #6e8efb;
+            box-shadow: 0 0 0 3px rgba(110, 142, 251, 0.25);
+        }
+        .table th, .table td {
+            vertical-align: middle;
+            padding: 1rem;
+        }
+        .table tbody tr {
+            transition: background-color 0.2s ease;
+        }
+        .table tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+        .badge {
+            border-radius: 50px;
+            padding: 0.5em 1em;
+            font-weight: 500;
+        }
+        .no-data {
+            color: #adb5bd;
+            font-style: italic;
+        }
+        .section-title {
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            position: relative;
+            padding-bottom: 0.5rem;
+        }
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            right: 0; /* RTL */
+            width: 50px;
+            height: 3px;
+            background: var(--bs-primary);
+            border-radius: 3px;
+        }
+        .action-btns .btn {
+            border-radius: 8px !important;
+            padding: 6px 10px !important;
+        }
+        .search-highlight {
+            background-color: #fff3cd;
+            border-radius: 4px;
+            padding: 0 2px;
+        }
+        .empty-state {
+            padding: 4rem 1rem;
+            text-align: center;
+        }
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.6;
+        }
+        .theme-toggle {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: #fff;
+            padding: 0.5rem;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+        .theme-toggle:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        /* Dark Theme */
+        body.dark {
+            background-color: #121212;
+            color: #e0e0e0;
+        }
+        body.dark .card {
+            background-color: #1e1e1e;
+            color: #e0e0e0;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+        body.dark .form-control, body.dark .form-select {
+            background-color: #2d2d2d;
+            border-color: #444;
+            color: #e0e0e0;
+        }
+        body.dark .form-control:focus, body.dark .form-select:focus {
+            border-color: #a777e3;
+            box-shadow: 0 0 0 3px rgba(167, 119, 227, 0.3);
+        }
+        body.dark .table tbody tr:hover {
+            background-color: #2d2d2d;
+        }
+        body.dark .navbar {
+            background-color: #1a1a1a !important;
+        }
+        body.dark .alert {
+            background-color: #2d2d2d;
+            color: #e0e0e0;
+            border: none;
+        }
+        .progress-bar-animated {
+            animation: progress-bar-stripes 1s linear infinite;
+        }
+        @media (max-width: 768px) {
+            .btn-group-sm .btn {
+                padding: 0.25rem 0.5rem;
+                font-size: 0.875rem;
+            }
+            .action-btns {
+                display: flex;
+                flex-direction: column;
+                gap: 5px;
+            }
+            .action-btns .btn {
+                width: 100%;
+            }
+        }
+        /* RTL fixes */
+        .me-1 { margin-left: 0.25rem !important; margin-right: 0 !important; }
+        .me-2 { margin-left: 0.5rem !important; margin-right: 0 !important; }
+        .me-3 { margin-left: 1rem !important; margin-right: 0 !important; }
+        .text-end { text-align: left !important; }
+        .text-start { text-align: right !important; }
+    </style>
+</head>
+<body class="bg-light">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
+        <div class="container d-flex justify-content-between">
+            <a class="navbar-brand d-flex align-items-center" href="{{ url_for('main.voir_classe_ar', classe_id=classe.id) }}">
+                <i class="fas fa-arrow-right ms-2"></i>العودة إلى القسم
+            </a>
+            <div class="d-flex align-items-center">
+                <button class="theme-toggle ms-3" onclick="toggleTheme()">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <a class="btn btn-outline-light btn-sm" href="{{ url_for('main.dashboard_ar') }}">
+                    <i class="fas fa-tachometer-alt ms-1"></i>لوحة التحكم
+                </a>
+            </div>
+        </div>
+    </nav>
+    <div class="container mt-5 pt-4">
+        <!-- En-tête -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card border-0">
+                    <div class="card-body text-center py-5">
+                        <h1 class="display-5 fw-bold mb-2">
+                            <i class="fas fa-user-graduate text-primary ms-3"></i>إدارة التلاميذ
+                        </h1>
+                        <h3 class="mb-1">{{ classe.nom }}</h3>
+                        <p class="lead text-muted">السنة الدراسية: {{ classe.annee_scolaire }}</p>
+                        <div class="d-inline-block bg-light rounded-4 px-4 py-2">
+                            <strong class="h4 mb-0">{{ eleves|length }}</strong> 
+                            <span class="text-muted">تلميذ(ة)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Messages Flash -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, msg in messages %}
+                    <div class="alert alert-{{ 'danger' if category=='error' else 'success' if category=='success' else 'warning' }} alert-dismissible fade show d-flex align-items-center" role="alert">
+                        <i class="fas fa-{{ 'exclamation-circle' if category == 'error' else 'check-circle' if category == 'success' else 'exclamation-triangle' }} ms-2"></i>
+                        {{ msg }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        <!-- Formulaire d'ajout/modification -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card border-0">
+                    <div class="card-header bg-white border-0 pb-0">
+                        <h3 class="section-title mb-0">
+                            <i class="fas fa-plus-circle ms-2 text-primary"></i>
+                            <span id="form-title">إضافة تلميذ</span>
+                        </h3>
+                    </div>
+                    <div class="card-body pt-0">
+                        <form method="POST" id="eleveForm" class="needs-validation" novalidate>
+                            <input type="hidden" name="action" value="add">
+                            <input type="hidden" name="eleve_id" id="eleveId">
+                            <div class="row g-3">
+                                <div class="col-md-3">
+                                    <label class="form-label">الاسم <span class="text-danger">*</span></label>
+                                    <input type="text" name="prenom" id="prenom" class="form-control" required>
+                                    <div class="invalid-feedback">الاسم إلزامي.</div>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">العائلة <span class="text-danger">*</span></label>
+                                    <input type="text" name="nom" id="nom" class="form-control" required>
+                                    <div class="invalid-feedback">العائلة إلزامية.</div>
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label">تاريخ الازدياد <span class="text-danger">*</span></label>
+                                    <input type="date" name="date_naissance" id="date_naissance" class="form-control" required>
+                                    <div class="invalid-feedback">التاريخ إلزامي.</div>
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label">الجنس <span class="text-danger">*</span></label>
+                                    <select name="sexe" id="sexe" class="form-select" required>
+                                        <option value="">اختر...</option>
+                                        <option value="M">ذكر</option>
+                                        <option value="F">أنثى</option>
+                                    </select>
+                                    <div class="invalid-feedback">الجنس إلزامي.</div>
+                                </div>
+                                <div class="col-md-2 d-flex align-items-end">
+                                    <button type="submit" class="btn btn-primary w-100 py-3">
+                                        <i class="fas fa-save ms-2"></i>حفظ
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="row g-3 mt-3">
+                                <div class="col-md-4">
+                                    <label class="form-label">اسم الأب</label>
+                                    <input type="text" name="tuteur" id="tuteur" class="form-control" placeholder="مثال: عبد الله كوليبالي">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">هاتف الأب</label>
+                                    <input type="text" name="telephone_tuteur" id="telephone_tuteur" class="form-control" placeholder="+225 XX XX XX XX">
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Liste des élèves -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card border-0">
+                    <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center flex-wrap gap-3">
+                        <h3 class="section-title mb-0"><i class="fas fa-users ms-2 text-primary"></i>قائمة التلاميذ</h3>
+                        <div class="d-flex gap-2 flex-wrap">
+                            {% if eleves|length > 0 %}
+                                <button class="btn btn-outline-danger btn-sm py-2" id="deleteAllBtn">
+                                    <i class="fas fa-trash-alt ms-1"></i>حذف الكل
+                                </button>
+                                <button id="exportPdf" class="btn btn-outline-success btn-sm py-2"
+                                        data-classe="{{ classe.nom | e }}"
+                                        data-annee="{{ classe.annee_scolaire | e }}"
+                                        data-total="{{ eleves|length }}">
+                                    <i class="fas fa-file-pdf ms-1"></i>تصدير PDF
+                                </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="card-body pt-0">
+                        {% if eleves %}
+                            <!-- Barre de recherche -->
+                            <div class="mb-4">
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white border-end-0">
+                                        <i class="fas fa-search text-muted"></i>
+                                    </span>
+                                    <input 
+                                        type="text" 
+                                        id="searchInput" 
+                                        class="form-control border-start-0" 
+                                        placeholder="ابحث عن تلميذ حسب الاسم أو العائلة أو الأب أو الجنس...">
+                                </div>
+                                <div class="text-muted small mt-1">
+                                    <i class="fas fa-info-circle ms-1"></i> اكتب للتصفية في الوقت الحقيقي.
+                                </div>
+                            </div>
+                            <!-- Progress bar si peu d'élèves -->
+                            {% if eleves|length < 5 %}
+                                <div class="alert alert-warning d-flex align-items-center mb-4">
+                                    <i class="fas fa-lightbulb ms-2"></i>
+                                    <div>
+                                        <strong>تلميح:</strong> أضف 5 تلاميذ على الأقل لتجربة أفضل.
+                                        <div class="progress mt-2" style="height: 6px;">
+                                            <div class="progress-bar bg-warning" role="progressbar" style="width: {{ (eleves|length / 5) * 100 }}%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endif %}
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle mb-0" id="elevesTable">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>#</th>
+                                            <th>الاسم</th>
+                                            <th>العائلة</th>
+                                            <th>تاريخ الازدياد</th>
+                                            <th>الجنس</th>
+                                            <th>الأب</th>
+                                            <th>الهاتف</th>
+                                            <th>مسجل في</th>
+                                            <th class="text-start">الإجراءات</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for e in eleves %}
+                                            <tr data-eleve-id="{{ e.id }}">
+                                                <td><strong>{{ loop.index }}</strong></td>
+                                                <td class="searchable">{{ e.prenom }}</td>
+                                                <td class="searchable">{{ e.nom }}</td>
+                                                <td class="searchable">{{ e.date_naissance.strftime('%d/%m/%Y') }}</td>
+                                                <td>
+                                                    <span class="badge bg-{{ 'primary' if e.sexe == 'M' else 'danger' }} rounded-pill">
+                                                        <i class="fas fa-{{ 'mars' if e.sexe == 'M' else 'venus' }} ms-1"></i>
+                                                        {{ 'ذ' if e.sexe == 'M' else 'أ' }}
+                                                    </span>
+                                                </td>
+                                                <td class="searchable">{{ e.tuteur or '<span class="text-muted no-data">–</span>'|safe }}</td>
+                                                <td class="searchable">{{ e.telephone_tuteur or '<span class="text-muted no-data">–</span>'|safe }}</td>
+                                                <td>{{ e.date_enregistrement.strftime('%d/%m/%Y %H:%M') if e.date_enregistrement else '–' }}</td>
+                                                <td class="text-start action-btns">
+                                                    <div class="btn-group btn-group-sm">
+                                                        <button class="btn btn-outline-primary btn-modifier"
+                                                                data-id="{{ e.id }}"
+                                                                data-prenom="{{ e.prenom }}"
+                                                                data-nom="{{ e.nom }}"
+                                                                data-date="{{ e.date_naissance.strftime('%Y-%m-%d') }}"
+                                                                data-sexe="{{ e.sexe }}"
+                                                                data-tuteur="{{ e.tuteur or '' }}"
+                                                                data-tel="{{ e.telephone_tuteur or '' }}"
+                                                                title="تعديل التلميذ"
+                                                                data-bs-toggle="tooltip" data-bs-title="تعديل">
+                                                            <i class="fas fa-edit"></i>
+                                                        </button>
+                                                        <button class="btn btn-outline-danger btn-supprimer"
+                                                                data-id="{{ e.id }}"
+                                                                data-nom="{{ e.prenom }} {{ e.nom }}"
+                                                                title="حذف التلميذ"
+                                                                data-bs-toggle="tooltip" data-bs-title="حذف">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <div class="empty-state">
+                                <i class="fas fa-user-slash text-muted"></i>
+                                <h4 class="mt-3">لا يوجد تلاميذ في هذا القسم</h4>
+                                <p class="text-muted mb-4">ابدأ بإضافة تلاميذ عبر النموذج أعلاه.</p>
+                                <a href="#eleveForm" class="btn btn-primary">
+                                    <i class="fas fa-plus ms-2"></i>إضافة أول تلميذ
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Retour -->
+        <div class="text-center mt-4">
+            <a href="{{ url_for('main.dashboard_ar') }}" class="btn btn-secondary px-4 py-2">
+                <i class="fas fa-arrow-right ms-2"></i>العودة إلى لوحة التحكم
+            </a>
+        </div>
+    </div>
+    <!-- Modal suppression unique -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title text-danger">
+                        <i class="fas fa-exclamation-triangle ms-2"></i>حذف تلميذ
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body pt-0">
+                    <p class="lead">هل أنت متأكد من حذف:</p>
+                    <h5><strong id="deleteNom" class="text-primary"></strong></h5>
+                    <p class="text-muted small mt-3">
+                        <i class="fas fa-info-circle ms-1"></i> هذا الإجراء لا يمكن التراجع عنه.
+                    </p>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">إلغاء</button>
+                    <form method="POST" id="deleteForm" style="display:inline;">
+                        <input type="hidden" name="action" value="delete">
+                        <input type="hidden" name="eleve_id" id="deleteEleveId">
+                        <button type="submit" class="btn btn-danger px-4">
+                            <i class="fas fa-trash-alt ms-1"></i>حذف
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal suppression totale -->
+    <div class="modal fade" id="deleteAllModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title text-danger">
+                        <i class="fas fa-skull-crossbones ms-2"></i>حذف جميع التلاميذ
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body pt-0">
+                    <div class="alert alert-danger d-flex align-items-center">
+                        <i class="fas fa-exclamation-triangle ms-2"></i>
+                        <div>
+                            <strong>تنبيه!</strong> هذا الإجراء لا يمكن التراجع عنه.
+                        </div>
+                    </div>
+                    <p>أنت على وشك حذف <strong class="text-danger">{{ eleves|length }} تلميذ(ة)</strong> من القسم <strong>{{ classe.nom }}</strong>.</p>
+                    <p class="text-muted small mt-3">
+                        <i class="fas fa-lightbulb ms-1"></i> يمكنك إضافتهم يدوياً لاحقاً.
+                    </p>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">إلغاء</button>
+                    <form method="POST" style="display:inline;">
+                        <input type="hidden" name="action" value="delete_all">
+                        <button type="submit" class="btn btn-danger px-4">
+                            <i class="fas fa-trash-alt ms-1"></i>حذف الكل
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Toggle Theme
+        function toggleTheme() {
+            const body = document.body;
+            const themeIcon = document.querySelector('.theme-toggle i');
+            if (body.getAttribute('data-bs-theme') === 'dark') {
+                body.setAttribute('data-bs-theme', 'light');
+                body.classList.remove('dark');
+                themeIcon.classList.replace('fa-sun', 'fa-moon');
+            } else {
+                body.setAttribute('data-bs-theme', 'dark');
+                body.classList.add('dark');
+                themeIcon.classList.replace('fa-moon', 'fa-sun');
+            }
+        }
+        // -----------------------------
+        // 1. Modifier un élève
+        // -----------------------------
+        document.querySelectorAll('.btn-modifier').forEach(btn => {
+            btn.addEventListener('click', function () {
+                document.getElementById('form-title').textContent = 'تعديل التلميذ';
+                document.getElementById('eleveForm').action.value = 'edit';
+                document.getElementById('eleveId').value = this.getAttribute('data-id');
+                document.getElementById('prenom').value = this.getAttribute('data-prenom');
+                document.getElementById('nom').value = this.getAttribute('data-nom');
+                document.getElementById('date_naissance').value = this.getAttribute('data-date');
+                document.getElementById('sexe').value = this.getAttribute('data-sexe');
+                document.getElementById('tuteur').value = this.getAttribute('data-tuteur');
+                document.getElementById('telephone_tuteur').value = this.getAttribute('data-tel');
+                document.getElementById('prenom').focus();
+                // Scroll to form
+                document.getElementById('eleveForm').scrollIntoView({ behavior: 'smooth' });
+            });
+        });
+        // -----------------------------
+        // 2. Supprimer un élève
+        // -----------------------------
+        document.querySelectorAll('.btn-supprimer').forEach(btn => {
+            btn.addEventListener('click', function () {
+                const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
+                document.getElementById('deleteNom').textContent = this.getAttribute('data-nom');
+                document.getElementById('deleteEleveId').value = this.getAttribute('data-id');
+                modal.show();
+            });
+        });
+        // -----------------------------
+        // 3. Supprimer tous les élèves
+        // -----------------------------
+        document.getElementById('deleteAllBtn')?.addEventListener('click', function () {
+            const modal = new bootstrap.Modal(document.getElementById('deleteAllModal'));
+            modal.show();
+        });
+        // -----------------------------
+        // 4. Exporter en PDF
+        // -----------------------------
+        document.getElementById('exportPdf')?.addEventListener('click', function () {
+            const className = this.getAttribute('data-classe');
+            const anneeScolaire = this.getAttribute('data-annee');
+            const nbEleves = parseInt(this.getAttribute('data-total'), 10);
+            let content = `
+                <div style="font-family: 'Cairo', 'Tahoma', sans-serif; padding: 30px; max-width: 1000px; margin: 0 auto;">
+                    <div style="text-align: center; margin-bottom: 30px;">
+                        <h1 style="color: #2c3e50; margin-bottom: 10px;">📋 قائمة التلاميذ</h1>
+                        <h2 style="color: #3498db; margin-bottom: 5px;">${className}</h2>
+                        <p style="color: #7f8c8d; font-size: 16px;">السنة الدراسية: <strong>${anneeScolaire}</strong> • <strong>${nbEleves}</strong> تلميذ(ة)</p>
+                    </div>
+                    <table style="width: 100%; border-collapse: collapse; margin: 20px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border-radius: 8px; overflow: hidden;">
+                        <thead>
+                            <tr style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                                <th style="padding: 15px 12px; text-align: center; font-weight: 600;">#</th>
+                                <th style="padding: 15px 12px; text-align: right; font-weight: 600;">الاسم</th>
+                                <th style="padding: 15px 12px; text-align: right; font-weight: 600;">العائلة</th>
+                                <th style="padding: 15px 12px; text-align: center; font-weight: 600;">تاريخ الازدياد</th>
+                                <th style="padding: 15px 12px; text-align: center; font-weight: 600;">الجنس</th>
+                                <th style="padding: 15px 12px; text-align: right; font-weight: 600;">الأب</th>
+                                <th style="padding: 15px 12px; text-align: right; font-weight: 600;">الهاتف</th>
+                                <th style="padding: 15px 12px; text-align: center; font-weight: 600;">مسجل في</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+            // Parcourir chaque ligne
+            document.querySelectorAll('#elevesTable tbody tr').forEach((tr, index) => {
+                const tds = tr.querySelectorAll('td');
+                const data = Array.from(tds).slice(1, -1).map(td => td.innerText);
+                const rowColor = index % 2 === 0 ? '#f8f9fa' : 'white';
+                content += `
+                    <tr style="background-color: ${rowColor}; border-bottom: 1px solid #eee;">
+                        <td style="padding: 15px 12px; text-align: center; font-weight: 500;">${index + 1}</td>
+                        <td style="padding: 15px 12px; font-weight: 500;">${data[0]}</td>
+                        <td style="padding: 15px 12px; font-weight: 500;">${data[1]}</td>
+                        <td style="padding: 15px 12px; text-align: center;">${data[2]}</td>
+                        <td style="padding: 15px 12px; text-align: center;">
+                            <span style="background: ${data[3].includes('ذ') ? '#3498db' : '#e74c3c'}; color: white; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600;">
+                                ${data[3]}
+                            </span>
+                        </td>
+                        <td style="padding: 15px 12px;">${data[4]}</td>
+                        <td style="padding: 15px 12px;">${data[5]}</td>
+                        <td style="padding: 15px 12px; text-align: center; color: #7f8c8d;">${data[6]}</td>
+                    </tr>
+                `;
+            });
+            content += `</tbody></table></div>`;
+            const printWindow = window.open('', '_blank', 'width=1000,height=800');
+            printWindow.document.write(`
+                <!DOCTYPE html>
+                <html dir="rtl">
+                    <head>
+                        <title>قائمة التلاميذ - ${className}</title>
+                        <style>
+                            body { background: #f5f7fa; margin: 0; padding: 20px; font-family: 'Cairo', 'Tahoma', sans-serif; }
+                            @media print {
+                                body { background: white; }
+                                @page { margin: 15mm; }
+                            }
+                        </style>
+                    </head>
+                    <body>${content}</body>
+                </html>
+            `);
+            printWindow.document.close();
+            printWindow.focus();
+            printWindow.onload = function () {
+                setTimeout(() => {
+                    printWindow.print();
+                }, 500);
+            };
+        });
+        // Recherche en temps réel
+        document.getElementById('searchInput').addEventListener('input', function () {
+            const searchTerm = this.value.toLowerCase().trim();
+            const tableRows = document.querySelectorAll('#elevesTable tbody tr');
+            let visibleCount = 0;
+            tableRows.forEach(row => {
+                const searchableCells = row.querySelectorAll('.searchable');
+                let found = false;
+                if (searchTerm === '') {
+                    row.style.display = '';
+                    visibleCount++;
+                    return;
+                }
+                searchableCells.forEach(cell => {
+                    const text = cell.textContent.toLowerCase();
+                    if (text.includes(searchTerm)) {
+                        found = true;
+                    }
+                });
+                if (found) {
+                    row.style.display = '';
+                    visibleCount++;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+            // Feedback utilisateur
+            if (searchTerm && visibleCount === 0) {
+                const noResult = document.getElementById('noResult');
+                if (!noResult) {
+                    const msg = document.createElement('div');
+                    msg.id = 'noResult';
+                    msg.className = 'alert alert-info mt-3 text-center';
+                    msg.innerHTML = `<i class="fas fa-search ms-2"></i> لا يوجد تلميذ يطابق "<strong>${searchTerm}</strong>"`;
+                    document.querySelector('#elevesTable').parentNode.appendChild(msg);
+                }
+            } else {
+                const noResult = document.getElementById('noResult');
+                if (noResult) noResult.remove();
+            }
+        });
+        // Validation du formulaire
+        (function () {
+            'use strict'
+            const forms = document.querySelectorAll('.needs-validation')
+            Array.from(forms).forEach(form => {
+                form.addEventListener('submit', event => {
+                    if (!form.checkValidity()) {
+                        event.preventDefault()
+                        event.stopPropagation()
+                    }
+                    form.classList.add('was-validated')
+                }, false)
+            })
+        })()
+        // Tooltips
+        document.addEventListener('DOMContentLoaded', function() {
+            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+        });
+    </script>
+</body>
+</html>
