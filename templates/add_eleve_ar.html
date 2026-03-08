@@ -57,7 +57,7 @@
         .form-card-title { font-size:0.95rem; font-weight:700; color:var(--gold-light); }
         .form-card-body { padding:28px; }
 
-        .form-grid-main { display:grid; grid-template-columns:1fr 1fr 1fr 1fr auto; gap:14px; align-items:end; margin-bottom:16px; }
+        .form-grid-main { display:grid; grid-template-columns:1fr 1fr 1fr 1fr 1fr auto; gap:14px; align-items:end; margin-bottom:16px; }
         .form-grid-extra { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
         .field label { display:block; font-size:0.73rem; font-weight:700; color:var(--text-muted); letter-spacing:0.3px; margin-bottom:7px; }
         .field input, .field select {
@@ -103,6 +103,7 @@
         .badge-male   { display:inline-flex; align-items:center; gap:5px; background:rgba(99,102,241,0.1); color:#4f46e5; padding:4px 12px; border-radius:50px; font-size:0.75rem; font-weight:700; }
         .badge-female { display:inline-flex; align-items:center; gap:5px; background:rgba(196,98,45,0.1); color:var(--rust); padding:4px 12px; border-radius:50px; font-size:0.75rem; font-weight:700; }
         .text-dash { color:#c8d0da; }
+        .badge-matricule { display:inline-flex; align-items:center; gap:5px; background:rgba(201,168,76,0.12); border:1px solid rgba(201,168,76,0.25); color:#7a5c10; padding:4px 10px; border-radius:50px; font-size:0.75rem; font-weight:700; letter-spacing:0.3px; }
         .row-num { width:32px; height:32px; background:var(--mist); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:0.8rem; font-weight:700; color:var(--text-muted); }
 
         /* Action buttons */
@@ -233,6 +234,10 @@
                             <option value="F">أنثى</option>
                         </select>
                     </div>
+                    <div class="field">
+                        <label>رقم التسجيل (ماتريكول)</label>
+                        <input type="text" name="matricule" id="matricule" placeholder="مثال: 1001">
+                    </div>
                     <div style="display:flex;gap:8px;align-items:flex-end;">
                         <button type="submit" class="btn-save" id="btnSave">
                             <i class="bi bi-check-lg"></i> حفظ
@@ -285,6 +290,7 @@
                 <thead>
                     <tr>
                         <th>#</th>
+                        <th>الماتريكول</th>
                         <th>الاسم</th>
                         <th>العائلة</th>
                         <th>تاريخ الازدياد</th>
@@ -298,6 +304,13 @@
                     {% for e in eleves %}
                     <tr>
                         <td><div class="row-num">{{ loop.index }}</div></td>
+                        <td>
+                            {% if e.matricule %}
+                                <span class="badge-matricule"><i class="bi bi-hash"></i>{{ e.matricule }}</span>
+                            {% else %}
+                                <span class="text-dash">—</span>
+                            {% endif %}
+                        </td>
                         <td class="searchable" style="font-weight:600;">{{ e.prenom }}</td>
                         <td class="searchable" style="font-weight:600;">{{ e.nom }}</td>
                         <td class="searchable">{{ e.date_naissance.strftime('%d/%m/%Y') }}</td>
@@ -320,6 +333,7 @@
                                         data-sexe="{{ e.sexe }}"
                                         data-tuteur="{{ e.tuteur or '' }}"
                                         data-tel="{{ e.telephone_tuteur or '' }}"
+                                        data-matricule="{{ e.matricule or '' }}"
                                         title="تعديل">
                                     <i class="bi bi-pencil"></i>
                                 </button>
@@ -409,6 +423,7 @@
             document.getElementById('sexe').value = this.dataset.sexe;
             document.getElementById('tuteur').value = this.dataset.tuteur;
             document.getElementById('telephone_tuteur').value = this.dataset.tel;
+            document.getElementById('matricule').value = this.dataset.matricule;
             document.getElementById('btnReset').style.display = 'flex';
             document.getElementById('eleveForm').scrollIntoView({ behavior:'smooth' });
         });
