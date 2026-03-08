@@ -3,305 +3,396 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>إدارة المواد - {{ classe.nom }}</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>إدارة المواد — {{ classe.nom }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Cairo', 'Tahoma', sans-serif;
+        :root {
+            --ink: #0d1117; --cream: #f5f0e8; --gold: #c9a84c;
+            --gold-light: #e8d5a3; --rust: #c4622d; --mist: #e8edf2;
+            --text-muted: #6b7685; --border: #e8edf2;
+            --success-color: #1a6b3c;
         }
-        .action-btns { font-size: 0.9rem; }
-        .card-header { background-color: #f8f9fa; border-bottom: 1px solid #dee2e6; }
-        .form-control, .form-select { font-size: 0.9rem; }
-        .table th, .table td { vertical-align: middle; }
-        .no-cours { color: #6c757d; font-style: italic; }
-        /* RTL fixes */
-        .me-1 { margin-left: 0.25rem !important; margin-right: 0 !important; }
-        .me-2 { margin-left: 0.5rem !important; margin-right: 0 !important; }
-        .text-end { text-align: left !important; }
-        .text-start { text-align: right !important; }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Cairo',sans-serif; background:var(--cream); min-height:100vh; direction:rtl; overflow-x:hidden; }
+        .bg-decor { position:fixed; inset:0; z-index:0; pointer-events:none; }
+        .bg-decor::before { content:''; position:absolute; top:-200px; left:-200px; width:600px; height:600px; background:radial-gradient(circle,rgba(201,168,76,0.1) 0%,transparent 70%); border-radius:50%; }
+        .bg-decor::after  { content:''; position:absolute; bottom:-150px; right:-150px; width:500px; height:500px; background:radial-gradient(circle,rgba(196,98,45,0.07) 0%,transparent 70%); border-radius:50%; }
+        .grid-dots { position:fixed; inset:0; z-index:0; background-image:radial-gradient(circle,#c9a84c18 1px,transparent 1px); background-size:32px 32px; }
+
+        /* Navbar */
+        .navbar { position:sticky; top:0; z-index:100; background:rgba(245,240,232,0.92); backdrop-filter:blur(16px); border-bottom:1px solid rgba(201,168,76,0.2); padding:0 40px; height:64px; display:flex; align-items:center; justify-content:space-between; }
+        .nav-brand { display:flex; align-items:center; gap:10px; font-size:1.1rem; font-weight:800; color:var(--ink); text-decoration:none; }
+        .nav-brand .brand-icon { width:36px; height:36px; background:var(--ink); border-radius:10px; display:flex; align-items:center; justify-content:center; color:var(--gold); font-size:1rem; }
+        .nav-links { display:flex; gap:8px; }
+        .btn-nav { display:flex; align-items:center; gap:7px; padding:8px 16px; background:transparent; border:1.5px solid var(--border); border-radius:50px; font-family:'Cairo',sans-serif; font-size:0.83rem; font-weight:600; color:var(--text-muted); text-decoration:none; transition:all 0.2s; }
+        .btn-nav:hover { border-color:var(--ink); color:var(--ink); }
+
+        /* Content */
+        .page-content { position:relative; z-index:1; padding:40px; max-width:1200px; margin:0 auto; }
+
+        /* Flash */
+        .flash-msg { padding:14px 18px; border-radius:14px; font-size:0.88rem; margin-bottom:14px; display:flex; align-items:center; gap:10px; animation:slideDown 0.4s ease; }
+        @keyframes slideDown { from{opacity:0;transform:translateY(-10px)} to{opacity:1;transform:translateY(0)} }
+        .flash-success { background:rgba(39,174,96,0.08); border:1px solid rgba(39,174,96,0.2); color:var(--success-color); }
+        .flash-error   { background:rgba(196,98,45,0.08); border:1px solid rgba(196,98,45,0.2); color:var(--rust); }
+        .flash-close   { margin-right:auto; background:none; border:none; cursor:pointer; color:inherit; opacity:0.6; }
+
+        /* Hero */
+        .hero { background:var(--ink); border-radius:24px; padding:40px 48px; margin-bottom:32px; position:relative; overflow:hidden; animation:fadeUp 0.6s ease both; }
+        .hero::before { content:''; position:absolute; top:-80px; left:-80px; width:300px; height:300px; background:radial-gradient(circle,rgba(201,168,76,0.1) 0%,transparent 70%); border-radius:50%; }
+        .hero-inner { position:relative; z-index:1; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:20px; }
+        .hero-label { display:inline-flex; align-items:center; gap:8px; background:rgba(201,168,76,0.12); border:1px solid rgba(201,168,76,0.25); color:var(--gold); padding:6px 14px; border-radius:50px; font-size:0.78rem; font-weight:700; margin-bottom:12px; }
+        .hero h1 { font-size:1.9rem; font-weight:800; color:#e8edf2; line-height:1.3; margin-bottom:4px; }
+        .hero h1 span { color:var(--gold-light); }
+        .hero-sub { color:#4a5568; font-size:0.88rem; }
+        .hero-badge { background:rgba(201,168,76,0.12); border:1px solid rgba(201,168,76,0.2); border-radius:16px; padding:16px 24px; text-align:center; flex-shrink:0; }
+        .hero-badge-num { font-size:2rem; font-weight:800; color:var(--gold); line-height:1; }
+        .hero-badge-label { font-size:0.75rem; color:#4a5568; margin-top:4px; }
+
+        /* Form card */
+        .form-card { background:white; border:1px solid var(--border); border-radius:24px; margin-bottom:32px; overflow:hidden; animation:fadeUp 0.6s ease 0.1s both; }
+        .form-card-header { background:var(--ink); padding:18px 28px; display:flex; align-items:center; justify-content:space-between; }
+        .form-card-header-left { display:flex; align-items:center; gap:12px; }
+        .form-card-icon { width:36px; height:36px; background:rgba(201,168,76,0.15); border-radius:10px; display:flex; align-items:center; justify-content:center; color:var(--gold); font-size:0.95rem; }
+        .form-card-title { font-size:0.95rem; font-weight:700; color:var(--gold-light); }
+        .form-card-body { padding:28px; }
+
+        .form-grid { display:grid; grid-template-columns:2fr 2fr 1.5fr 1.2fr auto; gap:14px; align-items:end; }
+        .field label { display:block; font-size:0.73rem; font-weight:700; color:var(--text-muted); letter-spacing:0.3px; margin-bottom:7px; }
+        .field input, .field select {
+            width:100%; background:var(--mist); border:1.5px solid var(--border); border-radius:12px;
+            padding:11px 14px; color:var(--ink); font-family:'Cairo',sans-serif; font-size:0.9rem;
+            outline:none; transition:all 0.2s; text-align:right;
+        }
+        .field input:focus, .field select:focus { border-color:var(--gold); background:white; box-shadow:0 0 0 3px rgba(201,168,76,0.12); }
+        .field input::placeholder { color:#c8d0da; }
+        .form-btns { display:flex; gap:8px; align-items:flex-end; }
+        .btn-save { display:flex; align-items:center; justify-content:center; gap:8px; background:var(--ink); color:var(--cream); padding:11px 18px; border-radius:12px; border:2px solid var(--ink); font-family:'Cairo',sans-serif; font-size:0.88rem; font-weight:700; cursor:pointer; white-space:nowrap; transition:all 0.25s; height:44px; }
+        .btn-save:hover { background:transparent; color:var(--ink); }
+        .btn-reset { width:44px; height:44px; display:flex; align-items:center; justify-content:center; background:transparent; border:1.5px solid var(--border); border-radius:12px; color:var(--text-muted); cursor:pointer; transition:all 0.2s; }
+        .btn-reset:hover { border-color:var(--rust); color:var(--rust); }
+
+        /* Section header */
+        .section-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; flex-wrap:wrap; gap:12px; }
+        .section-title { font-size:1.2rem; font-weight:800; color:var(--ink); display:flex; align-items:center; gap:10px; }
+        .section-count { background:var(--ink); color:var(--gold); padding:3px 12px; border-radius:50px; font-size:0.72rem; font-weight:700; }
+        .btn-pdf { display:flex; align-items:center; gap:7px; padding:8px 16px; background:transparent; border:1.5px solid var(--border); border-radius:50px; font-family:'Cairo',sans-serif; font-size:0.82rem; font-weight:600; color:var(--text-muted); cursor:pointer; transition:all 0.2s; }
+        .btn-pdf:hover { border-color:var(--ink); color:var(--ink); }
+
+        /* Matières grid */
+        .matieres-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+
+        .matiere-card { background:white; border:1.5px solid var(--border); border-radius:20px; overflow:hidden; transition:all 0.3s ease; animation:fadeUp 0.5s ease both; }
+        .matiere-card:hover { border-color:var(--gold); box-shadow:0 12px 32px rgba(13,17,23,0.07); transform:translateY(-3px); }
+
+        .matiere-card-top { padding:20px 22px 16px; border-bottom:1px solid var(--mist); }
+        .matiere-nom { font-size:1.05rem; font-weight:800; color:var(--ink); margin-bottom:6px; }
+        .matiere-prof { display:flex; align-items:center; gap:7px; font-size:0.82rem; color:var(--text-muted); }
+        .matiere-prof i { color:var(--gold); }
+
+        .matiere-card-schedule { padding:14px 22px; border-bottom:1px solid var(--mist); }
+        .schedule-badge { display:inline-flex; align-items:center; gap:8px; background:rgba(201,168,76,0.1); border:1px solid rgba(201,168,76,0.2); color:#7a5c10; padding:7px 14px; border-radius:50px; font-size:0.8rem; font-weight:700; }
+        .schedule-none { font-size:0.8rem; color:#c8d0da; display:flex; align-items:center; gap:6px; }
+
+        .matiere-card-footer { padding:12px 16px; display:flex; justify-content:flex-end; gap:8px; }
+        .icon-btn { width:32px; height:32px; border-radius:9px; display:flex; align-items:center; justify-content:center; border:1.5px solid var(--border); background:transparent; color:var(--text-muted); cursor:pointer; transition:all 0.2s; font-size:0.8rem; }
+        .icon-btn.edit:hover { background:var(--ink); border-color:var(--ink); color:var(--cream); }
+        .icon-btn.del:hover  { background:rgba(196,98,45,0.1); border-color:rgba(196,98,45,0.3); color:var(--rust); }
+
+        /* Empty */
+        .empty-state { background:white; border:1px solid var(--border); border-radius:24px; padding:64px 24px; text-align:center; }
+        .empty-icon { width:72px; height:72px; background:var(--mist); border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 18px; font-size:1.8rem; color:#c8d0da; }
+        .empty-state h3 { font-size:1.1rem; font-weight:800; color:var(--ink); margin-bottom:8px; }
+        .empty-state p { color:var(--text-muted); font-size:0.85rem; }
+
+        /* Modal */
+        .modal-overlay { display:none; position:fixed; inset:0; z-index:500; background:rgba(13,17,23,0.5); backdrop-filter:blur(4px); align-items:center; justify-content:center; padding:24px; }
+        .modal-overlay.open { display:flex; }
+        .modal-box { background:white; border-radius:24px; padding:36px; width:100%; max-width:460px; box-shadow:0 32px 80px rgba(0,0,0,0.2); animation:popIn 0.3s cubic-bezier(0.22,1,0.36,1); direction:rtl; }
+        @keyframes popIn { from{opacity:0;transform:scale(0.95) translateY(10px)} to{opacity:1;transform:scale(1) translateY(0)} }
+        .modal-title { font-size:1.2rem; font-weight:800; color:var(--ink); margin-bottom:4px; }
+        .modal-sub   { color:var(--text-muted); font-size:0.83rem; margin-bottom:20px; }
+        .delete-info { background:rgba(196,98,45,0.06); border:1px solid rgba(196,98,45,0.18); border-radius:14px; padding:16px; margin-bottom:4px; }
+        .delete-name { font-size:1rem; font-weight:800; color:var(--ink); margin-bottom:4px; }
+        .delete-warn { font-size:0.78rem; color:var(--text-muted); display:flex; align-items:center; gap:6px; }
+        .modal-footer-btns { display:flex; gap:10px; margin-top:20px; }
+        .btn-cancel  { flex:1; padding:13px; background:var(--mist); border:none; border-radius:12px; font-family:'Cairo',sans-serif; font-size:0.88rem; font-weight:700; color:var(--text-muted); cursor:pointer; }
+        .btn-cancel:hover { background:var(--border); }
+        .btn-confirm { flex:2; padding:13px; border:none; border-radius:12px; font-family:'Cairo',sans-serif; font-size:0.88rem; font-weight:700; color:var(--cream); cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; transition:all 0.2s; }
+        .btn-confirm.red  { background:var(--rust); }
+        .btn-confirm.red:hover { background:#a0522d; }
+
+        @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+
+        @media(max-width:960px) {
+            .navbar { padding:0 20px; }
+            .page-content { padding:24px 16px; }
+            .hero { padding:28px 24px; }
+            .hero-inner { flex-direction:column; align-items:flex-start; }
+            .form-grid { grid-template-columns:1fr 1fr; }
+            .matieres-grid { grid-template-columns:repeat(2,1fr); }
+        }
+        @media(max-width:560px) {
+            .form-grid { grid-template-columns:1fr; }
+            .matieres-grid { grid-template-columns:1fr; }
+        }
     </style>
 </head>
-<body class="bg-light">
-<div class="container mt-4">
-    <!-- En-tête -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <h3 class="mb-1"><i class="fas fa-book text-primary ms-2"></i>إدارة المواد – {{ classe.nom }}</h3>
-                    <p class="text-muted mb-0">{{ classe.annee_scolaire }}</p>
-                </div>
-            </div>
-        </div>
-    </div>
+<body>
+<div class="bg-decor"></div>
+<div class="grid-dots"></div>
 
-    <!-- Messages Flash -->
+<!-- Navbar -->
+<nav class="navbar">
+    <a href="{{ url_for('main.dashboard_ar') }}" class="nav-brand">
+        <span class="brand-icon"><i class="bi bi-mortarboard-fill"></i></span>
+        EduBulletin
+    </a>
+    <div class="nav-links">
+        <a href="{{ url_for('main.voir_classe_ar', classe_id=classe.id) }}" class="btn-nav">
+            <i class="bi bi-arrow-right"></i> العودة إلى القسم
+        </a>
+        <a href="{{ url_for('main.dashboard_ar') }}" class="btn-nav">
+            <i class="bi bi-grid"></i> لوحة التحكم
+        </a>
+    </div>
+</nav>
+
+<div class="page-content">
+
+    <!-- Flash -->
     {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            {% for category, msg in messages %}
-                <div class="alert alert-{{ 'danger' if category=='error' else 'success' if category=='success' else 'warning' }} alert-dismissible fade show">
-                    {{ msg }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            {% endfor %}
-        {% endif %}
+        {% if messages %}{% for category, msg in messages %}
+        <div class="flash-msg flash-{{ 'error' if category=='error' else 'success' }}">
+            <i class="bi bi-{{ 'exclamation-circle' if category=='error' else 'check-circle' }}"></i>
+            {{ msg }}
+            <button class="flash-close" onclick="this.parentElement.remove()"><i class="bi bi-x"></i></button>
+        </div>
+        {% endfor %}{% endif %}
     {% endwith %}
 
-    <!-- Formulaire d'ajout/modification -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card shadow-sm">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">
-                        <i class="fas fa-plus-circle ms-2"></i>
-                        <span id="form-title">إضافة مادة</span>
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <form method="POST" id="matiereForm">
-                        <input type="hidden" name="action" value="add">
-                        <input type="hidden" name="matiere_id" id="matiereId">
-
-                        <div class="row g-3">
-                            <div class="col-md-4">
-                                <label class="form-label">اسم المادة</label>
-                                <input type="text" name="nom" id="nom" class="form-control" placeholder="مثال: الرياضيات" required>
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label">الأستاذ</label>
-                                <input type="text" name="professeur" id="professeur" class="form-control" placeholder="الأستاذ عبد الله">
-                            </div>
-                            <div class="col-md-2">
-                                <label class="form-label">يوم الدرس</label>
-                                <select name="jour" id="jour" class="form-select">
-                                    <option value="">-- اختر اليوم --</option>
-                                    <option value="الاثنين">الاثنين</option>
-                                    <option value="الثلاثاء">الثلاثاء</option>
-                                    <option value="الأربعاء">الأربعاء</option>
-                                    <option value="الخميس">الخميس</option>
-                                    <option value="الجمعة">الجمعة</option>
-                                    <option value="السبت">السبت</option>
-                                </select>
-                            </div>
-                            <div class="col-md-2">
-                                <label class="form-label">الساعة</label>
-                                <input type="time" name="heure" id="heure" class="form-control">
-                            </div>
-                            <div class="col-md-1 d-flex align-items-end">
-                                <button type="submit" class="btn btn-primary w-100">حفظ</button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
+    <!-- Hero -->
+    <div class="hero">
+        <div class="hero-inner">
+            <div>
+                <div class="hero-label"><i class="bi bi-journal-text"></i> إدارة المواد</div>
+                <h1>{{ classe.nom }}<br><span>مواد القسم</span></h1>
+                <p class="hero-sub">السنة الدراسية: {{ classe.annee_scolaire }}</p>
+            </div>
+            <div class="hero-badge">
+                <div class="hero-badge-num">{{ matieres|length }}</div>
+                <div class="hero-badge-label">مادة مسجلة</div>
             </div>
         </div>
     </div>
 
-    <!-- Liste des matières -->
-    <div class="row">
-        <div class="col-12">
-            <div class="card shadow-sm">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0"><i class="fas fa-th-list ms-2"></i>مواد القسم {{ classe.nom }}</h5>
-                    <div class="d-flex gap-2">
-                        <button class="btn btn-outline-success btn-sm" id="exportPdf">
-                            <i class="fas fa-file-pdf ms-1"></i>تصدير PDF
+    <!-- Form -->
+    <div class="form-card">
+        <div class="form-card-header">
+            <div class="form-card-header-left">
+                <div class="form-card-icon"><i class="bi bi-plus-circle-fill"></i></div>
+                <div class="form-card-title" id="formTitle">إضافة مادة جديدة</div>
+            </div>
+        </div>
+        <div class="form-card-body">
+            <form method="POST" id="matiereForm">
+                <input type="hidden" name="action" value="add" id="formAction">
+                <input type="hidden" name="matiere_id" id="matiereId">
+                <div class="form-grid">
+                    <div class="field">
+                        <label>اسم المادة <span style="color:var(--rust)">*</span></label>
+                        <input type="text" name="nom" id="nom" placeholder="مثال: الرياضيات، العلوم" required>
+                    </div>
+                    <div class="field">
+                        <label>الأستاذ</label>
+                        <input type="text" name="professeur" id="professeur" placeholder="اسم الأستاذ">
+                    </div>
+                    <div class="field">
+                        <label>يوم الدرس</label>
+                        <select name="jour" id="jour">
+                            <option value="">-- اختر اليوم --</option>
+                            <option value="الاثنين">الاثنين</option>
+                            <option value="الثلاثاء">الثلاثاء</option>
+                            <option value="الأربعاء">الأربعاء</option>
+                            <option value="الخميس">الخميس</option>
+                            <option value="الجمعة">الجمعة</option>
+                            <option value="السبت">السبت</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label>الساعة</label>
+                        <input type="time" name="heure" id="heure">
+                    </div>
+                    <div class="form-btns">
+                        <button type="submit" class="btn-save">
+                            <i class="bi bi-check-lg"></i> حفظ
+                        </button>
+                        <button type="button" class="btn-reset" id="btnReset" onclick="resetForm()" title="إلغاء التعديل" style="display:none;">
+                            <i class="bi bi-x-lg"></i>
                         </button>
                     </div>
                 </div>
-                <div class="card-body p-0">
-                    {% if matieres %}
-                        <div class="table-responsive">
-                            <table class="table table-hover mb-0">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th>المادة</th>
-                                        <th>الأستاذ</th>
-                                        <th>الجدول الزمني</th>
-                                        <th class="text-start">الإجراءات</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for m in matieres %}
-                                        <tr data-matiere-id="{{ m.id }}">
-                                            <td><strong>{{ m.nom }}</strong></td>
-                                            <td>{{ m.professeur or '<span class="text-muted no-cours">غير معين</span>'|safe }}</td>
-                                            <td>
-                                                {% if m.jour and m.heure %}
-                                                    <span class="badge bg-primary">{{ m.jour }}</span>
-                                                    {{ m.heure.strftime('%H:%M') }} ({{ m.duree }}ساعة)
-                                                {% else %}
-                                                    <span class="text-muted no-cours">لا يوجد درس مبرمج</span>
-                                                {% endif %}
-                                            </td>
-                                            <td class="text-start action-btns">
-                                                <div class="btn-group btn-group-sm">
-                                                    <button class="btn btn-outline-primary btn-modifier"
-                                                            data-id="{{ m.id }}"
-                                                            data-nom="{{ m.nom }}"
-                                                            data-professeur="{{ m.professeur or '' }}"
-                                                            data-jour="{{ m.jour or '' }}"
-                                                            data-heure="{{ m.heure.strftime('%H:%M') if m.heure else '' }}"
-                                                            title="تعديل">
-                                                        <i class="fas fa-edit"></i>
-                                                    </button>
-                                                    <button class="btn btn-outline-danger btn-supprimer"
-                                                            data-id="{{ m.id }}"
-                                                            data-nom="{{ m.nom }}"
-                                                            title="حذف">
-                                                        <i class="fas fa-trash"></i>
-                                                    </button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
-                    {% else %}
-                        <div class="text-center py-5">
-                            <i class="fas fa-book-open fa-3x text-muted mb-3"></i>
-                            <p class="text-muted">لا توجد مواد مضبوطة لهذا القسم.</p>
-                        </div>
-                    {% endif %}
+            </form>
+        </div>
+    </div>
+
+    <!-- List header -->
+    <div class="section-header">
+        <div class="section-title">
+            <i class="bi bi-journal-text" style="color:var(--gold);"></i>
+            مواد القسم
+            <span class="section-count">{{ matieres|length }}</span>
+        </div>
+        {% if matieres %}
+        <button class="btn-pdf" id="exportPdf">
+            <i class="bi bi-file-pdf"></i> تصدير PDF
+        </button>
+        {% endif %}
+    </div>
+
+    {% if matieres %}
+    <div class="matieres-grid">
+        {% for m in matieres %}
+        <div class="matiere-card" style="animation-delay:{{ loop.index0 * 0.06 }}s">
+            <div class="matiere-card-top">
+                <div class="matiere-nom">{{ m.nom }}</div>
+                <div class="matiere-prof">
+                    <i class="bi bi-person-fill"></i>
+                    {{ m.professeur or 'الأستاذ غير معين' }}
                 </div>
             </div>
+            <div class="matiere-card-schedule">
+                {% if m.jour and m.heure %}
+                    <span class="schedule-badge">
+                        <i class="bi bi-calendar3"></i>
+                        {{ m.jour }} — {{ m.heure.strftime('%H:%M') }}
+                    </span>
+                {% else %}
+                    <span class="schedule-none">
+                        <i class="bi bi-clock"></i> لا يوجد توقيت محدد
+                    </span>
+                {% endif %}
+            </div>
+            <div class="matiere-card-footer">
+                <button class="icon-btn edit btn-modifier"
+                        data-id="{{ m.id }}"
+                        data-nom="{{ m.nom }}"
+                        data-professeur="{{ m.professeur or '' }}"
+                        data-jour="{{ m.jour or '' }}"
+                        data-heure="{{ m.heure.strftime('%H:%M') if m.heure else '' }}"
+                        title="تعديل">
+                    <i class="bi bi-pencil"></i>
+                </button>
+                <button class="icon-btn del btn-supprimer"
+                        data-id="{{ m.id }}"
+                        data-nom="{{ m.nom }}"
+                        title="حذف">
+                    <i class="bi bi-trash"></i>
+                </button>
+            </div>
         </div>
+        {% endfor %}
     </div>
 
-    <!-- Retour -->
-    <div class="mt-4 text-center">
-        <a href="{{ url_for('main.dashboard_ar') }}" class="btn btn-secondary">
-            <i class="fas fa-arrow-right ms-1"></i>العودة إلى لوحة التحكم
-        </a>
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-icon"><i class="bi bi-journal-text"></i></div>
+        <h3>لا توجد مواد بعد</h3>
+        <p>أضف مواد القسم عبر النموذج أعلاه.</p>
+    </div>
+    {% endif %}
+
+</div>
+
+<!-- Modal حذف -->
+<div class="modal-overlay" id="deleteModal">
+    <div class="modal-box">
+        <h3 class="modal-title">حذف المادة</h3>
+        <p class="modal-sub">هذا الإجراء لا يمكن التراجع عنه</p>
+        <div class="delete-info">
+            <div class="delete-name" id="deleteNomDisplay"></div>
+            <div class="delete-warn">
+                <i class="bi bi-exclamation-triangle" style="color:var(--rust);"></i>
+                سيتم حذف جميع النقاط المرتبطة بهذه المادة.
+            </div>
+        </div>
+        <form method="POST">
+            <input type="hidden" name="action" value="delete">
+            <input type="hidden" name="matiere_id" id="deleteMatiereId">
+            <div class="modal-footer-btns">
+                <button type="button" class="btn-cancel" onclick="closeModal('deleteModal')">إلغاء</button>
+                <button type="submit" class="btn-confirm red"><i class="bi bi-trash"></i> حذف</button>
+            </div>
+        </form>
     </div>
 </div>
 
-<!-- Modal de suppression -->
-<div class="modal fade" id="deleteModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">تأكيد الحذف</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <p>هل تريد حذف المادة <strong id="deleteNom"></strong>؟</p>
-                <p class="text-danger"><small>سيتم حذف النقاط المرتبطة بها أيضاً.</small></p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
-                <form method="POST" id="deleteForm" style="display:inline;">
-                    <input type="hidden" name="action" value="delete">
-                    <input type="hidden" name="matiere_id" id="deleteMatiereId">
-                    <button type="submit" class="btn btn-danger">حذف</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    // Remplir le formulaire pour modification
+    function openModal(id)  { document.getElementById(id).classList.add('open'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+    document.querySelectorAll('.modal-overlay').forEach(o => o.addEventListener('click', e => { if(e.target===o) o.classList.remove('open'); }));
+    document.addEventListener('keydown', e => { if(e.key==='Escape') document.querySelectorAll('.modal-overlay.open').forEach(m=>m.classList.remove('open')); });
+
     document.querySelectorAll('.btn-modifier').forEach(btn => {
-        btn.addEventListener('click', function () {
-            document.getElementById('form-title').textContent = 'تعديل المادة';
-            document.getElementById('matiereForm').action.value = 'edit';
-            document.getElementById('matiereId').value = this.getAttribute('data-id');
-            document.getElementById('nom').value = this.getAttribute('data-nom');
-            document.getElementById('professeur').value = this.getAttribute('data-professeur');
-            document.getElementById('jour').value = this.getAttribute('data-jour');
-            document.getElementById('heure').value = this.getAttribute('data-heure');
+        btn.addEventListener('click', function() {
+            document.getElementById('formTitle').textContent = 'تعديل المادة';
+            document.getElementById('formAction').value = 'edit';
+            document.getElementById('matiereId').value = this.dataset.id;
+            document.getElementById('nom').value = this.dataset.nom;
+            document.getElementById('professeur').value = this.dataset.professeur;
+            document.getElementById('jour').value = this.dataset.jour;
+            document.getElementById('heure').value = this.dataset.heure;
+            document.getElementById('btnReset').style.display = 'flex';
             document.getElementById('nom').focus();
+            document.getElementById('matiereForm').scrollIntoView({ behavior:'smooth' });
         });
     });
 
-    // Réinitialiser le formulaire pour "Ajouter"
-    document.getElementById('matiereForm').addEventListener('reset', function () {
-        this.reset();
-        document.getElementById('form-title').textContent = 'إضافة مادة';
-        document.getElementById('matiereForm').action.value = 'add';
+    function resetForm() {
+        document.getElementById('formTitle').textContent = 'إضافة مادة جديدة';
+        document.getElementById('formAction').value = 'add';
         document.getElementById('matiereId').value = '';
-    });
+        document.getElementById('matiereForm').reset();
+        document.getElementById('btnReset').style.display = 'none';
+    }
 
-    // Ouvrir la modal de suppression
     document.querySelectorAll('.btn-supprimer').forEach(btn => {
-        btn.addEventListener('click', function () {
-            const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
-            document.getElementById('deleteNom').textContent = this.getAttribute('data-nom');
-            document.getElementById('deleteMatiereId').value = this.getAttribute('data-id');
-            modal.show();
+        btn.addEventListener('click', function() {
+            document.getElementById('deleteNomDisplay').textContent = this.dataset.nom;
+            document.getElementById('deleteMatiereId').value = this.dataset.id;
+            openModal('deleteModal');
         });
     });
 
-    // Exporter en PDF
-    document.getElementById('exportPdf').addEventListener('click', function () {
-        const class_name = "{{ classe.nom }}";
+    // Export PDF
+    document.getElementById('exportPdf')?.addEventListener('click', function() {
+        const className = "{{ classe.nom }}";
         const annee = "{{ classe.annee_scolaire }}";
-        let content = `
-            <h2 style="text-align:center;">الجدول الزمني - ${class_name}</h2>
-            <p style="text-align:center; color:#666;">السنة الدراسية: ${annee}</p>
-            <table border="1" cellpadding="8" width="100%" style="border-collapse:collapse; margin:20px 0;">
-                <thead>
-                    <tr style="background-color:#f0f0f0;">
-                        <th>المادة</th>
-                        <th>الأستاذ</th>
-                        <th>اليوم</th>
-                        <th>الساعة</th>
-                        <th>المدة</th>
-                    </tr>
-                </thead>
-                <tbody>
-        `;
-
-        document.querySelectorAll('tbody tr').forEach(tr => {
-            const tds = tr.querySelectorAll('td');
-            const nom = tds[0].innerText;
-            const prof = tds[1].innerText;
-            const emploi = tds[2].innerText;
-            const jourMatch = emploi.match(/(الاثنين|الثلاثاء|الأربعاء|الخميس|الجمعة|السبت)/);
-            const heureMatch = emploi.match(/\d{2}:\d{2}/);
-            const dureeMatch = emploi.match(/\((\d+) ساعة\)/);
-            const jour = jourMatch ? jourMatch[1] : '-';
-            const heure = heureMatch ? heureMatch[0] : '-';
-            const duree = dureeMatch ? dureeMatch[1] : '1';
-
-            content += `
-                <tr>
-                    <td>${nom}</td>
-                    <td>${prof}</td>
-                    <td>${jour}</td>
-                    <td>${heure}</td>
-                    <td>${duree} ساعة</td>
-                </tr>
-            `;
+        let rows = '';
+        document.querySelectorAll('.matiere-card').forEach((card, i) => {
+            const nom  = card.querySelector('.matiere-nom').textContent.trim();
+            const prof = card.querySelector('.matiere-prof').textContent.trim();
+            const sched= card.querySelector('.schedule-badge, .schedule-none').textContent.trim();
+            rows += `<tr style="background:${i%2===0?'#f9f8f6':'white'}">
+                <td>${i+1}</td><td><strong>${nom}</strong></td><td>${prof}</td><td>${sched}</td>
+            </tr>`;
         });
-
-        content += `</tbody></table>`;
-
-        const printWindow = window.open('', '', 'width=800,height=600');
-        printWindow.document.write(`
-            <html dir="rtl">
-                <head>
-                    <title>الجدول الزمني - ${class_name}</title>
-                    <style>
-                        body { font-family: 'Cairo', 'Tahoma', sans-serif; padding: 20px; }
-                        table { border: 1px solid #ccc; }
-                        th, td { text-align: right; }
-                        @media print {
-                            body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-                        }
-                    </style>
-                </head>
-                <body>${content}</body>
-            </html>
-        `);
-        printWindow.document.close();
-        printWindow.focus();
-        printWindow.print();
+        const win = window.open('','','width=900,height=700');
+        win.document.write(`<html dir="rtl"><head><title>مواد - ${className}</title>
+        <style>body{font-family:'Cairo','Tahoma',sans-serif;padding:30px;direction:rtl}
+        h2,h3{color:#0d1117;text-align:center}
+        table{width:100%;border-collapse:collapse;margin:20px 0;border-radius:8px;overflow:hidden}
+        th{background:#0d1117;color:#e8d5a3;padding:12px 16px;text-align:right;font-weight:700}
+        td{padding:12px 16px;border-bottom:1px solid #eee}
+        @media print{@page{margin:12mm}}</style></head>
+        <body>
+        <h2>جدول المواد</h2><h3>${className} — ${annee}</h3>
+        <table><thead><tr><th>#</th><th>المادة</th><th>الأستاذ</th><th>التوقيت</th></tr></thead>
+        <tbody>${rows}</tbody></table></body></html>`);
+        win.document.close();
+        win.focus();
+        setTimeout(() => win.print(), 400);
     });
 </script>
 </body>
