@@ -1,11 +1,10 @@
-
 <!DOCTYPE html>
-<html lang="{{ 'ar' if ecole.langue == 'ar' else 'fr' }}" {{ 'dir="rtl"' if ecole.langue == 'ar' else '' }}>
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% if ecole.langue == 'ar' %}تغيير كلمة المرور{% else %}Changer le mot de passe{% endif %} — {{ ecole.nom }}</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>تغيير كلمة المرور — {{ ecole.nom }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <style>
         :root {
@@ -17,88 +16,64 @@
         * { margin:0; padding:0; box-sizing:border-box; }
         html, body { min-height:100vh; overflow-y:auto; }
         body {
-            font-family: {% if ecole.langue == 'ar' %}'Cairo'{% else %}'DM Sans'{% endif %}, sans-serif;
+            font-family:'Cairo',sans-serif;
             background:var(--cream);
+            direction:rtl;
             display:flex; flex-direction:column; align-items:center; justify-content:center;
             padding:40px 16px;
             position:relative;
-            {% if ecole.langue == 'ar' %}direction:rtl;{% endif %}
         }
-
-        /* Background */
         .bg-decor { position:fixed; inset:0; z-index:0; pointer-events:none; }
-        .bg-decor::before { content:''; position:absolute; top:-200px; right:-200px; width:600px; height:600px; background:radial-gradient(circle,rgba(201,168,76,0.12) 0%,transparent 70%); border-radius:50%; }
-        .bg-decor::after  { content:''; position:absolute; bottom:-150px; left:-150px; width:500px; height:500px; background:radial-gradient(circle,rgba(196,98,45,0.07) 0%,transparent 70%); border-radius:50%; }
+        .bg-decor::before { content:''; position:absolute; top:-200px; left:-200px; width:600px; height:600px; background:radial-gradient(circle,rgba(201,168,76,0.12) 0%,transparent 70%); border-radius:50%; }
+        .bg-decor::after  { content:''; position:absolute; bottom:-150px; right:-150px; width:500px; height:500px; background:radial-gradient(circle,rgba(196,98,45,0.07) 0%,transparent 70%); border-radius:50%; }
         .grid-dots { position:fixed; inset:0; z-index:0; background-image:radial-gradient(circle,#c9a84c18 1px,transparent 1px); background-size:32px 32px; }
 
-        /* Card */
         .card { position:relative; z-index:1; background:white; border:1.5px solid var(--border); border-radius:28px; width:100%; max-width:480px; overflow:hidden; box-shadow:0 24px 64px rgba(13,17,23,0.08); animation:fadeUp 0.5s ease both; }
 
-        /* Card top bar */
         .card-top { background:var(--ink); padding:28px 36px; position:relative; overflow:hidden; }
-        .card-top::before { content:''; position:absolute; top:-40px; right:-40px; width:160px; height:160px; background:radial-gradient(circle,rgba(201,168,76,0.12) 0%,transparent 70%); border-radius:50%; }
+        .card-top::before { content:''; position:absolute; top:-40px; left:-40px; width:160px; height:160px; background:radial-gradient(circle,rgba(201,168,76,0.12) 0%,transparent 70%); border-radius:50%; }
         .card-top-label { display:inline-flex; align-items:center; gap:8px; background:rgba(201,168,76,0.12); border:1px solid rgba(201,168,76,0.25); color:var(--gold); padding:5px 12px; border-radius:50px; font-size:0.72rem; font-weight:700; margin-bottom:10px; }
         .card-top h2 { font-size:1.4rem; font-weight:800; color:#e8edf2; position:relative; z-index:1; }
         .card-top p  { font-size:0.82rem; color:#4a5568; margin-top:4px; position:relative; z-index:1; }
 
-        /* Card body */
         .card-body { padding:32px 36px; }
 
-        /* Flash */
         .flash-msg { padding:12px 16px; border-radius:12px; font-size:0.85rem; margin-bottom:16px; display:flex; align-items:center; gap:10px; }
         .flash-success { background:rgba(39,174,96,0.08); border:1px solid rgba(39,174,96,0.2); color:var(--success-color); }
         .flash-error   { background:rgba(196,98,45,0.08); border:1px solid rgba(196,98,45,0.2); color:var(--rust); }
         .flash-warning { background:rgba(201,168,76,0.1); border:1px solid rgba(201,168,76,0.3); color:#7a5c10; }
-        .flash-close   { margin-{% if ecole.langue == 'ar' %}right{% else %}left{% endif %}:auto; background:none; border:none; cursor:pointer; color:inherit; opacity:0.6; }
+        .flash-close   { margin-right:auto; background:none; border:none; cursor:pointer; color:inherit; opacity:0.6; }
 
-        /* School info */
         .school-badge { display:flex; align-items:center; gap:10px; background:var(--mist); border-radius:14px; padding:12px 16px; margin-bottom:24px; }
         .school-icon  { width:36px; height:36px; background:var(--ink); border-radius:10px; display:flex; align-items:center; justify-content:center; color:var(--gold); font-size:1rem; flex-shrink:0; }
         .school-name  { font-size:0.85rem; font-weight:700; color:var(--ink); }
         .school-sub   { font-size:0.72rem; color:var(--text-muted); }
 
-        /* Field */
         .field-group { margin-bottom:18px; }
         .field-label { display:flex; align-items:center; gap:7px; font-size:0.82rem; font-weight:700; color:var(--ink); margin-bottom:7px; }
         .field-label i { color:var(--gold); }
         .field-wrap { position:relative; }
-        .field-input {
-            width:100%; padding:12px 16px; padding-{% if ecole.langue == 'ar' %}left{% else %}right{% endif %}:44px;
-            border:1.5px solid var(--border); border-radius:12px;
-            font-family:inherit; font-size:0.9rem; color:var(--ink);
-            background:white; transition:all 0.2s; outline:none;
-            font-size:16px; /* prevent iOS zoom */
-        }
+        .field-input { width:100%; padding:12px 16px; padding-left:44px; border:1.5px solid var(--border); border-radius:12px; font-family:'Cairo',sans-serif; font-size:16px; color:var(--ink); background:white; transition:all 0.2s; outline:none; }
         .field-input:focus { border-color:var(--gold); box-shadow:0 0 0 3px rgba(201,168,76,0.1); }
         .field-input.error { border-color:var(--rust); }
-        .toggle-pw {
-            position:absolute; top:50%; {% if ecole.langue == 'ar' %}left{% else %}right{% endif %}:14px;
-            transform:translateY(-50%); background:none; border:none; cursor:pointer;
-            color:var(--text-muted); font-size:1rem; transition:color 0.2s;
-        }
+        .toggle-pw { position:absolute; top:50%; left:14px; transform:translateY(-50%); background:none; border:none; cursor:pointer; color:var(--text-muted); font-size:1rem; transition:color 0.2s; }
         .toggle-pw:hover { color:var(--ink); }
         .field-hint { font-size:0.72rem; color:var(--text-muted); margin-top:5px; }
 
-        /* Strength bar */
         .strength-bar { height:3px; border-radius:50px; background:var(--mist); margin-top:7px; overflow:hidden; }
         .strength-fill { height:100%; border-radius:50px; transition:all 0.3s; width:0; }
 
-        /* Warning box */
         .warning-box { display:flex; gap:10px; align-items:flex-start; background:rgba(201,168,76,0.08); border:1px solid rgba(201,168,76,0.2); border-radius:12px; padding:12px 14px; margin-bottom:24px; }
         .warning-box i { color:var(--gold); margin-top:1px; flex-shrink:0; }
         .warning-box span { font-size:0.78rem; color:#7a5c10; font-weight:600; line-height:1.5; }
 
-        /* Buttons */
-        .btn-submit { width:100%; padding:13px; background:var(--ink); color:var(--cream); border:none; border-radius:12px; font-family:inherit; font-size:0.95rem; font-weight:700; cursor:pointer; transition:all 0.25s; display:flex; align-items:center; justify-content:center; gap:8px; margin-bottom:10px; }
+        .btn-submit { width:100%; padding:13px; background:var(--ink); color:var(--cream); border:none; border-radius:12px; font-family:'Cairo',sans-serif; font-size:0.95rem; font-weight:700; cursor:pointer; transition:all 0.25s; display:flex; align-items:center; justify-content:center; gap:8px; margin-bottom:10px; }
         .btn-submit:hover { background:#1a2332; transform:translateY(-2px); box-shadow:0 8px 24px rgba(13,17,23,0.15); }
-        .btn-back { width:100%; padding:12px; background:transparent; color:var(--text-muted); border:1.5px solid var(--border); border-radius:12px; font-family:inherit; font-size:0.88rem; font-weight:600; cursor:pointer; transition:all 0.2s; display:flex; align-items:center; justify-content:center; gap:8px; text-decoration:none; }
+        .btn-back { width:100%; padding:12px; background:transparent; color:var(--text-muted); border:1.5px solid var(--border); border-radius:12px; font-family:'Cairo',sans-serif; font-size:0.88rem; font-weight:600; cursor:pointer; transition:all 0.2s; display:flex; align-items:center; justify-content:center; gap:8px; text-decoration:none; }
         .btn-back:hover { border-color:var(--ink); color:var(--ink); }
 
         @keyframes fadeUp { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
-
-        @media(max-width:520px) {
-            .card-top, .card-body { padding:24px 20px; }
-        }
+        @media(max-width:520px) { .card-top, .card-body { padding:24px 20px; } }
     </style>
 </head>
 <body>
@@ -107,16 +82,12 @@
 
 <div class="card">
     <div class="card-top">
-        <div class="card-top-label">
-            <i class="bi bi-shield-lock-fill"></i>
-            {% if ecole.langue == 'ar' %}الأمان{% else %}Sécurité{% endif %}
-        </div>
-        <h2>{% if ecole.langue == 'ar' %}تغيير كلمة المرور{% else %}Changer le mot de passe{% endif %}</h2>
-        <p>{% if ecole.langue == 'ar' %}اختر كلمة مرور قوية وآمنة{% else %}Choisissez un mot de passe fort et sécurisé{% endif %}</p>
+        <div class="card-top-label"><i class="bi bi-shield-lock-fill"></i> الأمان</div>
+        <h2>تغيير كلمة المرور</h2>
+        <p>اختر كلمة مرور قوية وآمنة</p>
     </div>
     <div class="card-body">
 
-        <!-- Flash -->
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}{% for category, msg in messages %}
             <div class="flash-msg flash-{{ 'error' if category=='error' else 'success' if category=='success' else 'warning' }}">
@@ -127,112 +98,69 @@
             {% endfor %}{% endif %}
         {% endwith %}
 
-        <!-- School badge -->
         <div class="school-badge">
             <div class="school-icon"><i class="bi bi-mortarboard-fill"></i></div>
             <div>
                 <div class="school-name">{{ ecole.nom }}</div>
-                <div class="school-sub">{% if ecole.langue == 'ar' %}حساب المدير{% else %}Compte directeur{% endif %}</div>
+                <div class="school-sub">حساب المدير</div>
             </div>
         </div>
 
         <form method="POST" id="pwForm">
-            <!-- Ancien MDP -->
             <div class="field-group">
                 <label class="field-label" for="ancien_mdp">
-                    <i class="bi bi-lock-fill"></i>
-                    {% if ecole.langue == 'ar' %}كلمة المرور الحالية *{% else %}Ancien mot de passe *{% endif %}
+                    <i class="bi bi-lock-fill"></i> كلمة المرور الحالية *
                 </label>
                 <div class="field-wrap">
-                    <input type="password" class="field-input" id="ancien_mdp" name="ancien_mdp"
-                           placeholder="{% if ecole.langue == 'ar' %}••••••••{% else %}Votre mot de passe actuel{% endif %}"
-                           required>
-                    <button type="button" class="toggle-pw" onclick="togglePw('ancien_mdp', this)">
-                        <i class="bi bi-eye"></i>
-                    </button>
+                    <input type="password" class="field-input" id="ancien_mdp" name="ancien_mdp" placeholder="••••••••" required>
+                    <button type="button" class="toggle-pw" onclick="togglePw('ancien_mdp', this)"><i class="bi bi-eye"></i></button>
                 </div>
             </div>
 
-            <!-- Nouveau MDP -->
             <div class="field-group">
                 <label class="field-label" for="nouveau_mdp">
-                    <i class="bi bi-key-fill"></i>
-                    {% if ecole.langue == 'ar' %}كلمة المرور الجديدة *{% else %}Nouveau mot de passe *{% endif %}
+                    <i class="bi bi-key-fill"></i> كلمة المرور الجديدة *
                 </label>
                 <div class="field-wrap">
-                    <input type="password" class="field-input" id="nouveau_mdp" name="nouveau_mdp"
-                           placeholder="{% if ecole.langue == 'ar' %}6 أحرف على الأقل{% else %}Au moins 6 caractères{% endif %}"
-                           minlength="6" required oninput="checkStrength(this.value)">
-                    <button type="button" class="toggle-pw" onclick="togglePw('nouveau_mdp', this)">
-                        <i class="bi bi-eye"></i>
-                    </button>
+                    <input type="password" class="field-input" id="nouveau_mdp" name="nouveau_mdp" placeholder="6 أحرف على الأقل" minlength="6" required oninput="checkStrength(this.value)">
+                    <button type="button" class="toggle-pw" onclick="togglePw('nouveau_mdp', this)"><i class="bi bi-eye"></i></button>
                 </div>
                 <div class="strength-bar"><div class="strength-fill" id="strengthFill"></div></div>
-                <div class="field-hint" id="strengthText">
-                    {% if ecole.langue == 'ar' %}6 أحرف على الأقل{% else %}Au moins 6 caractères{% endif %}
-                </div>
+                <div class="field-hint" id="strengthText">6 أحرف على الأقل</div>
             </div>
 
-            <!-- Confirmer MDP -->
             <div class="field-group">
                 <label class="field-label" for="confirmer_mdp">
-                    <i class="bi bi-check-circle-fill"></i>
-                    {% if ecole.langue == 'ar' %}تأكيد كلمة المرور *{% else %}Confirmer le mot de passe *{% endif %}
+                    <i class="bi bi-check-circle-fill"></i> تأكيد كلمة المرور *
                 </label>
                 <div class="field-wrap">
-                    <input type="password" class="field-input" id="confirmer_mdp" name="confirmer_mdp"
-                           placeholder="{% if ecole.langue == 'ar' %}أعد كتابة كلمة المرور{% else %}Ressaisissez le mot de passe{% endif %}"
-                           minlength="6" required oninput="checkMatch()">
-                    <button type="button" class="toggle-pw" onclick="togglePw('confirmer_mdp', this)">
-                        <i class="bi bi-eye"></i>
-                    </button>
+                    <input type="password" class="field-input" id="confirmer_mdp" name="confirmer_mdp" placeholder="أعد كتابة كلمة المرور" minlength="6" required oninput="checkMatch()">
+                    <button type="button" class="toggle-pw" onclick="togglePw('confirmer_mdp', this)"><i class="bi bi-eye"></i></button>
                 </div>
                 <div class="field-hint" id="matchHint"></div>
             </div>
 
-            <!-- Warning -->
             <div class="warning-box">
                 <i class="bi bi-exclamation-triangle-fill"></i>
-                <span>
-                    {% if ecole.langue == 'ar' %}
-                        احتفظ بكلمة مرورك الجديدة في مكان آمن. لن تتمكن من استرجاعها.
-                    {% else %}
-                        Notez votre nouveau mot de passe dans un endroit sûr. Il ne pourra pas être récupéré.
-                    {% endif %}
-                </span>
+                <span>احتفظ بكلمة مرورك الجديدة في مكان آمن. لن تتمكن من استرجاعها.</span>
             </div>
 
             <button type="submit" class="btn-submit">
-                <i class="bi bi-shield-check"></i>
-                {% if ecole.langue == 'ar' %}حفظ كلمة المرور{% else %}Enregistrer le mot de passe{% endif %}
+                <i class="bi bi-shield-check"></i> حفظ كلمة المرور
             </button>
-
-            <!-- Retour selon langue -->
-            <a href="{{ url_for('main.dashboard_ar') if ecole.langue == 'ar' else url_for('main.dashboard') }}" class="btn-back">
-                {% if ecole.langue == 'ar' %}
-                    <i class="bi bi-arrow-right"></i> العودة إلى لوحة التحكم
-                {% else %}
-                    <i class="bi bi-arrow-left"></i> Retour au dashboard
-                {% endif %}
+            <a href="{{ url_for('main.dashboard_ar') }}" class="btn-back">
+                <i class="bi bi-arrow-right"></i> العودة إلى لوحة التحكم
             </a>
         </form>
-
     </div>
 </div>
 
 <script>
-    const isAr = {{ 'true' if ecole.langue == 'ar' else 'false' }};
-
     function togglePw(id, btn) {
         const input = document.getElementById(id);
         const icon = btn.querySelector('i');
-        if (input.type === 'password') {
-            input.type = 'text';
-            icon.className = 'bi bi-eye-slash';
-        } else {
-            input.type = 'password';
-            icon.className = 'bi bi-eye';
-        }
+        input.type = input.type === 'password' ? 'text' : 'password';
+        icon.className = input.type === 'password' ? 'bi bi-eye' : 'bi bi-eye-slash';
     }
 
     function checkStrength(val) {
@@ -244,15 +172,12 @@
         if (/[A-Z]/.test(val)) score++;
         if (/[0-9]/.test(val)) score++;
         if (/[^A-Za-z0-9]/.test(val)) score++;
-
         const colors = ['#e8edf2','#ef4444','#f59e0b','#c9a84c','#27ae60','#1a6b3c'];
         const widths = ['0%','20%','40%','60%','80%','100%'];
-        const labelsAr = ['','ضعيفة جداً','ضعيفة','مقبولة','جيدة','قوية'];
-        const labelsFr = ['','Très faible','Faible','Acceptable','Bonne','Forte'];
-
+        const labels = ['','ضعيفة جداً','ضعيفة','مقبولة','جيدة','قوية'];
         fill.style.width = widths[score];
         fill.style.background = colors[score];
-        text.textContent = isAr ? labelsAr[score] : labelsFr[score];
+        text.textContent = labels[score];
         text.style.color = colors[score];
     }
 
@@ -263,11 +188,11 @@
         const input = document.getElementById('confirmer_mdp');
         if (!c) { hint.textContent = ''; return; }
         if (n === c) {
-            hint.textContent = isAr ? '✓ كلمتا المرور متطابقتان' : '✓ Les mots de passe correspondent';
+            hint.textContent = '✓ كلمتا المرور متطابقتان';
             hint.style.color = 'var(--success-color)';
             input.classList.remove('error');
         } else {
-            hint.textContent = isAr ? '✗ كلمتا المرور غير متطابقتين' : '✗ Les mots de passe ne correspondent pas';
+            hint.textContent = '✗ كلمتا المرور غير متطابقتين';
             hint.style.color = 'var(--rust)';
             input.classList.add('error');
         }
@@ -278,10 +203,9 @@
         const c = document.getElementById('confirmer_mdp').value;
         if (n !== c) {
             e.preventDefault();
-            alert(isAr ? 'كلمتا المرور غير متطابقتين!' : 'Les mots de passe ne correspondent pas !');
+            alert('كلمتا المرور غير متطابقتين!');
         }
     });
 </script>
 </body>
 </html>
-

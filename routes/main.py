@@ -1,3 +1,4 @@
+
 from flask import Blueprint, render_template, session, redirect, url_for, flash
 from models import db, Ecole, Classe, Eleve, Matiere
 from utils import login_required
@@ -72,7 +73,6 @@ def gestion_classe(classe_id):
         nb_matieres=len(matieres)
     )
 
-
 @main_bp.route('/changer_mot_de_passe', methods=['GET', 'POST'])
 def changer_mot_de_passe():
     """Permettre à l'école de changer son mot de passe"""
@@ -120,6 +120,43 @@ def changer_mot_de_passe():
     
     return render_template('changer_mot_de_passe.html', ecole=ecole)
 
+@main_bp.route('/changer_mot_de_passe_ar', methods=['GET', 'POST'])
+@login_required
+def changer_mot_de_passe_ar():
+    if 'ecole_id' not in session:
+        return redirect(url_for('auth.login'))
+
+    ecole = Ecole.query.get(session['ecole_id'])
+
+    if request.method == 'POST':
+        ancien_mdp    = request.form.get('ancien_mdp')
+        nouveau_mdp   = request.form.get('nouveau_mdp')
+        confirmer_mdp = request.form.get('confirmer_mdp')
+
+        if not all([ancien_mdp, nouveau_mdp, confirmer_mdp]):
+            flash("جميع الحقول إلزامية", "error")
+            return render_template('changer_mot_de_passe_ar.html', ecole=ecole)
+        if not check_password_hash(ecole.mot_de_passe, ancien_mdp):
+            flash("كلمة المرور الحالية غير صحيحة", "error")
+            return render_template('changer_mot_de_passe_ar.html', ecole=ecole)
+        if nouveau_mdp != confirmer_mdp:
+            flash("كلمتا المرور غير متطابقتين", "error")
+            return render_template('changer_mot_de_passe_ar.html', ecole=ecole)
+        if len(nouveau_mdp) < 6:
+            flash("كلمة المرور يجب أن تحتوي على 6 أحرف على الأقل", "error")
+            return render_template('changer_mot_de_passe_ar.html', ecole=ecole)
+
+        try:
+            ecole.mot_de_passe = generate_password_hash(nouveau_mdp)
+            db.session.commit()
+            flash("تم تغيير كلمة المرور بنجاح!", "success")
+            return redirect(url_for('main.dashboard_ar'))  # ✅ toujours dashboard_ar
+        except:
+            db.session.rollback()
+            flash("خطأ أثناء تغيير كلمة المرور", "error")
+            return render_template('changer_mot_de_passe_ar.html', ecole=ecole)
+
+    return render_template('changer_mot_de_passe_ar.html', ecole=ecole)
 
 
 @main_bp.route('/dashboard_ar')
@@ -198,3 +235,5 @@ def gestion_classe_ar(classe_id):
         nb_eleves=len(eleves),
         nb_matieres=len(matieres)
     )
+
+
