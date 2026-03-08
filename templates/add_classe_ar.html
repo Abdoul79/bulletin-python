@@ -2,346 +2,365 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>إدارة الأقسام</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <!-- Bootstrap 5.3 -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- Bootstrap Icons -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إدارة الأقسام — EduBulletin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-
-    <!-- Google Font: Cairo -->
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
     <style>
-        body {
-            font-family: 'Cairo', Tahoma, sans-serif;
-            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
-            min-height: 100vh;
-            padding: 40px 15px;
-            color: #333;
+        :root {
+            --ink: #0d1117; --cream: #f5f0e8; --gold: #c9a84c;
+            --gold-light: #e8d5a3; --rust: #c4622d; --mist: #e8edf2;
+            --text-muted: #6b7685; --border: #e8edf2;
+            --success-color: #1a6b3c;
         }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Cairo',sans-serif; background:var(--cream); min-height:100vh; position:relative; overflow-x:hidden; direction:rtl; }
+        .bg-decor { position:fixed; inset:0; z-index:0; pointer-events:none; }
+        .bg-decor::before { content:''; position:absolute; top:-200px; left:-200px; width:600px; height:600px; background:radial-gradient(circle,rgba(201,168,76,0.1) 0%,transparent 70%); border-radius:50%; }
+        .bg-decor::after  { content:''; position:absolute; bottom:-150px; right:-150px; width:500px; height:500px; background:radial-gradient(circle,rgba(196,98,45,0.07) 0%,transparent 70%); border-radius:50%; }
+        .grid-dots { position:fixed; inset:0; z-index:0; background-image:radial-gradient(circle,#c9a84c18 1px,transparent 1px); background-size:32px 32px; }
 
-        .glass-card {
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(18px);
-            -webkit-backdrop-filter: blur(18px);
-            border: 1px solid rgba(255, 255, 255, 0.18);
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
-            padding: 30px;
-            animation: fadeIn 0.7s ease;
-            direction: rtl;
+        /* Navbar */
+        .navbar { position:sticky; top:0; z-index:100; background:rgba(245,240,232,0.92); backdrop-filter:blur(16px); border-bottom:1px solid rgba(201,168,76,0.2); padding:0 40px; height:64px; display:flex; align-items:center; justify-content:space-between; }
+        .nav-brand { display:flex; align-items:center; gap:10px; font-family:'Cairo',sans-serif; font-size:1.2rem; font-weight:800; color:var(--ink); text-decoration:none; }
+        .nav-brand .brand-icon { width:36px; height:36px; background:var(--ink); border-radius:10px; display:flex; align-items:center; justify-content:center; color:var(--gold); font-size:1rem; }
+        .btn-back { display:flex; align-items:center; gap:8px; padding:8px 18px; background:transparent; border:1.5px solid var(--border); border-radius:50px; font-family:'Cairo',sans-serif; font-size:0.85rem; font-weight:600; color:var(--text-muted); text-decoration:none; transition:all 0.2s; }
+        .btn-back:hover { border-color:var(--ink); color:var(--ink); }
+
+        /* Content */
+        .page-content { position:relative; z-index:1; padding:40px; max-width:1200px; margin:0 auto; }
+
+        /* Flash */
+        .flash-msg { padding:14px 18px; border-radius:14px; font-size:0.9rem; margin-bottom:16px; display:flex; align-items:center; gap:10px; animation:slideDown 0.4s ease; }
+        @keyframes slideDown { from{opacity:0;transform:translateY(-10px)} to{opacity:1;transform:translateY(0)} }
+        .flash-success { background:rgba(39,174,96,0.08); border:1px solid rgba(39,174,96,0.2); color:var(--success-color); }
+        .flash-error   { background:rgba(196,98,45,0.08); border:1px solid rgba(196,98,45,0.2); color:var(--rust); }
+        .flash-warning { background:rgba(201,168,76,0.1); border:1px solid rgba(201,168,76,0.3); color:#7a5c10; }
+        .flash-close   { margin-right:auto; background:none; border:none; cursor:pointer; color:inherit; opacity:0.6; }
+
+        /* Hero */
+        .hero { background:var(--ink); border-radius:24px; padding:40px 48px; margin-bottom:32px; position:relative; overflow:hidden; animation:fadeUp 0.6s ease both; }
+        .hero::before { content:''; position:absolute; top:-80px; left:-80px; width:300px; height:300px; background:radial-gradient(circle,rgba(201,168,76,0.1) 0%,transparent 70%); border-radius:50%; }
+        .hero-label { display:inline-flex; align-items:center; gap:8px; background:rgba(201,168,76,0.12); border:1px solid rgba(201,168,76,0.25); color:var(--gold); padding:6px 14px; border-radius:50px; font-size:0.78rem; font-weight:700; margin-bottom:14px; }
+        .hero h1 { font-family:'Cairo',sans-serif; font-size:2rem; font-weight:800; color:#e8edf2; line-height:1.3; margin-bottom:6px; }
+        .hero h1 span { color:var(--gold-light); }
+        .hero-sub { color:#4a5568; font-size:0.9rem; }
+
+        /* Form card */
+        .form-card { background:white; border:1px solid var(--border); border-radius:24px; margin-bottom:32px; overflow:hidden; animation:fadeUp 0.6s ease 0.1s both; }
+        .form-card-header { background:var(--ink); padding:20px 28px; display:flex; align-items:center; gap:12px; }
+        .form-card-icon { width:38px; height:38px; background:rgba(201,168,76,0.15); border-radius:10px; display:flex; align-items:center; justify-content:center; color:var(--gold); font-size:1rem; }
+        .form-card-title { font-family:'Cairo',sans-serif; font-size:1rem; font-weight:700; color:var(--gold-light); }
+        .form-card-body { padding:28px; }
+
+        .form-row { display:grid; grid-template-columns:2fr 2fr 1fr; gap:14px; align-items:end; }
+        .field label { display:block; font-size:0.75rem; font-weight:700; color:var(--text-muted); letter-spacing:0.3px; margin-bottom:8px; }
+        .field input { width:100%; background:var(--mist); border:1.5px solid var(--border); border-radius:12px; padding:12px 14px; color:var(--ink); font-family:'Cairo',sans-serif; font-size:0.92rem; outline:none; transition:all 0.2s; text-align:right; }
+        .field input:focus { border-color:var(--gold); background:white; box-shadow:0 0 0 3px rgba(201,168,76,0.12); }
+        .field input::placeholder { color:#c8d0da; }
+        .btn-save { display:flex; align-items:center; justify-content:center; gap:8px; background:var(--ink); color:var(--cream); padding:12px 20px; border-radius:12px; border:2px solid var(--ink); font-family:'Cairo',sans-serif; font-size:0.9rem; font-weight:700; cursor:pointer; transition:all 0.25s; }
+        .btn-save:hover { background:transparent; color:var(--ink); }
+
+        /* Section header */
+        .section-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; }
+        .section-title { font-family:'Cairo',sans-serif; font-size:1.3rem; font-weight:800; color:var(--ink); display:flex; align-items:center; gap:10px; }
+        .section-count { background:var(--ink); color:var(--gold); padding:3px 12px; border-radius:50px; font-size:0.72rem; font-weight:700; }
+
+        /* Classes grid */
+        .classes-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
+
+        .classe-card { background:white; border:1.5px solid var(--border); border-radius:22px; overflow:hidden; transition:all 0.3s ease; animation:fadeUp 0.6s ease both; }
+        .classe-card:hover { border-color:var(--gold); box-shadow:0 16px 40px rgba(13,17,23,0.08); transform:translateY(-4px); }
+
+        .classe-card-top { background:var(--ink); padding:22px 24px; position:relative; overflow:hidden; }
+        .classe-card-top::before { content:''; position:absolute; top:-30px; left:-30px; width:120px; height:120px; background:rgba(201,168,76,0.08); border-radius:50%; }
+        .classe-nom { font-family:'Cairo',sans-serif; font-size:1.1rem; font-weight:800; color:#e8edf2; margin-bottom:4px; position:relative; z-index:1; }
+        .classe-annee { font-size:0.75rem; color:#4a5568; display:flex; align-items:center; gap:6px; position:relative; z-index:1; }
+        .classe-annee i { color:var(--gold); }
+
+        /* Stats */
+        .classe-stats { display:grid; grid-template-columns:1fr 1fr; gap:10px; padding:16px 18px; border-bottom:1px solid var(--mist); }
+        .stat-box { background:var(--mist); border-radius:12px; padding:12px; text-align:center; }
+        .stat-num   { font-family:'Cairo',sans-serif; font-size:1.3rem; font-weight:800; color:var(--ink); line-height:1; }
+        .stat-label { font-size:0.72rem; color:var(--text-muted); margin-top:3px; }
+
+        /* Quick actions */
+        .classe-quick { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; padding:14px 18px; border-bottom:1px solid var(--mist); }
+        .quick-btn { display:flex; flex-direction:column; align-items:center; gap:4px; padding:10px 6px; border-radius:12px; border:1.5px solid var(--border); background:transparent; text-decoration:none; transition:all 0.2s; cursor:pointer; }
+        .quick-btn:hover { transform:translateY(-2px); }
+        .quick-btn.eleves:hover   { border-color:rgba(39,174,96,0.4); background:rgba(39,174,96,0.04); }
+        .quick-btn.matieres:hover { border-color:rgba(99,102,241,0.4); background:rgba(99,102,241,0.04); }
+        .quick-btn.notes:hover    { border-color:rgba(201,168,76,0.4); background:rgba(201,168,76,0.05); }
+        .quick-icon { width:32px; height:32px; border-radius:9px; display:flex; align-items:center; justify-content:center; font-size:0.9rem; }
+        .quick-icon.green { background:rgba(39,174,96,0.1); color:var(--success-color); }
+        .quick-icon.blue  { background:rgba(99,102,241,0.1); color:#4f46e5; }
+        .quick-icon.gold  { background:rgba(201,168,76,0.12); color:#7a5c10; }
+        .quick-label { font-size:0.7rem; font-weight:700; color:var(--text-muted); }
+
+        /* Card footer actions */
+        .classe-footer { display:flex; align-items:center; justify-content:space-between; padding:14px 18px; }
+        .btn-view { display:flex; align-items:center; gap:7px; padding:8px 16px; background:var(--ink); color:var(--cream); border-radius:10px; text-decoration:none; font-family:'Cairo',sans-serif; font-size:0.8rem; font-weight:700; transition:all 0.2s; }
+        .btn-view:hover { background:#1a2332; color:var(--cream); }
+        .footer-icons { display:flex; gap:6px; }
+        .icon-btn { width:32px; height:32px; border-radius:9px; display:flex; align-items:center; justify-content:center; border:1.5px solid var(--border); background:transparent; color:var(--text-muted); cursor:pointer; transition:all 0.2s; font-size:0.82rem; }
+        .icon-btn.edit:hover { background:var(--ink); border-color:var(--ink); color:var(--cream); }
+        .icon-btn.del:hover  { background:rgba(196,98,45,0.1); border-color:rgba(196,98,45,0.3); color:var(--rust); }
+
+        /* Empty */
+        .empty-state { background:white; border:1px solid var(--border); border-radius:24px; padding:64px 24px; text-align:center; }
+        .empty-icon { width:80px; height:80px; background:var(--mist); border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 20px; font-size:2rem; color:#c8d0da; }
+        .empty-state h3 { font-family:'Cairo',sans-serif; font-size:1.3rem; font-weight:800; color:var(--ink); margin-bottom:8px; }
+        .empty-state p { color:var(--text-muted); font-size:0.88rem; margin-bottom:24px; }
+        .btn-empty { display:inline-flex; align-items:center; gap:8px; background:var(--ink); color:var(--cream); padding:12px 24px; border-radius:12px; border:none; font-family:'Cairo',sans-serif; font-size:0.9rem; font-weight:700; cursor:pointer; transition:all 0.2s; }
+        .btn-empty:hover { background:#1a2332; transform:translateY(-2px); }
+
+        /* Modal */
+        .modal-overlay { display:none; position:fixed; inset:0; z-index:500; background:rgba(13,17,23,0.5); backdrop-filter:blur(4px); align-items:center; justify-content:center; padding:24px; }
+        .modal-overlay.open { display:flex; }
+        .modal-box { background:white; border-radius:24px; padding:36px; width:100%; max-width:460px; box-shadow:0 32px 80px rgba(0,0,0,0.2); animation:popIn 0.3s cubic-bezier(0.22,1,0.36,1); direction:rtl; }
+        @keyframes popIn { from{opacity:0;transform:scale(0.95) translateY(10px)} to{opacity:1;transform:scale(1) translateY(0)} }
+        .modal-title { font-family:'Cairo',sans-serif; font-size:1.3rem; font-weight:800; color:var(--ink); margin-bottom:4px; }
+        .modal-sub   { color:var(--text-muted); font-size:0.85rem; margin-bottom:24px; }
+        .modal-field { margin-bottom:16px; }
+        .modal-field label { display:block; font-size:0.75rem; font-weight:700; color:var(--text-muted); margin-bottom:8px; }
+        .modal-field input { width:100%; background:var(--mist); border:1.5px solid var(--border); border-radius:12px; padding:12px 14px; color:var(--ink); font-family:'Cairo',sans-serif; font-size:0.92rem; outline:none; transition:all 0.2s; text-align:right; }
+        .modal-field input:focus { border-color:var(--gold); background:white; box-shadow:0 0 0 3px rgba(201,168,76,0.12); }
+        .modal-footer-btns { display:flex; gap:10px; margin-top:24px; }
+        .btn-cancel  { flex:1; padding:13px; background:var(--mist); border:none; border-radius:12px; font-family:'Cairo',sans-serif; font-size:0.9rem; font-weight:700; color:var(--text-muted); cursor:pointer; }
+        .btn-cancel:hover { background:var(--border); }
+        .btn-confirm { flex:2; padding:13px; background:var(--ink); border:none; border-radius:12px; font-family:'Cairo',sans-serif; font-size:0.9rem; font-weight:700; color:var(--cream); cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; transition:all 0.2s; }
+        .btn-confirm:hover { background:#1a2332; }
+        .btn-confirm.red { background:var(--rust); }
+        .btn-confirm.red:hover { background:#a0522d; }
+
+        /* Delete info */
+        .delete-info { background:rgba(196,98,45,0.06); border:1px solid rgba(196,98,45,0.18); border-radius:14px; padding:16px; margin-bottom:16px; }
+        .delete-name { font-family:'Cairo',sans-serif; font-size:1rem; font-weight:800; color:var(--ink); margin-bottom:6px; }
+        .delete-warn { font-size:0.8rem; color:var(--text-muted); display:flex; align-items:center; gap:6px; }
+
+        @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+
+        @media(max-width:900px) {
+            .navbar { padding:0 20px; }
+            .page-content { padding:24px 16px; }
+            .hero { padding:32px 24px; }
+            .form-row { grid-template-columns:1fr; }
+            .classes-grid { grid-template-columns:repeat(2,1fr); }
         }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        h3, h4, .section-title {
-            color: #fff;
-            font-weight: 700;
-            text-shadow: 0 2px 6px rgba(0,0,0,0.25);
-        }
-
-        .form-control {
-            border-radius: 12px;
-            padding: 0.5rem 1rem;
-            text-align: right;
-        }
-
-        .btn-rounded {
-            border-radius: 50px;
-            font-weight: 600;
-        }
-
-        .class-card {
-            background: #ffffff;
-            border: none;
-            border-radius: 18px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-            transition: all 0.3s ease;
-            direction: rtl;
-        }
-
-        .class-card:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
-        }
-
-        .stat-box {
-            border-radius: 12px;
-            padding: 10px;
-            background: rgba(255, 255, 255, 0.9);
-            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-            text-align: center;
-        }
-
-        .section-title {
-            margin-bottom: 20px;
-        }
-
-        .back-btn {
-            border-radius: 30px;
-            font-weight: 500;
-        }
-
-        .alert {
-            border-radius: 12px;
-            font-weight: 500;
-            text-align: right;
-        }
-
-        .btn-sm {
-            border-radius: 8px;
-            font-size: 0.85rem;
-            padding: 0.25rem 0.5rem;
-        }
-
-        /* Fix RTL for icons spacing */
-        .ms-1, .ms-2 { margin-right: 0.25rem !important; margin-left: 0 !important; }
-        .me-1, .me-2 { margin-left: 0.25rem !important; margin-right: 0 !important; }
+        @media(max-width:560px) { .classes-grid { grid-template-columns:1fr; } }
     </style>
 </head>
 <body>
+<div class="bg-decor"></div>
+<div class="grid-dots"></div>
 
-<div class="container">
+<!-- Navbar -->
+<nav class="navbar">
+    <a href="{{ url_for('main.dashboard_ar') }}" class="nav-brand">
+        <span class="brand-icon"><i class="bi bi-mortarboard-fill"></i></span>
+        EduBulletin
+    </a>
+    <a href="{{ url_for('main.dashboard_ar') }}" class="btn-back">
+        <i class="bi bi-arrow-right"></i> لوحة التحكم
+    </a>
+</nav>
 
-    <!-- العنوان + النموذج -->
-    <div class="glass-card mb-4">
-        <h3 class="mb-3">
-            <i class="bi bi-building ms-2"></i>إدارة الأقسام
-        </h3>
+<div class="page-content">
 
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, msg in messages %}
-                    <div class="alert alert-{{ 'danger' if category=='error' else 'success' if category=='success' else 'warning' }} alert-dismissible fade show">
-                        {{ msg }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    <!-- Flash -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}{% for category, msg in messages %}
+        <div class="flash-msg flash-{{ 'error' if category=='error' else 'success' if category=='success' else 'warning' }}">
+            <i class="bi bi-{{ 'exclamation-circle' if category=='error' else 'check-circle' if category=='success' else 'exclamation-triangle' }}"></i>
+            {{ msg }}
+            <button class="flash-close" onclick="this.parentElement.remove()"><i class="bi bi-x"></i></button>
+        </div>
+        {% endfor %}{% endif %}
+    {% endwith %}
+
+    <!-- Hero -->
+    <div class="hero">
+        <div class="hero-label"><i class="bi bi-building"></i> إدارة الأقسام</div>
+        <h1>أقسام المدرسة<br><span>أضف وعدّل وأدر أقسامك</span></h1>
+        <p class="hero-sub">أنشئ الأقسام وحدد السنة الدراسية لكل قسم.</p>
+    </div>
+
+    <!-- Form -->
+    <div class="form-card">
+        <div class="form-card-header">
+            <div class="form-card-icon"><i class="bi bi-plus-circle"></i></div>
+            <div class="form-card-title" id="formTitle">إضافة قسم جديد</div>
+        </div>
+        <div class="form-card-body">
+            <form method="POST" id="classeForm">
+                <input type="hidden" name="action" value="add">
+                <input type="hidden" name="classe_id" id="classeId">
+                <div class="form-row">
+                    <div class="field">
+                        <label>اسم القسم</label>
+                        <input type="text" name="nom" id="nom" placeholder="مثال: سنة أولى، سنة خامسة" required>
                     </div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
-
-        <h5 class="text-white mb-3">
-            <i class="bi bi-plus-circle ms-2"></i>إضافة / تعديل قسم
-        </h5>
-
-        <form method="POST" id="classeForm">
-            <input type="hidden" name="action" value="add">
-            <input type="hidden" name="classe_id" id="classeId">
-
-            <div class="row g-3">
-                <div class="col-md-4">
-                    <input type="text" name="nom" id="nom" class="form-control"
-                           placeholder="مثال: سنة أولى، سنة خامسة" required>
+                    <div class="field">
+                        <label>السنة الدراسية</label>
+                        <input type="text" name="annee_scolaire" id="annee_scolaire" value="2025-2026" required>
+                    </div>
+                    <button type="submit" class="btn-save">
+                        <i class="bi bi-check-lg"></i> حفظ
+                    </button>
                 </div>
-                <div class="col-md-4">
-                    <input type="text" name="annee_scolaire" id="annee_scolaire"
-                           class="form-control" value="2025-2026" required>
+            </form>
+        </div>
+    </div>
+
+    <!-- Classes list -->
+    <div class="section-header">
+        <div class="section-title">
+            <i class="bi bi-grid-3x3-gap-fill" style="color:var(--gold);"></i>
+            الأقسام الموجودة
+            <span class="section-count">{{ classes|length if classes else 0 }}</span>
+        </div>
+    </div>
+
+    {% if classes %}
+    <div class="classes-grid">
+        {% for c in classes %}
+        <div class="classe-card" style="animation-delay:{{ loop.index0 * 0.07 }}s">
+            <div class="classe-card-top">
+                <div class="classe-nom">{{ c.nom }}</div>
+                <div class="classe-annee">
+                    <i class="bi bi-calendar3"></i> {{ c.annee_scolaire }}
                 </div>
-                <div class="col-md-4">
-                    <button class="btn btn-primary btn-rounded w-100">
-                        <i class="bi bi-save ms-1"></i>حفظ
+            </div>
+
+            <div class="classe-stats">
+                <div class="stat-box">
+                    <div class="stat-num">{{ c.nb_eleves }}</div>
+                    <div class="stat-label">تلميذ</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-num">{{ c.nb_matieres }}</div>
+                    <div class="stat-label">مادة</div>
+                </div>
+            </div>
+
+            <div class="classe-quick">
+                <a href="{{ url_for('eleve.add_eleve_ar', classe_id=c.id) }}" class="quick-btn eleves" title="التلاميذ">
+                    <span class="quick-icon green"><i class="bi bi-person-plus-fill"></i></span>
+                    <span class="quick-label">تلاميذ</span>
+                </a>
+                <a href="{{ url_for('matiere.add_matiere_ar', classe_id=c.id) }}" class="quick-btn matieres" title="المواد">
+                    <span class="quick-icon blue"><i class="bi bi-journal-plus"></i></span>
+                    <span class="quick-label">مواد</span>
+                </a>
+                <a href="{{ url_for('notes.saisir_notes_ar', classe_id=c.id) }}" class="quick-btn notes" title="النقاط">
+                    <span class="quick-icon gold"><i class="bi bi-pencil-square"></i></span>
+                    <span class="quick-label">نقاط</span>
+                </a>
+            </div>
+
+            <div class="classe-footer">
+                <a href="{{ url_for('main.voir_classe_ar', classe_id=c.id) }}" class="btn-view">
+                    <i class="bi bi-eye"></i> عرض القسم
+                </a>
+                <div class="footer-icons">
+                    <button class="icon-btn edit btn-modifier"
+                            data-id="{{ c.id }}"
+                            data-nom="{{ c.nom }}"
+                            data-annee="{{ c.annee_scolaire }}"
+                            title="تعديل">
+                        <i class="bi bi-pencil"></i>
+                    </button>
+                    <button class="icon-btn del btn-supprimer"
+                            data-id="{{ c.id }}"
+                            data-nom="{{ c.nom }}"
+                            title="حذف">
+                        <i class="bi bi-trash"></i>
                     </button>
                 </div>
             </div>
-        </form>
-    </div>
-
-    <!-- زر العودة -->
-    <div class="mb-4 text-end">
-        <a href="{{ url_for('main.dashboard_ar') }}" class="btn btn-secondary back-btn">
-            <i class="bi bi-arrow-left ms-2"></i>العودة إلى لوحة التحكم
-        </a>
-    </div>
-
-    <h4 class="section-title">الأقسام الموجودة</h4>
-
-    {% if not classes %}
-        <div class="alert alert-info d-flex align-items-center">
-            <i class="bi bi-info-circle ms-2"></i>
-            لا توجد أقسام مضبوطة بعد.
         </div>
+        {% endfor %}
+    </div>
+
     {% else %}
-        <div class="row g-4">
-            {% for c in classes %}
-            <div class="col-md-6">
-                <div class="card class-card h-100">
-                    <div class="card-body text-center">
-
-                        <h5 class="fw-bold mb-2">
-                            <i class="bi bi-easel2-fill text-primary ms-1"></i>
-                            {{ c.nom }}
-                        </h5>
-                        <p class="text-muted mb-3">
-                            السنة الدراسية: {{ c.annee_scolaire }}
-                        </p>
-
-                        <!-- الإحصائيات -->
-                        <div class="row mb-3">
-                            <div class="col-6">
-                                <div class="stat-box">
-                                    <h6 class="text-primary mb-1">{{ c.nb_eleves }}</h6>
-                                    <small class="text-muted">تلاميذ</small>
-                                </div>
-                            </div>
-                            <div class="col-6">
-                                <div class="stat-box">
-                                    <h6 class="text-success mb-1">{{ c.nb_matieres }}</h6>
-                                    <small class="text-muted">المواد</small>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- إجراءات سريعة -->
-                        <div class="row g-2 mb-3">
-                            <div class="col-4">
-                                <a href="{{ url_for('eleve.add_eleve_ar', classe_id=c.id) }}"
-                                   class="btn btn-sm btn-primary w-100" title="التلاميذ">
-                                    <i class="bi bi-person-plus"></i>
-                                </a>
-                            </div>
-                            <div class="col-4">
-                                <a href="{{ url_for('matiere.add_matiere_ar', classe_id=c.id) }}"
-                                   class="btn btn-sm btn-success w-100" title="المواد">
-                                    <i class="bi bi-book"></i>
-                                </a>
-                            </div>
-                            <div class="col-4">
-                                <a href="{{ url_for('notes.saisir_notes', classe_id=c.id) }}"
-                                   class="btn btn-sm btn-warning w-100" title="النقاط">
-                                    <i class="bi bi-pencil"></i>
-                                </a>
-                            </div>
-                        </div>
-
-                        <!-- أزرار الإجراءات -->
-                        <div class="d-flex justify-content-center gap-2 flex-wrap">
-                            <a href="{{ url_for('main.voir_classe_ar', classe_id=c.id) }}"
-                               class="btn btn-outline-info btn-sm" title="عرض القسم">
-                                <i class="bi bi-eye"></i>
-                            </a>
-
-                            <button class="btn btn-outline-primary btn-sm btn-modifier"
-                                    data-id="{{ c.id }}"
-                                    data-nom="{{ c.nom }}"
-                                    data-annee="{{ c.annee_scolaire }}"
-                                    title="تعديل">
-                                <i class="bi bi-pencil"></i>
-                            </button>
-
-                            <button class="btn btn-outline-danger btn-sm btn-supprimer"
-                                    data-id="{{ c.id }}"
-                                    data-nom="{{ c.nom }}"
-                                    title="حذف">
-                                <i class="bi bi-trash"></i>
-                            </button>
-
-                            
-                        </div>
-
-                    </div>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
+    <div class="empty-state">
+        <div class="empty-icon"><i class="bi bi-building"></i></div>
+        <h3>لا توجد أقسام بعد</h3>
+        <p>ابدأ بإضافة قسمك الأول من النموذج أعلاه.</p>
+    </div>
     {% endif %}
 
 </div>
 
-<!-- نافذة التعديل -->
-<div class="modal fade" id="editModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <form method="POST">
-                <input type="hidden" name="action" value="edit">
-                <input type="hidden" name="classe_id" id="editClasseId">
-                <div class="modal-header">
-                    <h5 class="modal-title">تعديل القسم</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label class="form-label">اسم القسم</label>
-                        <input type="text" name="nom" id="editNom" class="form-control" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">السنة الدراسية</label>
-                        <input type="text" name="annee_scolaire" id="editAnnee" class="form-control" required>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
-                    <button type="submit" class="btn btn-primary">حفظ</button>
-                </div>
-            </form>
-        </div>
+<!-- Modal تعديل -->
+<div class="modal-overlay" id="editModal">
+    <div class="modal-box">
+        <h3 class="modal-title">تعديل القسم</h3>
+        <p class="modal-sub">قم بتحديث معلومات القسم</p>
+        <form method="POST">
+            <input type="hidden" name="action" value="edit">
+            <input type="hidden" name="classe_id" id="editClasseId">
+            <div class="modal-field">
+                <label>اسم القسم</label>
+                <input type="text" name="nom" id="editNom" required>
+            </div>
+            <div class="modal-field">
+                <label>السنة الدراسية</label>
+                <input type="text" name="annee_scolaire" id="editAnnee" required>
+            </div>
+            <div class="modal-footer-btns">
+                <button type="button" class="btn-cancel" onclick="closeModal('editModal')">إلغاء</button>
+                <button type="submit" class="btn-confirm"><i class="bi bi-check-lg"></i> حفظ</button>
+            </div>
+        </form>
     </div>
 </div>
 
-<!-- نافذة الحذف -->
-<div class="modal fade" id="deleteModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <form method="POST">
-                <input type="hidden" name="action" value="delete">
-                <input type="hidden" name="classe_id" id="deleteClasseId">
-                <div class="modal-header">
-                    <h5 class="modal-title text-danger">تأكيد الحذف</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <p>هل أنت متأكد من حذف القسم <strong id="deleteNom"></strong>؟</p>
-                    <p class="text-muted small">هذا الإجراء لا يمكن التراجع عنه وسيتم حذف جميع التلاميذ والمواد المرتبطة به.</p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
-                    <button type="submit" class="btn btn-danger">حذف</button>
-                </div>
-            </form>
+<!-- Modal حذف -->
+<div class="modal-overlay" id="deleteModal">
+    <div class="modal-box">
+        <h3 class="modal-title">تأكيد الحذف</h3>
+        <p class="modal-sub">هذا الإجراء لا يمكن التراجع عنه</p>
+        <div class="delete-info">
+            <div class="delete-name" id="deleteNomDisplay"></div>
+            <div class="delete-warn">
+                <i class="bi bi-exclamation-triangle" style="color:var(--rust);"></i>
+                سيتم حذف جميع التلاميذ والمواد والنقاط المرتبطة بهذا القسم.
+            </div>
         </div>
+        <form method="POST">
+            <input type="hidden" name="action" value="delete">
+            <input type="hidden" name="classe_id" id="deleteClasseId">
+            <div class="modal-footer-btns">
+                <button type="button" class="btn-cancel" onclick="closeModal('deleteModal')">إلغاء</button>
+                <button type="submit" class="btn-confirm red"><i class="bi bi-trash"></i> حذف</button>
+            </div>
+        </form>
     </div>
 </div>
 
-<!-- Scripts -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    // فتح نافذة التعديل
+    function openModal(id)  { document.getElementById(id).classList.add('open'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+    document.querySelectorAll('.modal-overlay').forEach(o => o.addEventListener('click', e => { if(e.target===o) o.classList.remove('open'); }));
+    document.addEventListener('keydown', e => { if(e.key==='Escape') document.querySelectorAll('.modal-overlay.open').forEach(m=>m.classList.remove('open')); });
+
     document.querySelectorAll('.btn-modifier').forEach(btn => {
         btn.addEventListener('click', () => {
-            const modal = new bootstrap.Modal(document.getElementById('editModal'));
             document.getElementById('editClasseId').value = btn.dataset.id;
             document.getElementById('editNom').value = btn.dataset.nom;
             document.getElementById('editAnnee').value = btn.dataset.annee;
-            modal.show();
+            openModal('editModal');
         });
     });
 
-    // فتح نافذة الحذف
     document.querySelectorAll('.btn-supprimer').forEach(btn => {
         btn.addEventListener('click', () => {
-            const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
             document.getElementById('deleteClasseId').value = btn.dataset.id;
-            document.getElementById('deleteNom').textContent = btn.dataset.nom;
-            modal.show();
+            document.getElementById('deleteNomDisplay').textContent = btn.dataset.nom;
+            openModal('deleteModal');
         });
     });
-
-    // طباعة الكشوفات
-    function imprimerBulletins(classe_id, classe_nom, nb_eleves, nb_matieres) {
-        if (parseInt(nb_eleves) === 0) {
-            alert('لا يوجد تلاميذ في هذا القسم.');
-        } else if (parseInt(nb_matieres) === 0) {
-            alert('لم يتم ضبط أي مادة.');
-        } else if (confirm(`هل تريد طباعة جميع كشوفات ${classe_nom}؟`)) {
-            alert('وظيفة الطباعة الجماعية سيتم تنفيذها لاحقاً.');
-        }
-    }
 </script>
-
 </body>
 </html>
