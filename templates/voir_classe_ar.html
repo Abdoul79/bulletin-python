@@ -401,14 +401,14 @@
         document.getElementById('bulletinsMenu').classList.remove('open');
         if (!checkReady()) return;
         if (confirm(`تنزيل ${nombreEleves} كشف حسب الترتيب؟`))
-            window.location.href = `/bulletin/classe_classee/${classeId}`;
+            window.location.href = `/bulletin_ar/classe_classee/${classeId}`;
     }
     function telechargerBulletinsAlpha(e) {
         e.stopPropagation();
         document.getElementById('bulletinsMenu').classList.remove('open');
         if (!checkReady()) return;
         if (confirm(`تنزيل ${nombreEleves} كشف أبجدياً؟`))
-            window.location.href = `/bulletin/classe/${classeId}`;
+            window.location.href = `/bulletin_ar/classe/${classeId}`;
     }
     function imprimerTousBulletins(e) {
         e.stopPropagation();
