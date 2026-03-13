@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>المدفوعات — {{ eleve.prenom }} {{ eleve.nom }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --ink:#0d1117; --cream:#f5f0e8; --gold:#c9a84c; --gold-l:#e8d5a3;
+            --rust:#c4622d; --mist:#e8edf2; --muted:#6b7685; --green:#228B22;
+            --orange:#FF8C00; --red:#dc2626; --border:#e8edf2;
+        }
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{font-family:'Cairo',sans-serif;background:var(--cream);min-height:100vh;color:var(--ink);direction:rtl;}
+
+        body::before{content:'';position:fixed;inset:0;z-index:0;
+            background:radial-gradient(circle at 10% 10%,rgba(201,168,76,0.12),transparent 55%),
+                        radial-gradient(circle at 95% 90%,rgba(196,98,45,0.08),transparent 50%);
+            pointer-events:none;}
+        body::after{content:'';position:fixed;inset:0;z-index:0;
+            background-image:radial-gradient(circle,#c9a84c1a 1px,transparent 1px);
+            background-size:24px 24px;pointer-events:none;}
+
+        /* Navbar */
+        .navbar{position:sticky;top:0;z-index:100;background:rgba(245,240,232,0.95);
+            backdrop-filter:blur(12px);border-bottom:1px solid rgba(201,168,76,0.15);
+            padding:0 32px;display:flex;align-items:center;justify-content:space-between;height:60px;}
+        .brand{display:flex;align-items:center;gap:10px;text-decoration:none;flex-direction:row-reverse;}
+        .brand-icon{width:34px;height:34px;background:var(--ink);border-radius:9px;display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:1rem;}
+        .brand-name{font-size:1rem;font-weight:800;color:var(--ink);}
+        .nav-back{display:flex;align-items:center;gap:6px;padding:8px 16px;border-radius:10px;background:white;border:1.5px solid var(--border);color:var(--ink);font-size:13px;font-weight:700;text-decoration:none;transition:all 0.2s;}
+        .nav-back:hover{border-color:var(--gold);color:var(--gold);}
+
+        .main{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:32px 24px;}
+
+        /* Hero */
+        .hero{background:var(--ink);border-radius:20px;padding:24px 28px;margin-bottom:24px;position:relative;overflow:hidden;}
+        .hero::before{content:'';position:absolute;top:-60px;left:-60px;width:220px;height:220px;
+            background:radial-gradient(circle,rgba(201,168,76,0.1),transparent 70%);border-radius:50%;}
+        .hero-label{display:inline-flex;align-items:center;gap:6px;background:rgba(201,168,76,0.12);border:1px solid rgba(201,168,76,0.2);color:var(--gold);padding:4px 12px;border-radius:50px;font-size:11px;font-weight:700;margin-bottom:10px;}
+        .hero-name{font-size:1.4rem;font-weight:800;color:#e8edf2;margin-bottom:3px;}
+        .hero-info{font-size:12px;color:#4a5568;}
+        .hero-solde{position:absolute;top:20px;left:24px;}
+
+        /* Badge statut */
+        .badge-solde{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:50px;font-size:12px;font-weight:800;}
+        .badge-solde.ok{background:rgba(34,139,34,0.15);color:var(--green);border:1.5px solid rgba(34,139,34,0.25);}
+        .badge-solde.ko{background:rgba(220,38,38,0.1);color:var(--red);border:1.5px solid rgba(220,38,38,0.2);}
+        .badge-solde.partiel{background:rgba(255,140,0,0.12);color:var(--orange);border:1.5px solid rgba(255,140,0,0.25);}
+
+        /* Progress block */
+        .progress-block{background:white;border:1.5px solid var(--border);border-radius:16px;padding:20px;margin-bottom:20px;}
+        .progress-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+        .progress-title{font-size:14px;font-weight:800;color:var(--ink);}
+        .progress-pct{font-size:1.4rem;font-weight:800;color:var(--green);}
+        .progress-bar-wrap{background:#f0ede7;border-radius:50px;height:12px;overflow:hidden;margin-bottom:12px;transform:scaleX(-1);}
+        .progress-bar-fill{height:100%;border-radius:50px;transition:width 1s ease;background:linear-gradient(to right,var(--green),#52c41a);}
+        .progress-bar-fill.alerte{background:linear-gradient(to right,var(--orange),#faad14);}
+        .progress-bar-fill.danger{background:linear-gradient(to right,var(--red),#f87171);}
+        .progress-amounts{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+        .amount-box{text-align:center;padding:12px;border-radius:12px;}
+        .amount-box.total{background:rgba(13,17,23,0.05);}
+        .amount-box.paye{background:rgba(34,139,34,0.08);}
+        .amount-box.reste{background:rgba(255,140,0,0.08);}
+        .amount-num{font-size:1rem;font-weight:800;color:var(--ink);}
+        .amount-num.v-paye{color:var(--green);}
+        .amount-num.v-reste{color:var(--orange);}
+        .amount-lbl{font-size:10px;font-weight:700;color:var(--muted);margin-top:2px;}
+
+        /* Cards */
+        .section-card{background:white;border:1.5px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:20px;}
+        .section-head{background:var(--ink);padding:14px 20px;display:flex;align-items:center;gap:8px;}
+        .section-head-title{font-size:14px;font-weight:800;color:#e8edf2;}
+        .section-body{padding:20px;}
+
+        /* Formulaire */
+        .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+        .form-field{display:flex;flex-direction:column;gap:5px;}
+        .field-label{font-size:12px;font-weight:700;color:var(--ink);}
+        .field-input{padding:11px 14px;border:1.5px solid var(--border);border-radius:11px;font-size:13px;font-family:'Cairo',sans-serif;color:var(--ink);transition:all 0.2s;width:100%;text-align:right;}
+        .field-input:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,168,76,0.1);}
+        select.field-input{cursor:pointer;}
+        .montant-hint{font-size:11px;color:var(--muted);margin-top:3px;}
+        .montant-hint strong{color:var(--orange);}
+
+        .btn-primary{padding:12px 28px;background:var(--ink);color:var(--gold);border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Cairo',sans-serif;transition:all 0.2s;display:inline-flex;align-items:center;gap:7px;}
+        .btn-primary:hover{background:#1a2332;transform:translateY(-1px);}
+        .btn-secondary{padding:12px 20px;background:transparent;color:var(--ink);border:1.5px solid var(--border);border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Cairo',sans-serif;text-decoration:none;display:inline-flex;align-items:center;gap:7px;}
+        .btn-secondary:hover{border-color:var(--gold);}
+        .form-actions{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap;flex-direction:row-reverse;}
+
+        /* Historique */
+        .paiement-row{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--mist);transition:background 0.15s;}
+        .paiement-row:last-child{border-bottom:none;}
+        .paiement-row:hover{background:#fafaf8;}
+        .paie-right{display:flex;align-items:center;gap:12px;}
+        .paie-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;}
+        .paie-icon.especes{background:rgba(34,139,34,0.1);color:var(--green);}
+        .paie-icon.mobile{background:rgba(99,102,241,0.1);color:#4f46e5;}
+        .paie-icon.virement{background:rgba(59,130,246,0.1);color:#2563eb;}
+        .paie-num{font-size:11px;font-weight:800;color:var(--ink);}
+        .paie-date{font-size:10px;color:var(--muted);}
+        .paie-mode{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:50px;font-size:10px;font-weight:700;background:var(--mist);color:var(--muted);}
+        .paie-left{display:flex;align-items:center;gap:12px;}
+        .paie-montant{font-size:1rem;font-weight:800;color:var(--green);}
+        .btn-recu{display:inline-flex;align-items:center;gap:5px;padding:6px 12px;background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.2);color:#7a5c10;border-radius:8px;font-size:11px;font-weight:700;text-decoration:none;transition:all 0.2s;font-family:'Cairo',sans-serif;}
+        .btn-recu:hover{background:rgba(201,168,76,0.2);}
+        .btn-del{display:inline-flex;align-items:center;padding:6px 10px;background:rgba(220,38,38,0.08);border:none;border-radius:8px;color:var(--red);font-size:11px;cursor:pointer;transition:all 0.2s;}
+        .btn-del:hover{background:rgba(220,38,38,0.15);}
+
+        .empty-state{text-align:center;padding:40px;color:var(--muted);}
+        .empty-icon{font-size:2.5rem;margin-bottom:10px;opacity:0.4;}
+        .empty-text{font-size:14px;font-weight:600;}
+
+        /* Flash */
+        .flash{padding:12px 16px;border-radius:12px;margin-bottom:16px;font-size:13px;font-weight:600;}
+        .flash.success{background:rgba(34,139,34,0.1);border:1px solid rgba(34,139,34,0.2);color:#1a5c1a;}
+        .flash.danger{background:rgba(220,38,38,0.08);border:1px solid rgba(220,38,38,0.2);color:#991b1b;}
+        .flash.warning{background:rgba(255,140,0,0.1);border:1px solid rgba(255,140,0,0.2);color:#92400e;}
+
+        .define-banner{background:rgba(255,140,0,0.08);border:1.5px dashed rgba(255,140,0,0.3);border-radius:14px;padding:20px;text-align:center;margin-bottom:20px;}
+        .define-banner p{font-size:13px;color:var(--muted);margin-bottom:12px;}
+        .btn-define{padding:11px 22px;background:var(--orange);color:white;border:none;border-radius:11px;font-size:13px;font-weight:700;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:7px;font-family:'Cairo',sans-serif;}
+
+        .solde-celebrate{text-align:center;padding:16px;background:rgba(34,139,34,0.06);border:1.5px solid rgba(34,139,34,0.2);border-radius:14px;margin-bottom:20px;}
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <a href="{{ url_for('main.dashboard_ar') }}" class="brand">
+        <div class="brand-icon">🎓</div>
+        <span class="brand-name">EduBulletin</span>
+    </a>
+    <a href="{{ url_for('main.voir_classe_ar', classe_id=classe.id) }}" class="nav-back">
+        <i class="bi bi-arrow-right"></i> العودة إلى القسم
+    </a>
+</nav>
+
+<div class="main">
+
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for cat, msg in messages %}
+    <div class="flash {{ cat }}"><i class="bi bi-info-circle"></i> {{ msg }}</div>
+    {% endfor %}
+    {% endwith %}
+
+    <!-- Hero -->
+    <div class="hero">
+        <div class="hero-label">💰 مدفوعات الدراسة</div>
+        <div class="hero-name">{{ eleve.prenom }} {{ eleve.nom }}</div>
+        <div class="hero-info">{{ classe.nom }} &nbsp;•&nbsp; {{ classe.annee_scolaire }}</div>
+        {% if scolarite %}
+        <div class="hero-solde">
+            {% if scolarite.est_solde %}
+            <span class="badge-solde ok"><i class="bi bi-check-circle-fill"></i> تمّ الدفع ✓</span>
+            {% elif scolarite.pourcentage_paye >= 50 %}
+            <span class="badge-solde partiel"><i class="bi bi-clock-history"></i> جارٍ ({{ scolarite.pourcentage_paye }}%)</span>
+            {% else %}
+            <span class="badge-solde ko"><i class="bi bi-exclamation-circle-fill"></i> في انتظار الدفع</span>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+
+    {% if not scolarite %}
+    <!-- لم يتم تحديد الرسوم بعد -->
+    <div class="define-banner">
+        <div style="font-size:2rem;margin-bottom:8px;">💸</div>
+        <p>لم يتم تحديد رسوم الدراسة لهذا التلميذ بعد.</p>
+        <a href="{{ url_for('paiements.definir_scolarite', eleve_id=eleve.id) }}" class="btn-define">
+            <i class="bi bi-plus-circle"></i> تحديد رسوم الدراسة
+        </a>
+    </div>
+
+    {% else %}
+
+    <!-- شريط التقدم -->
+    <div class="progress-block">
+        <div class="progress-header">
+            <div class="progress-title">تقدم المدفوعات</div>
+            <div class="progress-pct">{{ scolarite.pourcentage_paye }}%</div>
+        </div>
+        <div class="progress-bar-wrap">
+            <div class="progress-bar-fill {% if scolarite.pourcentage_paye < 30 %}danger{% elif scolarite.pourcentage_paye < 70 %}alerte{% endif %}"
+                 style="width:{{ scolarite.pourcentage_paye }}%"></div>
+        </div>
+        <div class="progress-amounts">
+            <div class="amount-box total">
+                <div class="amount-num">{{ "{:,.0f}".format(scolarite.montant_total) }}</div>
+                <div class="amount-lbl">المجموع السنوي (FCFA)</div>
+            </div>
+            <div class="amount-box paye">
+                <div class="amount-num v-paye">{{ "{:,.0f}".format(scolarite.montant_paye) }}</div>
+                <div class="amount-lbl">المدفوع (FCFA)</div>
+            </div>
+            <div class="amount-box reste">
+                <div class="amount-num v-reste">{{ "{:,.0f}".format(scolarite.montant_restant) }}</div>
+                <div class="amount-lbl">المتبقي (FCFA)</div>
+            </div>
+        </div>
+        <div style="margin-top:12px;text-align:left;">
+            <a href="{{ url_for('paiements.definir_scolarite', eleve_id=eleve.id) }}" style="font-size:11px;color:var(--muted);text-decoration:none;">
+                <i class="bi bi-pencil"></i> تعديل الرسوم
+            </a>
+        </div>
+    </div>
+
+    {% if not scolarite.est_solde %}
+    <!-- نموذج دفعة جديدة -->
+    <div class="section-card">
+        <div class="section-head">
+            <i class="bi bi-plus-circle" style="color:var(--gold)"></i>
+            <span class="section-head-title">تسجيل دفعة جديدة</span>
+        </div>
+        <div class="section-body">
+            <form method="POST">
+                <div class="form-grid">
+                    <div class="form-field">
+                        <label class="field-label">المبلغ المدفوع (FCFA) *</label>
+                        <input type="number" name="montant" class="field-input" placeholder="مثال: 15000"
+                               min="1" max="{{ scolarite.montant_restant }}" step="500" required>
+                        <span class="montant-hint">المتبقي للدفع: <strong>{{ "{:,.0f}".format(scolarite.montant_restant) }} FCFA</strong></span>
+                    </div>
+                    <div class="form-field">
+                        <label class="field-label">طريقة الدفع</label>
+                        <select name="mode_paiement" class="field-input">
+                            <option value="espèces">💵 نقداً</option>
+                            <option value="mobile money">📱 موبايل موني</option>
+                            <option value="virement">🏦 تحويل بنكي</option>
+                            <option value="chèque">📄 شيك</option>
+                        </select>
+                    </div>
+                    <div class="form-field">
+                        <label class="field-label">المُحصِّل</label>
+                        <input type="text" name="encaisseur" class="field-input" placeholder="اسم المحاسب">
+                    </div>
+                    <div class="form-field">
+                        <label class="field-label">ملاحظات (اختياري)</label>
+                        <input type="text" name="notes" class="field-input" placeholder="ملاحظات...">
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary">
+                        <i class="bi bi-cash-coin"></i> تسجيل وطباعة الوصل
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {% else %}
+    <div class="solde-celebrate">
+        <div style="font-size:2rem;margin-bottom:6px;">🎉</div>
+        <div style="font-size:15px;font-weight:800;color:var(--green);">تمّ تسديد كامل رسوم الدراسة!</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px;">تمّ دفع جميع الرسوم للسنة الدراسية {{ classe.annee_scolaire }}</div>
+    </div>
+    {% endif %}
+
+    <!-- سجل المدفوعات -->
+    <div class="section-card">
+        <div class="section-head">
+            <i class="bi bi-clock-history" style="color:var(--gold)"></i>
+            <span class="section-head-title">سجل المدفوعات</span>
+        </div>
+        {% if paiements %}
+        {% for p in paiements %}
+        <div class="paiement-row">
+            <div class="paie-right">
+                <div class="paie-icon {{ 'mobile' if 'mobile' in p.mode_paiement else ('virement' if 'virement' in p.mode_paiement else 'especes') }}">
+                    {{ '📱' if 'mobile' in p.mode_paiement else ('🏦' if 'virement' in p.mode_paiement else '💵') }}
+                </div>
+                <div>
+                    <div class="paie-num">{{ p.numero_recu }}</div>
+                    <div class="paie-date">{{ p.date_paiement.strftime('%d/%m/%Y — %H:%M') }}</div>
+                    <span class="paie-mode">{{ p.mode_paiement }}</span>
+                    {% if p.encaisseur %}<span style="font-size:10px;color:var(--muted);margin-right:6px;">بواسطة {{ p.encaisseur }}</span>{% endif %}
+                </div>
+            </div>
+            <div class="paie-left">
+                <div class="paie-montant">{{ "{:,.0f}".format(p.montant) }}+ FCFA</div>
+                <a href="{{ url_for('paiements.recu_paiement', paiement_id=p.id) }}" class="btn-recu" target="_blank">
+                    <i class="bi bi-receipt"></i> وصل
+                </a>
+                <form method="POST" action="{{ url_for('paiements.supprimer_paiement', paiement_id=p.id) }}"
+                      onsubmit="return confirm('حذف هذه الدفعة؟');" style="display:inline;">
+                    <button type="submit" class="btn-del"><i class="bi bi-trash"></i></button>
+                </form>
+            </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">💳</div>
+            <div class="empty-text">لا توجد مدفوعات مسجلة</div>
+        </div>
+        {% endif %}
+    </div>
+
+    {% endif %}
+</div>
+</body>
+</html>

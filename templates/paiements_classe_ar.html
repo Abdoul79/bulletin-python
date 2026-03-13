@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مدفوعات القسم — {{ classe.nom }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root{--ink:#0d1117;--cream:#f5f0e8;--gold:#c9a84c;--mist:#e8edf2;--muted:#6b7685;--green:#228B22;--orange:#FF8C00;--red:#dc2626;}
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{font-family:'Cairo',sans-serif;background:var(--cream);min-height:100vh;color:var(--ink);direction:rtl;}
+        body::before{content:'';position:fixed;inset:0;z-index:0;background:radial-gradient(circle at 10% 10%,rgba(201,168,76,0.12),transparent 55%),radial-gradient(circle at 95% 90%,rgba(196,98,45,0.08),transparent 50%);pointer-events:none;}
+        body::after{content:'';position:fixed;inset:0;z-index:0;background-image:radial-gradient(circle,#c9a84c1a 1px,transparent 1px);background-size:24px 24px;pointer-events:none;}
+
+        .navbar{position:sticky;top:0;z-index:100;background:rgba(245,240,232,0.95);backdrop-filter:blur(12px);border-bottom:1px solid rgba(201,168,76,0.15);padding:0 32px;display:flex;align-items:center;justify-content:space-between;height:60px;}
+        .brand{display:flex;align-items:center;gap:10px;text-decoration:none;flex-direction:row-reverse;}
+        .brand-icon{width:34px;height:34px;background:var(--ink);border-radius:9px;display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:1rem;}
+        .brand-name{font-size:1rem;font-weight:800;color:var(--ink);}
+        .nav-back{display:flex;align-items:center;gap:6px;padding:8px 16px;border-radius:10px;background:white;border:1.5px solid var(--mist);color:var(--ink);font-size:13px;font-weight:700;text-decoration:none;transition:all 0.2s;}
+        .nav-back:hover{border-color:var(--gold);color:var(--gold);}
+
+        .main{position:relative;z-index:1;max-width:1000px;margin:0 auto;padding:32px 24px;}
+
+        /* Hero */
+        .hero{background:var(--ink);border-radius:20px;padding:24px 28px;margin-bottom:24px;position:relative;overflow:hidden;}
+        .hero::before{content:'';position:absolute;top:-60px;left:-60px;width:220px;height:220px;background:radial-gradient(circle,rgba(201,168,76,0.1),transparent 70%);border-radius:50%;}
+        .hero-label{display:inline-flex;align-items:center;gap:6px;background:rgba(201,168,76,0.12);border:1px solid rgba(201,168,76,0.2);color:var(--gold);padding:4px 12px;border-radius:50px;font-size:11px;font-weight:700;margin-bottom:10px;}
+        .hero-title{font-size:1.4rem;font-weight:800;color:#e8edf2;margin-bottom:3px;}
+        .hero-sub{font-size:12px;color:#4a5568;}
+
+        /* Stats */
+        .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px;}
+        .stat-card{background:white;border:1.5px solid var(--mist);border-radius:16px;padding:16px;text-align:center;}
+        .stat-num{font-size:1.3rem;font-weight:800;}
+        .stat-num.green{color:var(--green);}
+        .stat-num.orange{color:var(--orange);}
+        .stat-lbl{font-size:10px;font-weight:700;color:var(--muted);margin-top:3px;}
+        .stat-sub{font-size:10px;color:var(--muted);margin-top:2px;}
+
+        /* Progression */
+        .prog-card{background:white;border:1.5px solid var(--mist);border-radius:16px;padding:18px;margin-bottom:20px;}
+        .prog-card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
+        .prog-card-title{font-size:14px;font-weight:800;}
+        .prog-pct{font-size:1.2rem;font-weight:800;color:var(--green);}
+        .prog-bar-wrap{background:#f0ede7;border-radius:50px;height:10px;overflow:hidden;transform:scaleX(-1);}
+        .prog-bar-fill{height:100%;border-radius:50px;background:linear-gradient(to right,var(--green),#52c41a);transition:width 1s ease;}
+
+        /* Tableau élèves */
+        .section-card{background:white;border:1.5px solid var(--mist);border-radius:16px;overflow:hidden;}
+        .section-head{background:var(--ink);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;}
+        .section-head-title{font-size:14px;font-weight:800;color:#e8edf2;}
+        .section-head-right{font-size:11px;color:#4a5568;}
+
+        /* En-têtes */
+        .tbl-head{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 80px 100px;gap:8px;padding:10px 16px;background:#f8f9fa;border-bottom:1px solid var(--mist);}
+        .tbl-head div{font-size:10px;font-weight:800;color:var(--muted);}
+
+        /* Lignes */
+        .eleve-row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 80px 100px;gap:8px;padding:12px 16px;align-items:center;border-bottom:1px solid var(--mist);transition:background 0.15s;}
+        .eleve-row:last-child{border-bottom:none;}
+        .eleve-row:hover{background:#fafaf8;}
+        .eleve-infos{display:flex;align-items:center;gap:10px;flex-direction:row-reverse;}
+        .eleve-avatar{width:32px;height:32px;border-radius:50%;background:var(--ink);display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:11px;font-weight:800;flex-shrink:0;}
+        .eleve-name{font-size:12px;font-weight:700;color:var(--ink);text-align:right;}
+        .eleve-mat{font-size:9px;color:var(--muted);text-align:right;}
+        .montant-cell{font-size:12px;font-weight:700;text-align:center;direction:ltr;}
+        .m-total{color:var(--ink);}
+        .m-paye{color:var(--green);}
+        .m-reste{color:var(--orange);}
+        .m-reste.zero{color:var(--muted);}
+
+        /* Mini barre */
+        .mini-prog{background:#f0ede7;border-radius:50px;height:6px;overflow:hidden;transform:scaleX(-1);}
+        .mini-prog-fill{height:100%;border-radius:50px;background:linear-gradient(to right,var(--green),#52c41a);}
+        .mini-prog-fill.alerte{background:linear-gradient(to right,var(--orange),#faad14);}
+        .mini-prog-fill.danger{background:linear-gradient(to right,var(--red),#f87171);}
+
+        /* Badges */
+        .badge-ok{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:50px;font-size:10px;font-weight:800;background:rgba(34,139,34,0.1);color:var(--green);border:1px solid rgba(34,139,34,0.2);}
+        .badge-ko{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:50px;font-size:10px;font-weight:800;background:rgba(220,38,38,0.08);color:var(--red);border:1px solid rgba(220,38,38,0.15);}
+        .badge-partiel{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:50px;font-size:10px;font-weight:800;background:rgba(255,140,0,0.1);color:var(--orange);border:1px solid rgba(255,140,0,0.2);}
+
+        .btn-action{display:inline-flex;align-items:center;gap:5px;padding:6px 12px;background:var(--ink);color:var(--gold);border:none;border-radius:8px;font-size:11px;font-weight:700;text-decoration:none;cursor:pointer;transition:all 0.2s;font-family:'Cairo',sans-serif;}
+        .btn-action:hover{background:#1a2332;}
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <a href="{{ url_for('main.dashboard_ar') }}" class="brand">
+        <div class="brand-icon">🎓</div>
+        <span class="brand-name">EduBulletin</span>
+    </a>
+    <a href="{{ url_for('main.voir_classe_ar', classe_id=classe.id) }}" class="nav-back">
+        <i class="bi bi-arrow-right"></i> العودة إلى القسم
+    </a>
+</nav>
+
+<div class="main">
+
+    <!-- Hero -->
+    <div class="hero">
+        <div class="hero-label">💰 مدفوعات الدراسة</div>
+        <div class="hero-title">{{ classe.nom }}</div>
+        <div class="hero-sub">{{ classe.annee_scolaire }} &nbsp;•&nbsp; {{ scolarites|length }} تلميذ مسجل الرسوم</div>
+    </div>
+
+    <!-- Stats globales -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-num green">{{ "{:,.0f}".format(total_paye) }}</div>
+            <div class="stat-lbl">FCFA محصَّل</div>
+            <div class="stat-sub">إجمالي المدفوع</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-num orange">{{ "{:,.0f}".format(total_restant) }}</div>
+            <div class="stat-lbl">FCFA متبقٍّ</div>
+            <div class="stat-sub">للتحصيل</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-num">{{ "{:,.0f}".format(total_attendu) }}</div>
+            <div class="stat-lbl">FCFA متوقَّع</div>
+            <div class="stat-sub">الإجمالي السنوي</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-num green">{{ nb_soldes }}</div>
+            <div class="stat-lbl">تلاميذ سددوا</div>
+            <div class="stat-sub">من أصل {{ scolarites|length }}</div>
+        </div>
+    </div>
+
+    <!-- Progression globale -->
+    {% if total_attendu > 0 %}
+    {% set pct = ((total_paye / total_attendu) * 100) | int %}
+    <div class="prog-card">
+        <div class="prog-card-header">
+            <div class="prog-card-title">نسبة التحصيل في القسم</div>
+            <div class="prog-pct">{{ pct }}%</div>
+        </div>
+        <div class="prog-bar-wrap">
+            <div class="prog-bar-fill" style="width:{{ pct }}%"></div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Tableau détaillé -->
+    <div class="section-card">
+        <div class="section-head">
+            <span class="section-head-title"><i class="bi bi-people"></i> &nbsp;تفصيل حسب التلميذ</span>
+            <span class="section-head-right">{{ scolarites|length }} سجل</span>
+        </div>
+        <div class="tbl-head">
+            <div style="text-align:right;">التلميذ</div>
+            <div style="text-align:center;">الإجمالي</div>
+            <div style="text-align:center;">المدفوع</div>
+            <div style="text-align:center;">المتبقي</div>
+            <div style="text-align:center;">الحالة</div>
+            <div style="text-align:center;">إجراء</div>
+        </div>
+        {% for s in scolarites | sort(attribute='montant_restant', reverse=true) %}
+        <div class="eleve-row">
+            <div class="eleve-infos">
+                <div>
+                    <div class="eleve-name">{{ s.eleve.prenom }} {{ s.eleve.nom }}</div>
+                    {% if s.eleve.matricule %}<div class="eleve-mat">{{ s.eleve.matricule }}</div>{% endif %}
+                    <div style="margin-top:4px;">
+                        <div class="mini-prog" style="width:100px;">
+                            <div class="mini-prog-fill {% if s.pourcentage_paye < 30 %}danger{% elif s.pourcentage_paye < 70 %}alerte{% endif %}"
+                                 style="width:{{ s.pourcentage_paye }}%"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="eleve-avatar">{{ s.eleve.prenom[0] }}{{ s.eleve.nom[0] }}</div>
+            </div>
+            <div class="montant-cell m-total">{{ "{:,.0f}".format(s.montant_total) }}</div>
+            <div class="montant-cell m-paye">{{ "{:,.0f}".format(s.montant_paye) }}</div>
+            <div class="montant-cell m-reste {% if s.montant_restant == 0 %}zero{% endif %}">
+                {{ "{:,.0f}".format(s.montant_restant) }}
+            </div>
+            <div style="text-align:center;">
+                {% if s.est_solde %}
+                <span class="badge-ok"><i class="bi bi-check-circle-fill"></i> تمّ</span>
+                {% elif s.pourcentage_paye > 0 %}
+                <span class="badge-partiel">{{ s.pourcentage_paye }}%</span>
+                {% else %}
+                <span class="badge-ko"><i class="bi bi-exclamation-circle"></i> لم يدفع</span>
+                {% endif %}
+            </div>
+            <div style="text-align:center;">
+                <a href="{{ url_for('paiements.voir_paiements', eleve_id=s.eleve.id) }}" class="btn-action">
+                    <i class="bi bi-cash-coin"></i> إدارة
+                </a>
+            </div>
+        </div>
+        {% else %}
+        <div style="text-align:center;padding:40px;color:var(--muted);">
+            <div style="font-size:2rem;margin-bottom:8px;opacity:0.4;">💳</div>
+            <div style="font-size:14px;font-weight:600;">لم يتم تحديد أي رسوم دراسية في هذا القسم</div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+</body>
+</html>
