@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reçu {{ paiement.numero_recu }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=DM+Serif+Display&display=swap" rel="stylesheet">
+    <style>
+        @page { size: A5; margin: 0; }
+        * { margin:0; padding:0; box-sizing:border-box; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: #e8e8e8;
+            color: #000;
+        }
+
+        /* Controls (screen only) */
+        .controls {
+            position: fixed; top: 16px; right: 16px; z-index: 1000;
+            background: white; padding: 14px; border-radius: 14px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12); display: flex; flex-direction: column; gap: 8px;
+        }
+        .ctrl-btn {
+            display: flex; align-items: center; justify-content: center; gap: 6px;
+            padding: 9px 16px; border-radius: 10px; font-size: 12px; font-weight: 700;
+            border: none; cursor: pointer; text-decoration: none; font-family: 'DM Sans', sans-serif;
+        }
+        .ctrl-btn.primary { background: #0d1117; color: #c9a84c; }
+        .ctrl-btn.secondary { background: #f0ede7; color: #0d1117; border: 1.5px solid #e0e0e0; }
+
+        /* Reçu A5 */
+        .recu {
+            width: 148mm; min-height: 210mm;
+            background: white; margin: 20px auto;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.18);
+            overflow: hidden;
+        }
+
+        /* Barre tricolore */
+        .topbar { display: table; width: 100%; border-collapse: collapse; }
+        .topbar td { height: 8px; border: none; padding: 0; }
+        .tb-o { background: #FF8C00; width: 33.3%; }
+        .tb-w { background: #FFFFFF; width: 33.3%; }
+        .tb-g { background: #228B22; width: 33.4%; }
+
+        /* Header reçu */
+        .recu-header {
+            background: #0d1117; padding: 20px 22px;
+            display: table; width: 100%; border-collapse: collapse;
+        }
+        .rh-left { display: table-cell; vertical-align: middle; }
+        .rh-right { display: table-cell; vertical-align: middle; text-align: right; }
+        .rh-logo { display: inline-flex; align-items: center; gap: 8px; }
+        .rh-logo-box {
+            width: 30px; height: 30px; background: #c9a84c; border-radius: 8px;
+            display: flex; align-items: center; justify-content: center; font-size: 16px;
+        }
+        .rh-logo-name { font-size: 14px; font-weight: 800; color: #e8edf2; }
+        .rh-logo-sub  { font-size: 8px; color: #4a5568; }
+        .rh-school-name { font-size: 12px; font-weight: 700; color: #228B22; }
+        .rh-school-addr { font-size: 9px; color: #4a5568; margin-top: 2px; }
+
+        /* Badge REÇU */
+        .recu-title-bar {
+            background: #FF8C00; padding: 10px 22px;
+            display: table; width: 100%; border-collapse: collapse;
+        }
+        .rtb-left { display: table-cell; vertical-align: middle; }
+        .rtb-right { display: table-cell; vertical-align: middle; text-align: right; }
+        .recu-title { font-size: 16px; font-weight: 800; color: white; letter-spacing: 1px; }
+        .recu-num { font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.85); }
+
+        /* Statut paiement */
+        .recu-body { padding: 20px 22px; }
+
+        .status-block {
+            display: table; width: 100%; border-collapse: collapse;
+            background: {% if scolarite.est_solde %}rgba(34,139,34,0.06){% else %}rgba(255,140,0,0.06){% endif %};
+            border: 1.5px solid {% if scolarite.est_solde %}rgba(34,139,34,0.2){% else %}rgba(255,140,0,0.25){% endif %};
+            border-radius: 10px; margin-bottom: 16px; overflow: hidden;
+        }
+        .status-left  { display: table-cell; vertical-align: middle; padding: 14px 16px; }
+        .status-right { display: table-cell; vertical-align: middle; padding: 14px 16px; text-align: right; }
+        .status-badge {
+            display: inline-block; padding: 5px 14px; border-radius: 50px;
+            font-size: 11px; font-weight: 800;
+            background: {% if scolarite.est_solde %}#228B22{% else %}#FF8C00{% endif %};
+            color: white;
+        }
+        .montant-verse { font-size: 28px; font-weight: 800; color: #228B22; }
+        .montant-label { font-size: 9px; color: #6b7685; font-weight: 700; text-transform: uppercase; }
+
+        /* Info table */
+        .info-section { margin-bottom: 14px; }
+        .info-title { font-size: 10px; font-weight: 800; color: #6b7685; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; border-bottom: 1px solid #f0ede7; padding-bottom: 5px; }
+        .info-tbl { width: 100%; border-collapse: collapse; }
+        .info-tbl td { padding: 5px 0; font-size: 11px; border: none; vertical-align: top; }
+        .info-tbl .lbl { font-weight: 700; color: #6b7685; width: 40%; }
+        .info-tbl .val { color: #0d1117; font-weight: 600; }
+
+        /* Montants restants */
+        .amounts-tbl { width: 100%; border-collapse: collapse; margin-bottom: 16px; }
+        .amounts-tbl td { padding: 7px 10px; border: 1px solid #e8edf2; font-size: 11px; text-align: left; }
+        .amounts-tbl .a-lbl { font-weight: 700; background: #f8f9fa; width: 55%; }
+        .amounts-tbl .a-val { font-weight: 800; }
+        .amounts-tbl .a-val.paye   { color: #228B22; }
+        .amounts-tbl .a-val.reste  { color: #FF8C00; }
+        .amounts-tbl .a-val.total  { color: #0d1117; }
+
+        /* Progress bar */
+        .prog-wrap { background: #f0ede7; border-radius: 50px; height: 8px; overflow: hidden; margin-bottom: 4px; }
+        .prog-fill  { height: 100%; border-radius: 50px; background: linear-gradient(to right, #228B22, #52c41a); }
+        .prog-text  { font-size: 9px; color: #6b7685; text-align: right; }
+
+        /* Signature */
+        .sig-section { margin-top: 20px; display: table; width: 100%; border-collapse: collapse; }
+        .sig-box { display: table-cell; text-align: center; padding: 0 10px; vertical-align: top; }
+        .sig-label { font-size: 10px; font-weight: 700; color: #0d1117; margin-bottom: 4px; }
+        .sig-name  { font-size: 9px; color: #6b7685; margin-bottom: 30px; }
+        .sig-line  { border-top: 1px solid #0d1117; padding-top: 4px; font-size: 8px; color: #6b7685; }
+
+        /* Footer */
+        .recu-footer { background: #f5f0e8; padding: 10px 22px; text-align: center; border-top: 1px solid #e8edf2; margin-top: 16px; }
+        .recu-footer p { font-size: 8px; color: #6b7685; }
+        .recu-footer strong { color: #0d1117; }
+
+        @media print {
+            body { background: white; }
+            .controls { display: none !important; }
+            .recu { margin: 0; box-shadow: none; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Controls -->
+<div class="controls">
+    <button onclick="window.print()" class="ctrl-btn primary">🖨️ Imprimer</button>
+    <a href="{{ url_for('paiements.voir_paiements', eleve_id=eleve.id) }}" class="ctrl-btn secondary">← Retour</a>
+</div>
+
+<!-- Reçu A5 -->
+<div class="recu">
+
+    <!-- Barre tricolore -->
+    <table class="topbar"><tr>
+        <td class="tb-o"></td><td class="tb-w"></td><td class="tb-g"></td>
+    </tr></table>
+
+    <!-- Header -->
+    <table class="recu-header"><tr>
+        <td class="rh-left">
+            <div class="rh-logo">
+                <div class="rh-logo-box">🎓</div>
+                <div>
+                    <div class="rh-logo-name">EduBulletin</div>
+                    <div class="rh-logo-sub">Gestion scolaire</div>
+                </div>
+            </div>
+        </td>
+        <td class="rh-right">
+            <div class="rh-school-name">{{ ecole.nom }}</div>
+            <div class="rh-school-addr">{{ ecole.ville or 'Côte d\'Ivoire' }}</div>
+        </td>
+    </tr></table>
+
+    <!-- Titre REÇU -->
+    <table class="recu-title-bar"><tr>
+        <td class="rtb-left">
+            <div class="recu-title">REÇU DE PAIEMENT</div>
+        </td>
+        <td class="rtb-right">
+            <div class="recu-num">N° {{ paiement.numero_recu }}</div>
+            <div style="font-size:9px;color:rgba(255,255,255,0.7)">{{ paiement.date_paiement.strftime('%d/%m/%Y à %H:%M') }}</div>
+        </td>
+    </tr></table>
+
+    <div class="recu-body">
+
+        <!-- Statut + Montant -->
+        <table class="status-block"><tr>
+            <td class="status-left">
+                <div class="montant-label">Montant versé</div>
+                <div class="montant-verse">{{ "{:,.0f}".format(paiement.montant) }} FCFA</div>
+            </td>
+            <td class="status-right">
+                {% if scolarite.est_solde %}
+                <div class="status-badge">✓ SCOLARITÉ SOLDÉE</div>
+                {% else %}
+                <div class="status-badge">EN COURS</div>
+                {% endif %}
+                <div style="font-size:9px;color:#6b7685;margin-top:5px;">{{ paiement.mode_paiement | capitalize }}</div>
+            </td>
+        </tr></table>
+
+        <!-- Infos élève -->
+        <div class="info-section">
+            <div class="info-title">Informations élève</div>
+            <table class="info-tbl">
+                <tr><td class="lbl">Nom et prénoms :</td><td class="val">{{ eleve.nom }} {{ eleve.prenom }}</td></tr>
+                <tr><td class="lbl">Classe :</td><td class="val">{{ classe.nom }}</td></tr>
+                <tr><td class="lbl">Année scolaire :</td><td class="val">{{ classe.annee_scolaire }}</td></tr>
+                {% if eleve.matricule %}<tr><td class="lbl">Matricule :</td><td class="val">{{ eleve.matricule }}</td></tr>{% endif %}
+                {% if paiement.encaisseur %}<tr><td class="lbl">Encaissé par :</td><td class="val">{{ paiement.encaisseur }}</td></tr>{% endif %}
+                {% if paiement.notes %}<tr><td class="lbl">Notes :</td><td class="val">{{ paiement.notes }}</td></tr>{% endif %}
+            </table>
+        </div>
+
+        <!-- Récapitulatif montants -->
+        <div class="info-section">
+            <div class="info-title">Récapitulatif financier</div>
+            <table class="amounts-tbl">
+                <tr><td class="a-lbl">Frais annuels totaux</td><td class="a-val total">{{ "{:,.0f}".format(scolarite.montant_total) }} FCFA</td></tr>
+                <tr><td class="a-lbl">Total versé (cumul)</td><td class="a-val paye">{{ "{:,.0f}".format(scolarite.montant_paye) }} FCFA</td></tr>
+                <tr><td class="a-lbl"><strong>Reste à payer</strong></td><td class="a-val reste"><strong>{{ "{:,.0f}".format(scolarite.montant_restant) }} FCFA</strong></td></tr>
+            </table>
+            <div class="prog-wrap">
+                <div class="prog-fill" style="width:{{ scolarite.pourcentage_paye }}%"></div>
+            </div>
+            <div class="prog-text">{{ scolarite.pourcentage_paye }}% des frais réglés</div>
+        </div>
+
+        <!-- Signatures -->
+        <table class="sig-section"><tr>
+            <td class="sig-box">
+                <div class="sig-label">Le Caissier / Directeur</div>
+                <div class="sig-name">{{ ecole.directeur or '' }}</div>
+                <div class="sig-line">Signature et cachet</div>
+            </td>
+            <td class="sig-box">
+                <div class="sig-label">Le Parent / Tuteur</div>
+                <div class="sig-name">&nbsp;</div>
+                <div class="sig-line">Lu et approuvé</div>
+            </td>
+        </tr></table>
+    </div>
+
+    <!-- Footer -->
+    <div class="recu-footer">
+        <p>Ce reçu est un document officiel. Conservez-le précieusement.</p>
+        <p><strong>EduBulletin</strong> — Système de gestion scolaire &nbsp;|&nbsp; {{ ecole.nom }} &nbsp;|&nbsp; {{ classe.annee_scolaire }}</p>
+    </div>
+
+</div>
+</body>
+</html>
