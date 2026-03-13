@@ -56,22 +56,22 @@
         .status-incomplete .hero-status-icon { background:rgba(201,168,76,0.15); color:var(--gold); }
         .hero-status-text { font-size:0.78rem; color:#4a5568; font-weight:700; }
 
-        /* Actions grid */
+        /* ── Actions grid : 5 cartes ── */
         .actions-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:14px; margin-bottom:32px; animation:fadeUp 0.6s ease 0.1s both; }
         .action-card { background:white; border:1.5px solid var(--border); border-radius:18px; padding:20px 16px; text-align:center; text-decoration:none; transition:all 0.25s ease; display:flex; flex-direction:column; align-items:center; gap:10px; position:relative; overflow:visible; }
         .action-card:hover { transform:translateY(-4px); }
-        .action-card.manage:hover  { border-color:var(--ink); box-shadow:0 12px 32px rgba(13,17,23,0.1); }
-        .action-card.eleves:hover  { border-color:rgba(39,174,96,0.4); box-shadow:0 12px 32px rgba(39,174,96,0.08); }
-        .action-card.matieres:hover{ border-color:rgba(99,102,241,0.4); box-shadow:0 12px 32px rgba(99,102,241,0.08); }
-        .action-card.notes:hover   { border-color:rgba(201,168,76,0.4); box-shadow:0 12px 32px rgba(201,168,76,0.08); }
-        .action-card.bulletins:hover{ border-color:rgba(196,98,45,0.3); box-shadow:0 12px 32px rgba(196,98,45,0.08); }
+        .action-card.eleves:hover   { border-color:rgba(39,174,96,0.4);  box-shadow:0 12px 32px rgba(39,174,96,0.08); }
+        .action-card.matieres:hover { border-color:rgba(99,102,241,0.4); box-shadow:0 12px 32px rgba(99,102,241,0.08); }
+        .action-card.notes:hover    { border-color:rgba(201,168,76,0.4); box-shadow:0 12px 32px rgba(201,168,76,0.08); }
+        .action-card.bulletins:hover{ border-color:rgba(196,98,45,0.3);  box-shadow:0 12px 32px rgba(196,98,45,0.08); }
+        .action-card.paiements:hover{ border-color:rgba(34,139,34,0.4);  box-shadow:0 12px 32px rgba(34,139,34,0.08); }
         .action-icon-wrap { width:48px; height:48px; border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:1.2rem; transition:transform 0.2s; }
         .action-card:hover .action-icon-wrap { transform:scale(1.1); }
-        .icon-ink   { background:var(--ink); color:var(--gold); }
-        .icon-green { background:rgba(39,174,96,0.1); color:var(--success-color); }
-        .icon-blue  { background:rgba(99,102,241,0.1); color:#4f46e5; }
+        .icon-green { background:rgba(39,174,96,0.1);   color:var(--success-color); }
+        .icon-blue  { background:rgba(99,102,241,0.1);  color:#4f46e5; }
         .icon-gold  { background:rgba(201,168,76,0.12); color:#7a5c10; }
-        .icon-rust  { background:rgba(196,98,45,0.1); color:var(--rust); }
+        .icon-rust  { background:rgba(196,98,45,0.1);   color:var(--rust); }
+        .icon-pay   { background:rgba(34,139,34,0.1);   color:#1a6b3c; }  /* ← NOUVEAU */
         .action-label { font-size:0.82rem; font-weight:700; color:var(--ink); }
 
         /* Bulletins dropdown */
@@ -99,16 +99,38 @@
         .section-card-body { padding:0; }
 
         /* Student list */
-        .student-item { display:flex; align-items:center; justify-content:space-between; padding:14px 24px; border-bottom:1px solid var(--mist); transition:background 0.15s; }
+        .student-item { display:flex; align-items:center; gap:12px; padding:14px 24px; border-bottom:1px solid var(--mist); transition:background 0.15s; }
         .student-item:last-child { border-bottom:none; }
         .student-item:hover { background:#fdfcfa; }
         .student-avatar { width:38px; height:38px; background:var(--ink); color:var(--gold); border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:0.8rem; font-weight:800; flex-shrink:0; }
-        .student-info { flex:1; margin-right:12px; }
+        .student-info { flex:1; }
         .student-name { font-size:0.9rem; font-weight:700; color:var(--ink); }
-        .student-meta { display:flex; align-items:center; gap:10px; font-size:0.72rem; color:var(--text-muted); margin-top:2px; }
+        .student-meta { display:flex; align-items:center; gap:10px; font-size:0.72rem; color:var(--text-muted); margin-top:2px; flex-wrap:wrap; }
         .student-meta i { font-size:0.65rem; }
         .badge-male   { background:rgba(99,102,241,0.1); color:#4f46e5; padding:2px 8px; border-radius:50px; font-size:0.68rem; font-weight:700; }
         .badge-female { background:rgba(196,98,45,0.1); color:var(--rust); padding:2px 8px; border-radius:50px; font-size:0.68rem; font-weight:700; }
+
+        /* ── Bouton paiement par élève ── */
+        .btn-pay {
+            display:inline-flex; align-items:center; justify-content:center;
+            width:34px; height:34px; border-radius:10px; font-size:0.9rem;
+            text-decoration:none; transition:all 0.2s; border:1.5px solid var(--border);
+            flex-shrink:0; position:relative; cursor:pointer;
+        }
+        .btn-pay.solde   { background:rgba(34,139,34,0.1);  border-color:rgba(34,139,34,0.25);  color:#1a6b3c; }
+        .btn-pay.partiel { background:rgba(255,140,0,0.1);  border-color:rgba(255,140,0,0.3);   color:#92400e; }
+        .btn-pay.impaye  { background:rgba(220,38,38,0.08); border-color:rgba(220,38,38,0.25);  color:#991b1b; }
+        .btn-pay.nd      { background:var(--mist); border-color:var(--border); color:var(--text-muted); }
+        .btn-pay:hover   { transform:scale(1.12); }
+        .btn-pay .tip {
+            display:none; position:absolute; bottom:calc(100% + 6px); right:50%;
+            transform:translateX(50%); background:var(--ink); color:white;
+            font-size:0.6rem; font-weight:700; padding:4px 8px; border-radius:6px;
+            white-space:nowrap; z-index:30; pointer-events:none;
+        }
+        .btn-pay:hover .tip { display:block; }
+
+        /* Bouton bulletin */
         .btn-preview { display:inline-flex; align-items:center; gap:6px; padding:8px 16px; border-radius:10px; background:var(--ink); color:var(--gold); text-decoration:none; transition:all 0.2s; font-size:0.78rem; font-weight:700; white-space:nowrap; flex-shrink:0; border:2px solid transparent; }
         .btn-preview:hover { background:#1a2332; color:var(--gold-light); transform:translateY(-1px); box-shadow:0 6px 16px rgba(13,17,23,0.15); }
 
@@ -139,44 +161,6 @@
         .btn-empty:hover { background:#1a2332; color:var(--cream); }
 
         @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
-
-        /* ── Paiements ── */
-        .btn-paiement {
-            display:inline-flex; align-items:center; justify-content:center;
-            width:36px; height:36px; border-radius:10px; font-size:0.85rem;
-            text-decoration:none; transition:all 0.2s; border:1.5px solid var(--border);
-            flex-shrink:0; position:relative; cursor:pointer;
-        }
-        .btn-paiement.solde   { background:rgba(34,139,34,0.1);  border-color:rgba(34,139,34,0.2);  color:#1a6b3c; }
-        .btn-paiement.partiel { background:rgba(255,140,0,0.1);  border-color:rgba(255,140,0,0.25); color:#92400e; }
-        .btn-paiement.impaye  { background:rgba(220,38,38,0.08); border-color:rgba(220,38,38,0.2);  color:#991b1b; }
-        .btn-paiement.nd      { background:var(--mist); border-color:var(--border); color:var(--text-muted); }
-        .btn-paiement:hover   { transform:scale(1.1); box-shadow:0 4px 12px rgba(0,0,0,0.08); }
-        .btn-paiement .pay-tip {
-            display:none; position:absolute; bottom:calc(100% + 6px); right:50%;
-            transform:translateX(50%); background:var(--ink); color:white;
-            font-size:0.62rem; font-weight:700; padding:4px 8px; border-radius:6px;
-            white-space:nowrap; z-index:20; pointer-events:none; font-family:'Cairo',sans-serif;
-        }
-        .btn-paiement:hover .pay-tip { display:block; }
-
-        /* Mini barre */
-        .pay-mini-bar { width:60px; height:4px; border-radius:50px; background:#e8edf2; overflow:hidden; display:inline-block; vertical-align:middle; transform:scaleX(-1); }
-        .pay-mini-bar-fill { height:100%; border-radius:50px; }
-        .pmb-green  { background:#22c55e; }
-        .pmb-orange { background:#fb923c; }
-        .pmb-red    { background:#f87171; }
-
-        /* Récap paiements dans la liste */
-        .pay-prog-wrap { background:#f0ede7; border-radius:50px; height:6px; overflow:hidden; transform:scaleX(-1); }
-        .pay-prog-fill { height:100%; border-radius:50px; background:linear-gradient(to right,#1a6b3c,#22c55e); }
-
-        /* Action card paiements */
-        .action-card.paiements:hover { border-color:rgba(201,168,76,0.4); box-shadow:0 12px 32px rgba(201,168,76,0.08); }
-        .icon-pay { background:rgba(201,168,76,0.12); color:#7a5c10; }
-
-        /* Hero stats paiements */
-        .hero-stat.pay-stat { background:rgba(201,168,76,0.1); border-color:rgba(201,168,76,0.2); }
 
         @media(max-width:960px) {
             .navbar { padding:0 20px; }
@@ -242,25 +226,6 @@
                         <i class="bi bi-journal-text"></i>
                         {{ matieres|length }} مادة
                     </div>
-                    {% set rh = namespace(paye=0,total=0,soldes=0) %}
-                    {% for eleve in eleves %}
-                        {% set s = eleve.scolarites | selectattr('annee_scolaire','equalto',classe.annee_scolaire) | list | first | default(None) %}
-                        {% if s %}
-                            {% set rh.paye  = rh.paye  + s.montant_paye %}
-                            {% set rh.total = rh.total + s.montant_total %}
-                            {% if s.est_solde %}{% set rh.soldes = rh.soldes + 1 %}{% endif %}
-                        {% endif %}
-                    {% endfor %}
-                    {% if rh.total > 0 %}
-                    <div class="hero-stat pay-stat">
-                        <i class="bi bi-cash-coin" style="color:var(--gold);"></i>
-                        {{ "{:,.0f}".format(rh.paye) }} FCFA
-                    </div>
-                    <div class="hero-stat pay-stat">
-                        <i class="bi bi-check-circle-fill" style="color:#4ade80;"></i>
-                        {{ rh.soldes }}/{{ eleves|length }} سدّدوا
-                    </div>
-                    {% endif %}
                 </div>
             </div>
             <div class="hero-status {{ 'status-ready' if eleves|length > 0 and matieres|length > 0 else 'status-incomplete' }}">
@@ -282,7 +247,7 @@
         </div>
     </div>
 
-    <!-- Actions -->
+    <!-- Actions — 5 cartes -->
     <div class="actions-grid">
         <a href="{{ url_for('eleve.add_eleve_ar', classe_id=classe.id) }}" class="action-card eleves">
             <div class="action-icon-wrap icon-green"><i class="bi bi-person-plus-fill"></i></div>
@@ -323,7 +288,7 @@
                 </button>
             </div>
         </div>
-        <!-- مدفوعات -->
+        {# ── CARTE PAIEMENTS (NOUVELLE) ── #}
         <a href="{{ url_for('paiements.paiements_classe', classe_id=classe.id) }}" class="action-card paiements">
             <div class="action-icon-wrap icon-pay"><i class="bi bi-cash-coin"></i></div>
             <span class="action-label">المدفوعات</span>
@@ -331,7 +296,7 @@
     </div>
 
     <!-- Stats -->
-    <div class="stats-row" style="grid-template-columns:repeat(5,1fr);">
+    <div class="stats-row">
         <div class="stat-card">
             <div class="stat-card-icon" style="background:rgba(99,102,241,0.1);color:#4f46e5;"><i class="bi bi-people-fill"></i></div>
             <div class="stat-num">{{ eleves|length }}</div>
@@ -344,29 +309,10 @@
         </div>
         <div class="stat-card">
             <div class="stat-card-icon" style="background:rgba(201,168,76,0.12);color:#7a5c10;"><i class="bi bi-check2-circle"></i></div>
-            <div class="stat-num" style="font-size:1.3rem;{% if eleves|length > 0 and matieres|length > 0 %}color:var(--success-color){% else %}color:var(--gold){% endif %}">
+            <div class="stat-num" style="font-size:1.5rem;{% if eleves|length > 0 and matieres|length > 0 %}color:var(--success-color){% else %}color:var(--gold){% endif %}">
                 {% if eleves|length > 0 and matieres|length > 0 %}جاهز{% else %}غير مكتمل{% endif %}
             </div>
             <div class="stat-label">حالة القسم</div>
-        </div>
-        {% set st = namespace(paye=0,total=0,soldes=0) %}
-        {% for eleve in eleves %}
-            {% set s2 = eleve.scolarites | selectattr('annee_scolaire','equalto',classe.annee_scolaire) | list | first | default(None) %}
-            {% if s2 %}
-                {% set st.paye  = st.paye  + s2.montant_paye %}
-                {% set st.total = st.total + s2.montant_total %}
-                {% if s2.est_solde %}{% set st.soldes = st.soldes + 1 %}{% endif %}
-            {% endif %}
-        {% endfor %}
-        <div class="stat-card">
-            <div class="stat-card-icon" style="background:rgba(34,139,34,0.1);color:#1a6b3c;"><i class="bi bi-cash-coin"></i></div>
-            <div class="stat-num" style="font-size:1rem;color:#1a6b3c;">{{ "{:,.0f}".format(st.paye) }}</div>
-            <div class="stat-label">FCFA محصَّل</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-card-icon" style="background:rgba(255,140,0,0.1);color:#92400e;"><i class="bi bi-hourglass-split"></i></div>
-            <div class="stat-num" style="font-size:1rem;color:#92400e;">{{ "{:,.0f}".format(st.total - st.paye) }}</div>
-            <div class="stat-label">FCFA متبقٍّ</div>
         </div>
     </div>
 
@@ -385,47 +331,10 @@
                     <i class="bi bi-plus-lg"></i> إضافة
                 </a>
             </div>
-
-            <!-- ملخص المدفوعات -->
-            {% set rp = namespace(paye=0,total=0,soldes=0,avec=0) %}
-            {% for eleve in eleves %}
-                {% set s = eleve.scolarites | selectattr('annee_scolaire','equalto',classe.annee_scolaire) | list | first | default(None) %}
-                {% if s %}
-                    {% set rp.paye  = rp.paye  + s.montant_paye %}
-                    {% set rp.total = rp.total + s.montant_total %}
-                    {% set rp.avec  = rp.avec  + 1 %}
-                    {% if s.est_solde %}{% set rp.soldes = rp.soldes + 1 %}{% endif %}
-                {% endif %}
-            {% endfor %}
-            {% if rp.total > 0 %}
-            <div style="padding:12px 20px;border-bottom:1px solid var(--border);background:#fdfcfa;">
-                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-                    <a href="{{ url_for('paiements.paiements_classe', classe_id=classe.id) }}" style="font-size:0.75rem;font-weight:700;color:var(--gold);text-decoration:none;">← عرض الكل</a>
-                    <span style="font-size:0.8rem;font-weight:700;color:var(--ink);">💰 المدفوعات — {{ rp.avec }} تلميذ</span>
-                </div>
-                <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:8px;">
-                    <div style="text-align:center;background:rgba(34,139,34,0.07);border-radius:10px;padding:7px;">
-                        <div style="font-size:0.8rem;font-weight:800;color:#1a6b3c;">{{ "{:,.0f}".format(rp.paye) }}</div>
-                        <div style="font-size:0.62rem;color:var(--text-muted);font-weight:700;">محصَّل</div>
-                    </div>
-                    <div style="text-align:center;background:rgba(255,140,0,0.08);border-radius:10px;padding:7px;">
-                        <div style="font-size:0.8rem;font-weight:800;color:#92400e;">{{ "{:,.0f}".format(rp.total - rp.paye) }}</div>
-                        <div style="font-size:0.62rem;color:var(--text-muted);font-weight:700;">متبقٍّ</div>
-                    </div>
-                    <div style="text-align:center;background:var(--mist);border-radius:10px;padding:7px;">
-                        <div style="font-size:0.8rem;font-weight:800;color:var(--ink);">{{ rp.soldes }}/{{ rp.avec }}</div>
-                        <div style="font-size:0.62rem;color:var(--text-muted);font-weight:700;">سدّدوا</div>
-                    </div>
-                </div>
-                {% set pct_cl = ((rp.paye / rp.total) * 100) | int %}
-                <div class="pay-prog-wrap"><div class="pay-prog-fill" style="width:{{ pct_cl }}%"></div></div>
-                <div style="font-size:0.62rem;color:var(--text-muted);margin-top:3px;text-align:left;">{{ pct_cl }}%</div>
-            </div>
-            {% endif %}
-
             <div class="section-card-body">
                 {% if eleves %}
                     {% for eleve in eleves %}
+                    {# scolarité de l'élève pour l'année courante #}
                     {% set sc = eleve.scolarites | selectattr('annee_scolaire','equalto',classe.annee_scolaire) | list | first | default(None) %}
                     <div class="student-item">
                         <div class="student-avatar">{{ eleve.prenom[0] }}{{ eleve.nom[0] }}</div>
@@ -439,17 +348,19 @@
                                 {% endif %}
                             </div>
                         </div>
-                        <!-- زر الدفع -->
+
+                        {# ── زر الدفع (NOUVEAU) ── #}
                         <a href="{{ url_for('paiements.voir_paiements', eleve_id=eleve.id) }}"
-                           class="btn-paiement {% if sc %}{% if sc.est_solde %}solde{% elif sc.pourcentage_paye > 0 %}partiel{% else %}impaye{% endif %}{% else %}nd{% endif %}"
-                           title="المدفوعات">
+                           class="btn-pay {% if sc %}{% if sc.est_solde %}solde{% elif sc.pourcentage_paye > 0 %}partiel{% else %}impaye{% endif %}{% else %}nd{% endif %}">
                             {% if sc %}
                                 {% if sc.est_solde %}<i class="bi bi-check-circle-fill"></i>
                                 {% elif sc.pourcentage_paye > 0 %}<i class="bi bi-clock-history"></i>
-                                {% else %}<i class="bi bi-exclamation-circle"></i>
+                                {% else %}<i class="bi bi-exclamation-circle-fill"></i>
                                 {% endif %}
-                            {% else %}<i class="bi bi-cash-coin"></i>{% endif %}
-                            <span class="pay-tip">
+                            {% else %}
+                                <i class="bi bi-cash-coin"></i>
+                            {% endif %}
+                            <span class="tip">
                                 {% if sc %}
                                     {% if sc.est_solde %}✓ تمّ التسديد
                                     {% elif sc.pourcentage_paye > 0 %}{{ sc.pourcentage_paye }}% — متبقٍّ {{ "{:,.0f}".format(sc.montant_restant) }} FCFA
@@ -458,7 +369,8 @@
                                 {% else %}تحديد الرسوم{% endif %}
                             </span>
                         </a>
-                        <!-- زر الكشف -->
+
+                        {# ── زر الكشف (original) ── #}
                         <a href="{{ url_for('pdf_ar.preview_bulletin_ar', eleve_id=eleve.id) }}" class="btn-preview" target="_blank" data-eleve-id="{{ eleve.id }}">
                             <i class="bi bi-file-earmark-pdf-fill"></i> كشف
                         </a>
