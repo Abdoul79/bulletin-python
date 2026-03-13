@@ -2,6 +2,11 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from datetime import datetime
 
+
+import uuid
+from datetime import datetime
+
+
 db = SQLAlchemy()
 migrate = Migrate()
 
@@ -72,6 +77,84 @@ class Eleve(db.Model):
 
     def __repr__(self):
         return f'<Eleve {self.matricule} - {self.prenom} {self.nom}>'
+
+# commmencer par ici
+# ═══════════════════════════════════════════════════════
+#  AJOUTER CES DEUX CLASSES DANS models.py
+#  (après la classe Eleve)
+# ═══════════════════════════════════════════════════════
+
+class Scolarite(db.Model):
+    """Frais de scolarité annuels d'un élève"""
+    __tablename__ = 'scolarite'
+
+    id             = db.Column(db.Integer, primary_key=True)
+    eleve_id       = db.Column(db.Integer, db.ForeignKey('eleve.id'), nullable=False)
+    classe_id      = db.Column(db.Integer, db.ForeignKey('classe.id'), nullable=False)
+    montant_total  = db.Column(db.Float, nullable=False, default=0.0)   # Montant annuel total
+    annee_scolaire = db.Column(db.String(20), nullable=False)
+    date_creation  = db.Column(db.DateTime, default=datetime.utcnow)
+
+    # Relations
+    eleve    = db.relationship('Eleve',   backref=db.backref('scolarites', lazy=True))
+    classe   = db.relationship('Classe',  backref=db.backref('scolarites', lazy=True))
+    paiements = db.relationship('Paiement', backref='scolarite', lazy=True,
+                                 cascade='all, delete-orphan')
+
+    @property
+    def montant_paye(self):
+        return sum(p.montant for p in self.paiements)
+
+    @property
+    def montant_restant(self):
+        return max(0.0, self.montant_total - self.montant_paye)
+
+    @property
+    def est_solde(self):
+        return self.montant_restant <= 0
+
+    @property
+    def pourcentage_paye(self):
+        if self.montant_total == 0:
+            return 100
+        return min(100, int(self.montant_paye / self.montant_total * 100))
+
+    def __repr__(self):
+        return f'<Scolarite eleve={self.eleve_id} total={self.montant_total}>'
+
+
+class Paiement(db.Model):
+    """Un versement effectué pour une scolarité"""
+    __tablename__ = 'paiement'
+
+    id             = db.Column(db.Integer, primary_key=True)
+    scolarite_id   = db.Column(db.Integer, db.ForeignKey('scolarite.id'), nullable=False)
+    montant        = db.Column(db.Float, nullable=False)
+    date_paiement  = db.Column(db.DateTime, default=datetime.utcnow)
+    numero_recu    = db.Column(db.String(50), unique=True, nullable=False)
+    mode_paiement  = db.Column(db.String(30), default='espèces')   # espèces, mobile money, virement
+    notes          = db.Column(db.String(200), nullable=True)
+    encaisseur     = db.Column(db.String(100), nullable=True)       # nom du caissier
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        if not self.numero_recu:
+            self.numero_recu = self._generer_numero()
+
+    @staticmethod
+    def _generer_numero():
+        """Génère un numéro de reçu unique : REC-YYYYMMDD-XXXX"""
+        date_str = datetime.utcnow().strftime('%Y%m%d')
+        uid = uuid.uuid4().hex[:6].upper()
+        return f'REC-{date_str}-{uid}'
+
+    def __repr__(self):
+        return f'<Paiement {self.numero_recu} {self.montant}>'
+
+
+# terminer 
+
+
 
 
 class MatriculeUsed(db.Model):
