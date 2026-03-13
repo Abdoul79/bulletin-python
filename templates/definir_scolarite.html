@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Frais de scolarité — {{ eleve.prenom }} {{ eleve.nom }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root{--ink:#0d1117;--cream:#f5f0e8;--gold:#c9a84c;--mist:#e8edf2;--muted:#6b7685;--green:#228B22;--orange:#FF8C00;}
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{font-family:'DM Sans',sans-serif;background:var(--cream);min-height:100vh;display:flex;align-items:center;justify-content:center;color:var(--ink);}
+        body::before{content:'';position:fixed;inset:0;background:radial-gradient(circle at 80% 20%,rgba(201,168,76,0.12),transparent 55%);pointer-events:none;}
+        body::after{content:'';position:fixed;inset:0;background-image:radial-gradient(circle,#c9a84c1a 1px,transparent 1px);background-size:24px 24px;pointer-events:none;}
+
+        .card{position:relative;z-index:1;background:white;border:1.5px solid var(--mist);border-radius:24px;padding:36px;width:100%;max-width:440px;box-shadow:0 20px 60px rgba(0,0,0,0.08);}
+
+        .card-logo{display:flex;align-items:center;gap:10px;margin-bottom:24px;}
+        .logo-box{width:38px;height:38px;background:var(--ink);border-radius:10px;display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:1.1rem;}
+        .logo-name{font-size:1rem;font-weight:800;color:var(--ink);}
+
+        .card-title{font-size:1.1rem;font-weight:800;color:var(--ink);margin-bottom:4px;}
+        .card-sub{font-size:11px;color:var(--muted);margin-bottom:24px;}
+
+        /* Infos élève */
+        .eleve-box{display:flex;align-items:center;gap:12px;background:rgba(13,17,23,0.04);border-radius:12px;padding:14px;margin-bottom:22px;}
+        .eleve-avatar{width:40px;height:40px;background:var(--ink);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:14px;font-weight:800;}
+        .eleve-name{font-size:13px;font-weight:800;color:var(--ink);}
+        .eleve-info{font-size:10px;color:var(--muted);}
+
+        /* Montants suggérés */
+        .suggest-label{font-size:11px;font-weight:700;color:var(--ink);margin-bottom:8px;}
+        .suggest-btns{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px;}
+        .suggest-btn{padding:7px 14px;border:1.5px solid var(--mist);border-radius:50px;background:white;font-size:11px;font-weight:700;color:var(--ink);cursor:pointer;transition:all 0.2s;}
+        .suggest-btn:hover{border-color:var(--gold);color:var(--gold);}
+
+        .field-label{font-size:11px;font-weight:700;color:var(--ink);margin-bottom:5px;display:block;}
+        .field-input{width:100%;padding:13px 16px;border:1.5px solid var(--mist);border-radius:12px;font-size:14px;font-weight:700;font-family:'DM Sans',sans-serif;color:var(--ink);margin-bottom:6px;transition:all 0.2s;}
+        .field-input:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,168,76,0.1);}
+        .field-hint{font-size:10px;color:var(--muted);margin-bottom:20px;}
+
+        .btn-submit{width:100%;padding:14px;background:var(--ink);color:var(--gold);border:none;border-radius:13px;font-size:13px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:10px;transition:all 0.2s;}
+        .btn-submit:hover{background:#1a2332;transform:translateY(-1px);}
+        .btn-cancel{width:100%;padding:12px;background:transparent;color:var(--ink);border:1.5px solid var(--mist);border-radius:13px;font-size:13px;font-weight:700;cursor:pointer;text-align:center;text-decoration:none;display:block;transition:all 0.2s;}
+        .btn-cancel:hover{border-color:var(--gold);}
+
+        {% if scolarite and scolarite.paiements %}
+        .warning-box{background:rgba(255,140,0,0.08);border:1px solid rgba(255,140,0,0.25);border-radius:10px;padding:10px 14px;font-size:11px;color:#92400e;margin-bottom:16px;}
+        {% endif %}
+    </style>
+</head>
+<body>
+<div class="card">
+    <div class="card-logo">
+        <div class="logo-box">🎓</div>
+        <div class="logo-name">EduBulletin</div>
+    </div>
+
+    <div class="card-title">Définir les frais de scolarité</div>
+    <div class="card-sub">Montant annuel total à payer pour cet élève</div>
+
+    <!-- Infos élève -->
+    <div class="eleve-box">
+        <div class="eleve-avatar">{{ eleve.prenom[0] }}{{ eleve.nom[0] }}</div>
+        <div>
+            <div class="eleve-name">{{ eleve.prenom }} {{ eleve.nom }}</div>
+            <div class="eleve-info">{{ classe.nom }} &nbsp;•&nbsp; {{ classe.annee_scolaire }}</div>
+        </div>
+    </div>
+
+    {% if scolarite and scolarite.paiements %}
+    <div class="warning-box">
+        <i class="bi bi-exclamation-triangle"></i>
+        Des paiements ont déjà été enregistrés ({{ "{:,.0f}".format(scolarite.montant_paye) }} FCFA).
+        Modifier le montant total recalculera le reste à payer.
+    </div>
+    {% endif %}
+
+    <form method="POST">
+        <!-- Montants suggérés -->
+        <div class="suggest-label">Montants courants :</div>
+        <div class="suggest-btns">
+            <button type="button" class="suggest-btn" onclick="setMontant(50000)">50 000</button>
+            <button type="button" class="suggest-btn" onclick="setMontant(75000)">75 000</button>
+            <button type="button" class="suggest-btn" onclick="setMontant(100000)">100 000</button>
+            <button type="button" class="suggest-btn" onclick="setMontant(150000)">150 000</button>
+            <button type="button" class="suggest-btn" onclick="setMontant(200000)">200 000</button>
+        </div>
+
+        <label class="field-label" for="montant">Montant total (FCFA) *</label>
+        <input type="number" id="montant" name="montant_total" class="field-input"
+               placeholder="ex: 100 000"
+               value="{{ scolarite.montant_total | int if scolarite else '' }}"
+               min="1000" step="500" required>
+        <div class="field-hint">Ce montant représente les frais de scolarité pour toute l'année {{ classe.annee_scolaire }}</div>
+
+        <button type="submit" class="btn-submit">
+            <i class="bi bi-check-circle"></i>
+            {{ 'Mettre à jour' if scolarite else 'Enregistrer les frais' }}
+        </button>
+        <a href="{{ url_for('paiements.voir_paiements', eleve_id=eleve.id) if scolarite else url_for('main.voir_classe', classe_id=classe.id) }}" class="btn-cancel">
+            Annuler
+        </a>
+    </form>
+</div>
+<script>
+function setMontant(v) {
+    document.getElementById('montant').value = v;
+    document.getElementById('montant').focus();
+}
+</script>
+</body>
+</html>
