@@ -66,6 +66,33 @@
         .btn-hero.outline { background:transparent; border-color:rgba(255,255,255,0.15); color:#e8edf2; }
         .btn-hero.outline:hover { background:rgba(255,255,255,0.06); transform:translateY(-2px); }
 
+        /* ── BANNIÈRE PAIEMENTS (NOUVELLE) ── */
+        .pay-banner {
+            background: var(--ink); border-radius: 20px; padding: 20px 28px;
+            margin-bottom: 28px; display: grid;
+            grid-template-columns: 1fr repeat(3, auto);
+            align-items: center; gap: 16px;
+            animation: fadeUp 0.6s ease 0.05s both;
+        }
+        .pay-banner-label {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: rgba(201,168,76,0.12); border: 1px solid rgba(201,168,76,0.22);
+            color: var(--gold); padding: 4px 12px; border-radius: 50px;
+            font-size: 0.75rem; font-weight: 700; margin-bottom: 5px;
+        }
+        .pay-banner-title { font-size: 0.95rem; font-weight: 800; color: #e8edf2; }
+        .pay-bar-wrap { margin-top: 8px; background: rgba(255,255,255,0.08); border-radius: 50px; height: 5px; overflow: hidden; width: 180px; }
+        .pay-bar-fill { height: 100%; border-radius: 50px; background: linear-gradient(to left, #4ade80, #22c55e); }
+        .pay-stat {
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 14px; padding: 12px 18px; text-align: center; min-width: 120px;
+        }
+        .pay-stat-num { font-size: 1.1rem; font-weight: 800; line-height: 1.2; }
+        .pay-stat-num.g { color: #4ade80; }
+        .pay-stat-num.o { color: #fb923c; }
+        .pay-stat-num.w { color: #e8edf2; }
+        .pay-stat-lbl { font-size: 0.68rem; color: #4a5568; font-weight: 600; margin-top: 2px; }
+
         /* ── Section title ── */
         .section-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; }
         .section-title { font-family:'Cairo',sans-serif; font-size:1.3rem; font-weight:800; color:var(--ink); display:flex; align-items:center; gap:10px; }
@@ -93,15 +120,17 @@
         .action-btn .action-icon { width:30px; height:30px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:0.85rem; flex-shrink:0; transition:transform 0.2s; }
         .action-btn:hover .action-icon { transform:scale(1.1); }
 
-        .action-btn.manage:hover  { border-color:var(--ink); background:rgba(13,17,23,0.03); }
-        .action-btn.eleves:hover  { border-color:rgba(39,174,96,0.4); background:rgba(39,174,96,0.04); }
-        .action-btn.matieres:hover{ border-color:rgba(99,102,241,0.4); background:rgba(99,102,241,0.04); }
-        .action-btn.notes:hover   { border-color:rgba(201,168,76,0.4); background:rgba(201,168,76,0.05); }
+        .action-btn.manage:hover   { border-color:var(--ink);              background:rgba(13,17,23,0.03); }
+        .action-btn.eleves:hover   { border-color:rgba(39,174,96,0.4);     background:rgba(39,174,96,0.04); }
+        .action-btn.matieres:hover { border-color:rgba(99,102,241,0.4);    background:rgba(99,102,241,0.04); }
+        .action-btn.notes:hover    { border-color:rgba(201,168,76,0.4);    background:rgba(201,168,76,0.05); }
+        .action-btn.paiements:hover{ border-color:rgba(34,139,34,0.4);     background:rgba(34,139,34,0.04); }  /* ← NOUVEAU */
 
-        .action-icon.ink   { background:var(--ink); color:var(--gold); }
-        .action-icon.green { background:rgba(39,174,96,0.1); color:var(--success-color); }
-        .action-icon.blue  { background:rgba(99,102,241,0.1); color:#4f46e5; }
-        .action-icon.gold  { background:rgba(201,168,76,0.12); color:#7a5c10; }
+        .action-icon.ink   { background:var(--ink);              color:var(--gold); }
+        .action-icon.green { background:rgba(39,174,96,0.1);     color:var(--success-color); }
+        .action-icon.blue  { background:rgba(99,102,241,0.1);    color:#4f46e5; }
+        .action-icon.gold  { background:rgba(201,168,76,0.12);   color:#7a5c10; }
+        .action-icon.pay   { background:rgba(34,139,34,0.1);     color:#1a6b3c; }  /* ← NOUVEAU */
 
         /* ── Empty state ── */
         .empty-state { padding:64px 24px; text-align:center; }
@@ -113,40 +142,9 @@
 
         @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
 
-        /* ── Bannière paiements ── */
-        .paiement-banner {
-            background:var(--ink); border-radius:20px; padding:22px 28px;
-            margin-bottom:28px; display:grid;
-            grid-template-columns:1fr repeat(3,auto);
-            align-items:center; gap:20px; animation:fadeUp 0.6s ease both;
-        }
-        .paiement-banner-label {
-            display:inline-flex; align-items:center; gap:6px;
-            background:rgba(201,168,76,0.12); border:1px solid rgba(201,168,76,0.22);
-            color:var(--gold); padding:4px 12px; border-radius:50px;
-            font-size:0.75rem; font-weight:700; margin-bottom:6px;
-        }
-        .paiement-banner-title { font-size:1rem; font-weight:800; color:#e8edf2; }
-        .paiement-stat {
-            background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.08);
-            border-radius:14px; padding:14px 18px; text-align:center; min-width:130px;
-        }
-        .paiement-stat-num { font-size:1.2rem; font-weight:800; line-height:1.2; }
-        .paiement-stat-num.green  { color:#4ade80; }
-        .paiement-stat-num.orange { color:#fb923c; }
-        .paiement-stat-num.white  { color:#e8edf2; }
-        .paiement-stat-lbl { font-size:0.7rem; color:#4a5568; font-weight:600; margin-top:3px; }
-        .recouv-bar-wrap { margin-top:8px; background:rgba(255,255,255,0.08); border-radius:50px; height:5px; overflow:hidden; }
-        .recouv-bar-fill { height:100%; border-radius:50px; background:linear-gradient(to left,#4ade80,#22c55e); }
-
-        /* Bouton paiement dans carte classe */
-        .action-btn.paiements { border-color:rgba(201,168,76,0.25); }
-        .action-btn.paiements:hover { border-color:rgba(201,168,76,0.5); background:rgba(201,168,76,0.05); }
-        .action-icon.pay { background:rgba(201,168,76,0.12); color:#7a5c10; }
-
         @media(max-width:1000px) {
             .classes-grid { grid-template-columns:repeat(2,1fr); }
-            .paiement-banner { grid-template-columns:1fr; }
+            .pay-banner   { grid-template-columns:1fr; }
         }
         @media(max-width:640px) {
             .navbar { padding:0 20px; }
@@ -176,7 +174,7 @@
                 <i class="bi bi-chevron-down" style="font-size:0.7rem;"></i>
             </button>
             <div class="user-menu" id="userMenu">
-                <a href="{{ url_for('main.changer_mot_de_passe') }}" class="user-menu-item">
+                <a href="{{ url_for('main.changer_mot_de_passe_ar') }}" class="user-menu-item">
                     <i class="bi bi-key"></i> تغيير كلمة المرور
                 </a>
                 <hr class="user-menu-divider">
@@ -215,11 +213,8 @@
         </div>
     </div>
 
-    <!-- Classes -->
-    <div class="section-header">
-
-    <!-- ── بانيير المدفوعات الإجمالية ── -->
-    {% set tp = namespace(v=0) %}{%set ta=namespace(v=0)%}{%set ts=namespace(v=0)%}
+    {# ══ BANNIÈRE PAIEMENTS GLOBALE (NOUVELLE) ══ #}
+    {% set tp = namespace(v=0) %}{% set ta = namespace(v=0) %}{% set ts = namespace(v=0) %}
     {% for classe in classes %}
         {% for s in classe.scolarites %}
             {% if s.annee_scolaire == classe.annee_scolaire %}
@@ -231,26 +226,26 @@
     {% endfor %}
     {% if ta.v > 0 %}
     {% set pct = ((tp.v / ta.v) * 100) | int %}
-    <div class="paiement-banner">
+    <div class="pay-banner">
         <div>
-            <div class="paiement-banner-label"><i class="bi bi-cash-coin"></i> الرسوم الدراسية</div>
-            <div class="paiement-banner-title">المدفوعات — {{ ecole.nom }}</div>
-            <div class="recouv-bar-wrap" style="width:180px;margin-top:10px;">
-                <div class="recouv-bar-fill" style="width:{{ pct }}%"></div>
+            <div class="pay-banner-label"><i class="bi bi-cash-coin"></i> الرسوم الدراسية</div>
+            <div class="pay-banner-title">إجمالي المدفوعات — {{ ecole.nom }}</div>
+            <div class="pay-bar-wrap">
+                <div class="pay-bar-fill" style="width:{{ pct }}%"></div>
             </div>
-            <div style="font-size:0.7rem;color:#4a5568;margin-top:4px;">{{ pct }}% من الإجمالي تم تحصيله</div>
+            <div style="font-size:0.68rem;color:#4a5568;margin-top:3px;">{{ pct }}% من الإجمالي تم تحصيله</div>
         </div>
-        <div class="paiement-stat">
-            <div class="paiement-stat-num green">{{ "{:,.0f}".format(tp.v) }}</div>
-            <div class="paiement-stat-lbl">FCFA محصَّل</div>
+        <div class="pay-stat">
+            <div class="pay-stat-num g">{{ "{:,.0f}".format(tp.v) }}</div>
+            <div class="pay-stat-lbl">FCFA محصَّل</div>
         </div>
-        <div class="paiement-stat">
-            <div class="paiement-stat-num orange">{{ "{:,.0f}".format(ta.v - tp.v) }}</div>
-            <div class="paiement-stat-lbl">FCFA متبقٍّ</div>
+        <div class="pay-stat">
+            <div class="pay-stat-num o">{{ "{:,.0f}".format(ta.v - tp.v) }}</div>
+            <div class="pay-stat-lbl">FCFA متبقٍّ</div>
         </div>
-        <div class="paiement-stat">
-            <div class="paiement-stat-num white">{{ ts.v }}</div>
-            <div class="paiement-stat-lbl">تلاميذ سددوا</div>
+        <div class="pay-stat">
+            <div class="pay-stat-num w">{{ ts.v }}</div>
+            <div class="pay-stat-lbl">تلاميذ سددوا</div>
         </div>
     </div>
     {% endif %}
@@ -296,6 +291,7 @@
                         <span class="action-icon gold"><i class="bi bi-pencil-square"></i></span>
                         إدخال النقاط
                     </a>
+                    {# ── زر المدفوعات (NOUVEAU) ── #}
                     <a href="{{ url_for('paiements.paiements_classe', classe_id=classe.id) }}" class="action-btn paiements">
                         <span class="action-icon pay"><i class="bi bi-cash-coin"></i></span>
                         مدفوعات الدراسة
@@ -332,5 +328,3 @@
 </script>
 </body>
 </html>
-
-
