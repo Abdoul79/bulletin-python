@@ -57,7 +57,7 @@
         .hero-status-text { font-size:0.78rem; color:#4a5568; font-weight:700; }
 
         /* Actions grid */
-        .actions-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:32px; animation:fadeUp 0.6s ease 0.1s both; }
+        .actions-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:14px; margin-bottom:32px; animation:fadeUp 0.6s ease 0.1s both; }
         .action-card { background:white; border:1.5px solid var(--border); border-radius:18px; padding:20px 16px; text-align:center; text-decoration:none; transition:all 0.25s ease; display:flex; flex-direction:column; align-items:center; gap:10px; position:relative; overflow:visible; }
         .action-card:hover { transform:translateY(-4px); }
         .action-card.manage:hover  { border-color:var(--ink); box-shadow:0 12px 32px rgba(13,17,23,0.1); }
@@ -183,7 +183,7 @@
             .page-content { padding:24px 16px; }
             .hero { padding:28px 24px; }
             .hero-inner { flex-direction:column; align-items:flex-start; }
-            .actions-grid { grid-template-columns:repeat(2,1fr); }
+            .actions-grid { grid-template-columns:repeat(3,1fr); }
             .two-col { grid-template-columns:1fr; }
             .stats-row { grid-template-columns:repeat(2,1fr); }
         }
@@ -331,7 +331,7 @@
     </div>
 
     <!-- Stats -->
-    <div class="stats-row">
+    <div class="stats-row" style="grid-template-columns:repeat(5,1fr);">
         <div class="stat-card">
             <div class="stat-card-icon" style="background:rgba(99,102,241,0.1);color:#4f46e5;"><i class="bi bi-people-fill"></i></div>
             <div class="stat-num">{{ eleves|length }}</div>
@@ -344,10 +344,29 @@
         </div>
         <div class="stat-card">
             <div class="stat-card-icon" style="background:rgba(201,168,76,0.12);color:#7a5c10;"><i class="bi bi-check2-circle"></i></div>
-            <div class="stat-num" style="font-size:1.5rem;{% if eleves|length > 0 and matieres|length > 0 %}color:var(--success-color){% else %}color:var(--gold){% endif %}">
+            <div class="stat-num" style="font-size:1.3rem;{% if eleves|length > 0 and matieres|length > 0 %}color:var(--success-color){% else %}color:var(--gold){% endif %}">
                 {% if eleves|length > 0 and matieres|length > 0 %}جاهز{% else %}غير مكتمل{% endif %}
             </div>
             <div class="stat-label">حالة القسم</div>
+        </div>
+        {% set st = namespace(paye=0,total=0,soldes=0) %}
+        {% for eleve in eleves %}
+            {% set s2 = eleve.scolarites | selectattr('annee_scolaire','equalto',classe.annee_scolaire) | list | first | default(None) %}
+            {% if s2 %}
+                {% set st.paye  = st.paye  + s2.montant_paye %}
+                {% set st.total = st.total + s2.montant_total %}
+                {% if s2.est_solde %}{% set st.soldes = st.soldes + 1 %}{% endif %}
+            {% endif %}
+        {% endfor %}
+        <div class="stat-card">
+            <div class="stat-card-icon" style="background:rgba(34,139,34,0.1);color:#1a6b3c;"><i class="bi bi-cash-coin"></i></div>
+            <div class="stat-num" style="font-size:1rem;color:#1a6b3c;">{{ "{:,.0f}".format(st.paye) }}</div>
+            <div class="stat-label">FCFA محصَّل</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-card-icon" style="background:rgba(255,140,0,0.1);color:#92400e;"><i class="bi bi-hourglass-split"></i></div>
+            <div class="stat-num" style="font-size:1rem;color:#92400e;">{{ "{:,.0f}".format(st.total - st.paye) }}</div>
+            <div class="stat-label">FCFA متبقٍّ</div>
         </div>
     </div>
 
