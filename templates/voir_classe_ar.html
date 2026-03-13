@@ -140,6 +140,44 @@
 
         @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
 
+        /* ── Paiements ── */
+        .btn-paiement {
+            display:inline-flex; align-items:center; justify-content:center;
+            width:36px; height:36px; border-radius:10px; font-size:0.85rem;
+            text-decoration:none; transition:all 0.2s; border:1.5px solid var(--border);
+            flex-shrink:0; position:relative; cursor:pointer;
+        }
+        .btn-paiement.solde   { background:rgba(34,139,34,0.1);  border-color:rgba(34,139,34,0.2);  color:#1a6b3c; }
+        .btn-paiement.partiel { background:rgba(255,140,0,0.1);  border-color:rgba(255,140,0,0.25); color:#92400e; }
+        .btn-paiement.impaye  { background:rgba(220,38,38,0.08); border-color:rgba(220,38,38,0.2);  color:#991b1b; }
+        .btn-paiement.nd      { background:var(--mist); border-color:var(--border); color:var(--text-muted); }
+        .btn-paiement:hover   { transform:scale(1.1); box-shadow:0 4px 12px rgba(0,0,0,0.08); }
+        .btn-paiement .pay-tip {
+            display:none; position:absolute; bottom:calc(100% + 6px); right:50%;
+            transform:translateX(50%); background:var(--ink); color:white;
+            font-size:0.62rem; font-weight:700; padding:4px 8px; border-radius:6px;
+            white-space:nowrap; z-index:20; pointer-events:none; font-family:'Cairo',sans-serif;
+        }
+        .btn-paiement:hover .pay-tip { display:block; }
+
+        /* Mini barre */
+        .pay-mini-bar { width:60px; height:4px; border-radius:50px; background:#e8edf2; overflow:hidden; display:inline-block; vertical-align:middle; transform:scaleX(-1); }
+        .pay-mini-bar-fill { height:100%; border-radius:50px; }
+        .pmb-green  { background:#22c55e; }
+        .pmb-orange { background:#fb923c; }
+        .pmb-red    { background:#f87171; }
+
+        /* Récap paiements dans la liste */
+        .pay-prog-wrap { background:#f0ede7; border-radius:50px; height:6px; overflow:hidden; transform:scaleX(-1); }
+        .pay-prog-fill { height:100%; border-radius:50px; background:linear-gradient(to right,#1a6b3c,#22c55e); }
+
+        /* Action card paiements */
+        .action-card.paiements:hover { border-color:rgba(201,168,76,0.4); box-shadow:0 12px 32px rgba(201,168,76,0.08); }
+        .icon-pay { background:rgba(201,168,76,0.12); color:#7a5c10; }
+
+        /* Hero stats paiements */
+        .hero-stat.pay-stat { background:rgba(201,168,76,0.1); border-color:rgba(201,168,76,0.2); }
+
         @media(max-width:960px) {
             .navbar { padding:0 20px; }
             .page-content { padding:24px 16px; }
@@ -204,6 +242,25 @@
                         <i class="bi bi-journal-text"></i>
                         {{ matieres|length }} مادة
                     </div>
+                    {% set rh = namespace(paye=0,total=0,soldes=0) %}
+                    {% for eleve in eleves %}
+                        {% set s = eleve.scolarites | selectattr('annee_scolaire','equalto',classe.annee_scolaire) | list | first | default(None) %}
+                        {% if s %}
+                            {% set rh.paye  = rh.paye  + s.montant_paye %}
+                            {% set rh.total = rh.total + s.montant_total %}
+                            {% if s.est_solde %}{% set rh.soldes = rh.soldes + 1 %}{% endif %}
+                        {% endif %}
+                    {% endfor %}
+                    {% if rh.total > 0 %}
+                    <div class="hero-stat pay-stat">
+                        <i class="bi bi-cash-coin" style="color:var(--gold);"></i>
+                        {{ "{:,.0f}".format(rh.paye) }} FCFA
+                    </div>
+                    <div class="hero-stat pay-stat">
+                        <i class="bi bi-check-circle-fill" style="color:#4ade80;"></i>
+                        {{ rh.soldes }}/{{ eleves|length }} سدّدوا
+                    </div>
+                    {% endif %}
                 </div>
             </div>
             <div class="hero-status {{ 'status-ready' if eleves|length > 0 and matieres|length > 0 else 'status-incomplete' }}">
@@ -266,6 +323,11 @@
                 </button>
             </div>
         </div>
+        <!-- مدفوعات -->
+        <a href="{{ url_for('paiements.paiements_classe', classe_id=classe.id) }}" class="action-card paiements">
+            <div class="action-icon-wrap icon-pay"><i class="bi bi-cash-coin"></i></div>
+            <span class="action-label">المدفوعات</span>
+        </a>
     </div>
 
     <!-- Stats -->
@@ -304,9 +366,48 @@
                     <i class="bi bi-plus-lg"></i> إضافة
                 </a>
             </div>
+
+            <!-- ملخص المدفوعات -->
+            {% set rp = namespace(paye=0,total=0,soldes=0,avec=0) %}
+            {% for eleve in eleves %}
+                {% set s = eleve.scolarites | selectattr('annee_scolaire','equalto',classe.annee_scolaire) | list | first | default(None) %}
+                {% if s %}
+                    {% set rp.paye  = rp.paye  + s.montant_paye %}
+                    {% set rp.total = rp.total + s.montant_total %}
+                    {% set rp.avec  = rp.avec  + 1 %}
+                    {% if s.est_solde %}{% set rp.soldes = rp.soldes + 1 %}{% endif %}
+                {% endif %}
+            {% endfor %}
+            {% if rp.total > 0 %}
+            <div style="padding:12px 20px;border-bottom:1px solid var(--border);background:#fdfcfa;">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                    <a href="{{ url_for('paiements.paiements_classe', classe_id=classe.id) }}" style="font-size:0.75rem;font-weight:700;color:var(--gold);text-decoration:none;">← عرض الكل</a>
+                    <span style="font-size:0.8rem;font-weight:700;color:var(--ink);">💰 المدفوعات — {{ rp.avec }} تلميذ</span>
+                </div>
+                <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:8px;">
+                    <div style="text-align:center;background:rgba(34,139,34,0.07);border-radius:10px;padding:7px;">
+                        <div style="font-size:0.8rem;font-weight:800;color:#1a6b3c;">{{ "{:,.0f}".format(rp.paye) }}</div>
+                        <div style="font-size:0.62rem;color:var(--text-muted);font-weight:700;">محصَّل</div>
+                    </div>
+                    <div style="text-align:center;background:rgba(255,140,0,0.08);border-radius:10px;padding:7px;">
+                        <div style="font-size:0.8rem;font-weight:800;color:#92400e;">{{ "{:,.0f}".format(rp.total - rp.paye) }}</div>
+                        <div style="font-size:0.62rem;color:var(--text-muted);font-weight:700;">متبقٍّ</div>
+                    </div>
+                    <div style="text-align:center;background:var(--mist);border-radius:10px;padding:7px;">
+                        <div style="font-size:0.8rem;font-weight:800;color:var(--ink);">{{ rp.soldes }}/{{ rp.avec }}</div>
+                        <div style="font-size:0.62rem;color:var(--text-muted);font-weight:700;">سدّدوا</div>
+                    </div>
+                </div>
+                {% set pct_cl = ((rp.paye / rp.total) * 100) | int %}
+                <div class="pay-prog-wrap"><div class="pay-prog-fill" style="width:{{ pct_cl }}%"></div></div>
+                <div style="font-size:0.62rem;color:var(--text-muted);margin-top:3px;text-align:left;">{{ pct_cl }}%</div>
+            </div>
+            {% endif %}
+
             <div class="section-card-body">
                 {% if eleves %}
                     {% for eleve in eleves %}
+                    {% set sc = eleve.scolarites | selectattr('annee_scolaire','equalto',classe.annee_scolaire) | list | first | default(None) %}
                     <div class="student-item">
                         <div class="student-avatar">{{ eleve.prenom[0] }}{{ eleve.nom[0] }}</div>
                         <div class="student-info">
@@ -319,6 +420,26 @@
                                 {% endif %}
                             </div>
                         </div>
+                        <!-- زر الدفع -->
+                        <a href="{{ url_for('paiements.voir_paiements', eleve_id=eleve.id) }}"
+                           class="btn-paiement {% if sc %}{% if sc.est_solde %}solde{% elif sc.pourcentage_paye > 0 %}partiel{% else %}impaye{% endif %}{% else %}nd{% endif %}"
+                           title="المدفوعات">
+                            {% if sc %}
+                                {% if sc.est_solde %}<i class="bi bi-check-circle-fill"></i>
+                                {% elif sc.pourcentage_paye > 0 %}<i class="bi bi-clock-history"></i>
+                                {% else %}<i class="bi bi-exclamation-circle"></i>
+                                {% endif %}
+                            {% else %}<i class="bi bi-cash-coin"></i>{% endif %}
+                            <span class="pay-tip">
+                                {% if sc %}
+                                    {% if sc.est_solde %}✓ تمّ التسديد
+                                    {% elif sc.pourcentage_paye > 0 %}{{ sc.pourcentage_paye }}% — متبقٍّ {{ "{:,.0f}".format(sc.montant_restant) }} FCFA
+                                    {% else %}لم يدفع — {{ "{:,.0f}".format(sc.montant_total) }} FCFA
+                                    {% endif %}
+                                {% else %}تحديد الرسوم{% endif %}
+                            </span>
+                        </a>
+                        <!-- زر الكشف -->
                         <a href="{{ url_for('pdf_ar.preview_bulletin_ar', eleve_id=eleve.id) }}" class="btn-preview" target="_blank" data-eleve-id="{{ eleve.id }}">
                             <i class="bi bi-file-earmark-pdf-fill"></i> كشف
                         </a>
@@ -416,7 +537,7 @@
         const elems = document.querySelectorAll('[data-eleve-id]');
         if (elems.length === 0) { alert('لا يوجد تلاميذ'); return; }
         if (confirm(`فتح ${elems.length} نافذة للطباعة؟`)) {
-            elems.forEach((el, i) => setTimeout(() => window.open(`/bulletin/preview/${el.dataset.eleveId}`, '_blank'), i * 300));
+            elems.forEach((el, i) => setTimeout(() => window.open(`/bulletin_ar/preview/${el.dataset.eleveId}`, '_blank'), i * 300));
         }
     }
 </script>
