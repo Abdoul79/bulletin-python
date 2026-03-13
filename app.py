@@ -12,6 +12,7 @@ load_dotenv()  # ← charge .env au démarrage
 def create_app():
     app = Flask(__name__)
 
+
     # ── Configuration ──────────────────────────────────
     app.config.from_object(Config)
 
@@ -64,6 +65,7 @@ def register_routes(app):
         from routes.pdf      import pdf_bp, pdf_ar_bp
         from routes.language import language_bp
         from routes.search   import search_bp
+        from routes.paiements import paiements_bp
 
         app.register_blueprint(search_bp)
         app.register_blueprint(auth_bp)
@@ -75,6 +77,7 @@ def register_routes(app):
         app.register_blueprint(pdf_bp)
         app.register_blueprint(pdf_ar_bp)
         app.register_blueprint(language_bp)
+        app.register_blueprint(paiements_bp)
         print("✅ Tous les blueprints enregistrés")
 
     except ImportError as e:
