@@ -222,7 +222,7 @@
                     <div class="form-field">
                         <label class="field-label">Montant versé (FCFA) *</label>
                         <input type="number" name="montant" class="field-input" placeholder="ex: 15000"
-                               min="1" max="{{ scolarite.montant_restant }}" step="500" required>
+                               min="1" max="{{ scolarite.montant_restant }}" step="any" required>
                         <span class="montant-hint">Reste à payer : <strong>{{ "{:,.0f}".format(scolarite.montant_restant) }} FCFA</strong></span>
                     </div>
                     <div class="form-field">
@@ -302,3 +302,4 @@
 </div>
 </body>
 </html>
+
