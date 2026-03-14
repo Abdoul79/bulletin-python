@@ -3,11 +3,10 @@ routes/paiements.py
 Blueprint de gestion des paiements de scolarité
 """
 
-from flask import Blueprint, render_template, request, redirect, url_for, flash, abort
+from flask import Blueprint, render_template, request, redirect, url_for, flash, abort, session
 from models import db, Eleve, Classe, Scolarite, Paiement, Ecole
 from datetime import datetime
 from functools import wraps
-from flask import session
 
 paiements_bp = Blueprint('paiements', __name__)
 
@@ -27,7 +26,26 @@ def get_ecole():
 
 
 def is_arabe(ecole):
-    return ecole.type_ecole in ('arabe', 'franco_arabe')
+    """
+    Détecte si on doit afficher la version arabe.
+    Priorité :
+      1. Langue active dans la session  (session['lang'] / 'langue' / 'language')
+      2. type_ecole de l'école          (tiret ET underscore acceptés)
+    """
+    lang = session.get('lang') or session.get('langue') or session.get('language') or ''
+    if lang in ('ar', 'arabic', 'arabe'):
+        return True
+    return ecole.type_ecole in ('arabe', 'franco_arabe', 'franco-arabe')
+
+
+def get_template(nom_fr, nom_ar, ecole):
+    """Retourne le bon template selon la langue."""
+    return nom_ar if is_arabe(ecole) else nom_fr
+
+
+def flash_msg(msg_fr, msg_ar, ecole, category='success'):
+    """Flash bilingue selon la langue active."""
+    flash(msg_ar if is_arabe(ecole) else msg_fr, category)
 
 
 # ══════════════════════════════════════════════════════════════
@@ -64,10 +82,14 @@ def definir_scolarite(eleve_id):
             )
             db.session.add(scolarite)
         db.session.commit()
-        flash('Frais de scolarité enregistrés avec succès.', 'success')
+        flash_msg(
+            'Frais de scolarité enregistrés avec succès.',
+            'تم تسجيل رسوم الدراسة بنجاح.',
+            ecole, 'success'
+        )
         return redirect(url_for('paiements.voir_paiements', eleve_id=eleve_id))
 
-    template = 'definir_scolarite_ar.html' if is_arabe(ecole) else 'definir_scolarite.html'
+    template = get_template('definir_scolarite.html', 'definir_scolarite_ar.html', ecole)
     return render_template(template, ecole=ecole, eleve=eleve, classe=classe, scolarite=scolarite)
 
 
@@ -92,14 +114,21 @@ def voir_paiements(eleve_id):
 
     if request.method == 'POST':
         if not scolarite:
-            flash('Veuillez d\'abord définir les frais de scolarité.', 'warning')
+            flash_msg(
+                "Veuillez d'abord définir les frais de scolarité.",
+                'يرجى تحديد رسوم الدراسة أولاً.',
+                ecole, 'warning'
+            )
             return redirect(url_for('paiements.definir_scolarite', eleve_id=eleve_id))
 
         montant = float(request.form.get('montant', 0))
         if montant <= 0:
-            flash('Montant invalide.', 'danger')
+            flash_msg('Montant invalide.', 'المبلغ غير صالح.', ecole, 'danger')
         elif montant > scolarite.montant_restant + 0.01:
-            flash(f'Montant dépasse le reste dû ({scolarite.montant_restant:,.0f} FCFA).', 'danger')
+            if is_arabe(ecole):
+                flash(f'المبلغ يتجاوز المتبقي ({scolarite.montant_restant:,.0f} FCFA).', 'danger')
+            else:
+                flash(f'Montant dépasse le reste dû ({scolarite.montant_restant:,.0f} FCFA).', 'danger')
         else:
             paiement = Paiement(
                 scolarite_id=scolarite.id,
@@ -111,7 +140,11 @@ def voir_paiements(eleve_id):
             )
             db.session.add(paiement)
             db.session.commit()
-            flash('Paiement enregistré avec succès !', 'success')
+            flash_msg(
+                'Paiement enregistré avec succès !',
+                'تم تسجيل الدفعة بنجاح!',
+                ecole, 'success'
+            )
             return redirect(url_for('paiements.recu_paiement', paiement_id=paiement.id))
 
     paiements_liste = []
@@ -119,7 +152,7 @@ def voir_paiements(eleve_id):
         paiements_liste = Paiement.query.filter_by(scolarite_id=scolarite.id)\
                                         .order_by(Paiement.date_paiement.desc()).all()
 
-    template = 'paiements_ar.html' if is_arabe(ecole) else 'paiements.html'
+    template = get_template('paiements.html', 'paiements_ar.html', ecole)
     return render_template(template,
         ecole=ecole, eleve=eleve, classe=classe,
         scolarite=scolarite, paiements=paiements_liste
@@ -142,7 +175,7 @@ def recu_paiement(paiement_id):
     if classe.ecole_id != ecole.id:
         abort(403)
 
-    template = 'recu_paiement_ar.html' if is_arabe(ecole) else 'recu_paiement.html'
+    template = get_template('recu_paiement.html', 'recu_paiement_ar.html', ecole)
     return render_template(template,
         ecole=ecole, paiement=paiement,
         scolarite=scolarite, eleve=eleve, classe=classe
@@ -174,7 +207,7 @@ def paiements_classe(classe_id):
     total_restant = sum(s.montant_restant for s in scolarites)
     nb_soldes     = sum(1 for s in scolarites if s.est_solde)
 
-    template = 'paiements_classe_ar.html' if is_arabe(ecole) else 'paiements_classe.html'
+    template = get_template('paiements_classe.html', 'paiements_classe_ar.html', ecole)
     return render_template(template,
         ecole=ecole, classe=classe, scolarites=scolarites,
         total_attendu=total_attendu, total_paye=total_paye,
@@ -199,5 +232,6 @@ def supprimer_paiement(paiement_id):
 
     db.session.delete(paiement)
     db.session.commit()
-    flash('Paiement supprimé.', 'info')
+    flash_msg('Paiement supprimé.', 'تم حذف الدفعة.', ecole, 'info')
     return redirect(url_for('paiements.voir_paiements', eleve_id=eleve_id))
+
