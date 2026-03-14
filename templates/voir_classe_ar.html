@@ -295,27 +295,6 @@
         </a>
     </div>
 
-    <!-- Stats -->
-    <div class="stats-row">
-        <div class="stat-card">
-            <div class="stat-card-icon" style="background:rgba(99,102,241,0.1);color:#4f46e5;"><i class="bi bi-people-fill"></i></div>
-            <div class="stat-num">{{ eleves|length }}</div>
-            <div class="stat-label">تلاميذ مسجلون</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-card-icon" style="background:rgba(39,174,96,0.1);color:var(--success-color);"><i class="bi bi-journal-text"></i></div>
-            <div class="stat-num">{{ matieres|length }}</div>
-            <div class="stat-label">مواد مضبوطة</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-card-icon" style="background:rgba(201,168,76,0.12);color:#7a5c10;"><i class="bi bi-check2-circle"></i></div>
-            <div class="stat-num" style="font-size:1.5rem;{% if eleves|length > 0 and matieres|length > 0 %}color:var(--success-color){% else %}color:var(--gold){% endif %}">
-                {% if eleves|length > 0 and matieres|length > 0 %}جاهز{% else %}غير مكتمل{% endif %}
-            </div>
-            <div class="stat-label">حالة القسم</div>
-        </div>
-    </div>
-
     <!-- Students & Matieres -->
     <div class="two-col">
 
@@ -426,6 +405,27 @@
                 </div>
                 {% endif %}
             </div>
+        </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-row">
+        <div class="stat-card">
+            <div class="stat-card-icon" style="background:rgba(99,102,241,0.1);color:#4f46e5;"><i class="bi bi-people-fill"></i></div>
+            <div class="stat-num">{{ eleves|length }}</div>
+            <div class="stat-label">تلاميذ مسجلون</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-card-icon" style="background:rgba(39,174,96,0.1);color:var(--success-color);"><i class="bi bi-journal-text"></i></div>
+            <div class="stat-num">{{ matieres|length }}</div>
+            <div class="stat-label">مواد مضبوطة</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-card-icon" style="background:rgba(201,168,76,0.12);color:#7a5c10;"><i class="bi bi-check2-circle"></i></div>
+            <div class="stat-num" style="font-size:1.5rem;{% if eleves|length > 0 and matieres|length > 0 %}color:var(--success-color){% else %}color:var(--gold){% endif %}">
+                {% if eleves|length > 0 and matieres|length > 0 %}جاهز{% else %}غير مكتمل{% endif %}
+            </div>
+            <div class="stat-label">حالة القسم</div>
         </div>
     </div>
 
