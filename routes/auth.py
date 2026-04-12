@@ -3,6 +3,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, sessio
 from werkzeug.security import generate_password_hash, check_password_hash
 from models import db, Ecole, Classe
 from utils import format_filename
+
 import os
 
 auth_bp = Blueprint('auth', __name__)
@@ -300,6 +301,7 @@ def login():
                 return render_template('login.html')
             
             session.clear()
+
             session['ecole_id'] = ecole.id
             session['ecole_nom'] = ecole.nom
             session['user_type'] = 'ecole'
@@ -316,8 +318,6 @@ def login():
             flash("Email ou mot de passe incorrect", "error")
     
     return render_template('login.html')
-
-
 
 
 @auth_bp.route('/logout')
