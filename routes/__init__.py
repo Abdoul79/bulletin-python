@@ -5,14 +5,15 @@ from .eleve import eleve_bp
 from .matiere import matiere_bp
 from .notes import notes_bp
 from .pdf import pdf_bp
-
+from datetime import timedelta
 
 def register_routes(app):
     """Enregistrer tous les blueprints dans l'application Flask"""
     
     # Routes d'authentification
     app.register_blueprint(auth_bp)
-    
+
+
     # Routes principales
     app.register_blueprint(main_bp)
     
