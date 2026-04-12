@@ -3,7 +3,10 @@ from dotenv import load_dotenv
 from config import Config
 from models import db, migrate
 from i18n import init_babel, get_current_language, get_available_languages
+from routes.analytics import analytics_bp
 from translations_manual import t
+
+
 import os
 
 load_dotenv()  # ← charge .env au démarrage
@@ -11,7 +14,6 @@ load_dotenv()  # ← charge .env au démarrage
 
 def create_app():
     app = Flask(__name__)
-
 
     # ── Configuration ──────────────────────────────────
     app.config.from_object(Config)
@@ -54,6 +56,7 @@ def create_app():
 
 # ... tout le reste du code ...
 
+
 def register_routes(app):
     try:
         from routes.auth     import auth_bp
@@ -78,6 +81,7 @@ def register_routes(app):
         app.register_blueprint(pdf_ar_bp)
         app.register_blueprint(language_bp)
         app.register_blueprint(paiements_bp)
+        app.register_blueprint(analytics_bp)
         print("✅ Tous les blueprints enregistrés")
 
     except ImportError as e:
