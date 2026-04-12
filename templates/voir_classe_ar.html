@@ -175,6 +175,8 @@
             .actions-grid { grid-template-columns:repeat(2,1fr); }
             .stats-row { grid-template-columns:1fr; }
         }
+        .icon-carte { background: rgba(99,102,241,0.12); color: #4f46e5; }
+        .action-card.cartes:hover { border-color: #4f46e5; }
     </style>
 </head>
 <body>
@@ -293,6 +295,13 @@
             <div class="action-icon-wrap icon-pay"><i class="bi bi-cash-coin"></i></div>
             <span class="action-label">المدفوعات</span>
         </a>
+
+        {# ── CARTES SCOLAIRES ── #}
+        <a href="{{ url_for('analytics.cartes_classe', classe_id=classe.id) }}" class="action-card cartes">
+            <div class="action-icon-wrap icon-carte"><i class="bi bi-person-badge-fill"></i></div>
+            <span class="action-label">البطاقات المدرسية</span>
+        </a>
+
     </div>
 
     <!-- Students & Matieres -->
