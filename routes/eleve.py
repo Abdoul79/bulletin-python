@@ -3,6 +3,13 @@ from models import db, Classe, Eleve, Note, Ecole, MatriculeUsed
 from utils import login_required
 from datetime import date, datetime
 import traceback
+import uuid;
+import os
+from werkzeug.utils import secure_filename
+from flask import current_app
+
+UPLOAD_FOLDER = 'static/uploads/photos'
+ALLOWED_EXT   = {'jpg', 'jpeg', 'png', 'webp'}
 
 eleve_bp = Blueprint('eleve', __name__, url_prefix='/ecole')
 
@@ -70,7 +77,6 @@ def validate_matricule(matricule, ecole_id, exclude_eleve_id=None):
 # ─────────────────────────────────────────────
 #  ROUTE FRANÇAISE
 # ─────────────────────────────────────────────
-
 @eleve_bp.route('/add_eleve/<int:classe_id>', methods=['GET', 'POST'])
 @login_required
 def add_eleve(classe_id):
@@ -81,11 +87,25 @@ def add_eleve(classe_id):
         flash("Accès non autorisé.", "error")
         return redirect(url_for('main.dashboard'))
 
+    # ── Helper : suppression complète d'un élève ─────────────────
+    def supprimer_eleve_complet(eleve):
+        """Supprime un élève et toutes ses données liées dans le bon ordre :
+           Paiements → Scolarités → Notes → Élève"""
+        from models import Scolarite, Paiement
+        # 1. Paiements et scolarités
+        for scolarite in Scolarite.query.filter_by(eleve_id=eleve.id).all():
+            Paiement.query.filter_by(scolarite_id=scolarite.id).delete(synchronize_session=False)
+            db.session.delete(scolarite)
+        # 2. Notes
+        Note.query.filter_by(eleve_id=eleve.id).delete(synchronize_session=False)
+        # 3. Élève
+        db.session.delete(eleve)
+
     if request.method == 'POST':
         action = request.form.get('action')
 
         try:
-            # ── ADD / EDIT ────────────────────────────────
+            # ── ADD / EDIT ────────────────────────────────────────
             if action in ['add', 'edit']:
                 eleve_id         = request.form.get('eleve_id')
                 prenom           = request.form.get('prenom', '').strip()
@@ -126,8 +146,9 @@ def add_eleve(classe_id):
                         flash(err, "warning")
                         return redirect(url_for('eleve.add_eleve', classe_id=classe_id))
 
-                # ── ADD ──────────────────────────────────
+                # ── ADD ──────────────────────────────────────────
                 if action == 'add':
+                    photo_url = save_photo(request.files.get('photo'))
                     eleve = Eleve(
                         prenom=prenom,
                         nom=nom,
@@ -136,14 +157,15 @@ def add_eleve(classe_id):
                         sexe=sexe,
                         tuteur=tuteur,
                         telephone_tuteur=telephone_tuteur,
-                        classe_id=classe_id
+                        classe_id=classe_id,
+                        photo_url=photo_url
                     )
                     db.session.add(eleve)
                     reserve_matricule(matricule, ecole_id)
                     db.session.commit()
                     flash(f"Élève {prenom} {nom} ajouté avec le matricule {matricule}.", "success")
 
-                # ── EDIT ─────────────────────────────────
+                # ── EDIT ─────────────────────────────────────────
                 elif action == 'edit' and eleve_id:
                     eleve = Eleve.query.get_or_404(eleve_id)
 
@@ -153,6 +175,10 @@ def add_eleve(classe_id):
 
                     if eleve.matricule != matricule:
                         reserve_matricule(matricule, ecole_id)
+
+                    # Gestion photo (garder l'ancienne si pas de nouvelle)
+                    photo_url = save_photo(request.files.get('photo'))
+                    eleve.photo_url = photo_url or eleve.photo_url
 
                     eleve.prenom           = prenom
                     eleve.nom              = nom
@@ -164,7 +190,7 @@ def add_eleve(classe_id):
                     db.session.commit()
                     flash(f"Informations de {prenom} {nom} ({matricule}) mises à jour.", "success")
 
-            # ── DELETE ───────────────────────────────────
+            # ── DELETE (un seul élève) ────────────────────────────
             elif action == 'delete' and request.form.get('eleve_id'):
                 eleve = Eleve.query.get_or_404(request.form['eleve_id'])
 
@@ -174,27 +200,24 @@ def add_eleve(classe_id):
 
                 nom_complet = f"{eleve.prenom} {eleve.nom}"
                 mat         = eleve.matricule
-                nb_notes    = Note.query.filter_by(eleve_id=eleve.id).count()
-                if nb_notes > 0:
-                    Note.query.filter_by(eleve_id=eleve.id).delete()
-                db.session.delete(eleve)
+
+                supprimer_eleve_complet(eleve)
                 db.session.commit()
+
                 flash(
                     f"Élève {nom_complet} supprimé. "
                     f"Le matricule {mat} est définitivement réservé dans votre établissement.",
                     "success"
                 )
 
-            # ── DELETE ALL ───────────────────────────────
+            # ── DELETE ALL ────────────────────────────────────────
             elif action == 'delete_all':
-                eleves     = Eleve.query.filter_by(classe_id=classe_id).all()
-                eleves_ids = [e.id for e in eleves]
-                if eleves_ids:
-                    Note.query.filter(
-                        Note.eleve_id.in_(eleves_ids)
-                    ).delete(synchronize_session=False)
-                count = len(eleves)
-                Eleve.query.filter_by(classe_id=classe_id).delete()
+                eleves = Eleve.query.filter_by(classe_id=classe_id).all()
+                count  = len(eleves)
+
+                for eleve in eleves:
+                    supprimer_eleve_complet(eleve)
+
                 db.session.commit()
                 flash(
                     f"{count} élève(s) supprimé(s). "
@@ -209,7 +232,7 @@ def add_eleve(classe_id):
 
         return redirect(url_for('eleve.add_eleve', classe_id=classe_id))
 
-    # ── GET ──────────────────────────────────────────────
+    # ── GET ───────────────────────────────────────────────────────
     eleves = Eleve.query.filter_by(classe_id=classe_id).order_by(Eleve.nom, Eleve.prenom).all()
     for eleve in eleves:
         eleve.nb_notes = Note.query.filter_by(eleve_id=eleve.id).count()
@@ -222,6 +245,22 @@ def add_eleve(classe_id):
         eleves=eleves,
         suggested_matricule=suggested_matricule
     )
+
+
+
+def save_photo(file):
+    if not file or file.filename == '':
+        return None
+    ext = file.filename.rsplit('.', 1)[-1].lower()
+    if ext not in ALLOWED_EXT:
+        return None
+    filename = f"{uuid.uuid4().hex}.{ext}"
+    path = os.path.join(current_app.root_path, UPLOAD_FOLDER, filename)
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    file.save(path)
+    return f"/{UPLOAD_FOLDER}/{filename}"
+
+
 
 
 # ─────────────────────────────────────────────
@@ -288,6 +327,7 @@ def add_eleve_ar(classe_id):
 
                 # ── ADD ──────────────────────────────────
                 if action == 'add':
+                    photo_url = save_photo(request.files.get('photo'))
                     eleve = Eleve(
                         prenom=prenom,
                         nom=nom,
@@ -296,7 +336,8 @@ def add_eleve_ar(classe_id):
                         sexe=sexe,
                         tuteur=tuteur,
                         telephone_tuteur=telephone_tuteur,
-                        classe_id=classe_id
+                        classe_id=classe_id,
+                        photo_url=photo_url
                     )
                     db.session.add(eleve)
                     reserve_matricule(matricule, ecole_id)
@@ -313,6 +354,9 @@ def add_eleve_ar(classe_id):
 
                     if eleve.matricule != matricule:
                         reserve_matricule(matricule, ecole_id)
+
+                    photo_url = save_photo(request.files.get('photo'))
+                    eleve.photo_url = photo_url or eleve.photo_url
 
                     eleve.prenom           = prenom
                     eleve.nom              = nom
