@@ -1,3 +1,4 @@
+
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from datetime import datetime
@@ -72,8 +73,12 @@ class Eleve(db.Model):
     tuteur           = db.Column(db.String(100))
     telephone_tuteur = db.Column(db.String(15))
     date_enregistrement = db.Column(db.DateTime, default=datetime.utcnow)
+    photo_url = db.Column(db.String(255), nullable=True)
 
-    notes = db.relationship('Note', backref='eleve', lazy=True, cascade='all, delete-orphan')
+    #notes = db.relationship('Note', backref='eleve', lazy=True, cascade='all, delete-orphan')
+    #scolarites = db.relationship('Scolarite', backref='eleve', cascade="all, delete-orphan")
+    notes      = db.relationship('Note', backref='eleve', lazy=True, cascade='all, delete-orphan')
+    scolarites = db.relationship('Scolarite', back_populates='eleve', cascade="all, delete-orphan")
 
     def __repr__(self):
         return f'<Eleve {self.matricule} - {self.prenom} {self.nom}>'
@@ -95,11 +100,22 @@ class Scolarite(db.Model):
     annee_scolaire = db.Column(db.String(20), nullable=False)
     date_creation  = db.Column(db.DateTime, default=datetime.utcnow)
 
+    # CASSE CADE
+    eleve_id = db.Column(
+        db.Integer, 
+        db.ForeignKey('eleve.id', ondelete="CASCADE"),  # ← Important !
+        nullable=False
+    )
     # Relations
-    eleve    = db.relationship('Eleve',   backref=db.backref('scolarites', lazy=True))
-    classe   = db.relationship('Classe',  backref=db.backref('scolarites', lazy=True))
+    eleve     = db.relationship('Eleve', back_populates='scolarites')
+    classe    = db.relationship('Classe', backref='scolarites', lazy=True)
     paiements = db.relationship('Paiement', backref='scolarite', lazy=True,
-                                 cascade='all, delete-orphan')
+                                cascade='all, delete-orphan')
+    #eleve    = db.relationship('Eleve',   backref=db.backref('scolarites', lazy=True))
+    #classe   = db.relationship('Classe',  backref=db.backref('scolarites', lazy=True))
+    #paiements = db.relationship('Paiement', backref='scolarite', lazy=True,
+                                 #cascade='all, delete-orphan')
+                                 
 
     @property
     def montant_paye(self):
@@ -155,8 +171,6 @@ class Paiement(db.Model):
 # terminer 
 
 
-
-
 class MatriculeUsed(db.Model):
     """Historique des matricules par école — jamais réattribués au sein d'un même établissement."""
     __tablename__ = 'matricule_used'
@@ -183,3 +197,5 @@ class Note(db.Model):
 
     def __repr__(self):
         return f'<Note {self.note} - Élève:{self.eleve_id} Matière:{self.matiere_id}>'
+
+
