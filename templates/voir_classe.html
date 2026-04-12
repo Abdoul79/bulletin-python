@@ -364,6 +364,14 @@
             <div class="action-label">Paiements</div>
             <div class="action-sub">Scolarité &amp; reçus</div>
         </a>
+
+        <a href="{{ url_for('analytics.cartes_classe', classe_id=classe.id) }}" class="action-card" style="animation-delay:0.3s">
+            <div class="action-icon card"><i class="bi bi-credit-card-fill"></i></div>
+            <div class="action-label">Cartes scolaires</div>
+            <div class="action-sub">Générer et imprimer</div>
+        </a>
+
+        
     </div>
 
     <!-- Élèves + Matières -->
