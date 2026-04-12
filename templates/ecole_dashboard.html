@@ -691,6 +691,8 @@
             <div class="paiement-stat-num white">{{ nb_soldes_ecole.v }}</div>
             <div class="paiement-stat-lbl">élèves soldés</div>
         </div>
+
+
     </div>
     {% endif %}
 
@@ -701,6 +703,7 @@
             <span>Nouvelle classe</span>
             <span class="icon"><i class="bi bi-plus"></i></span>
         </a>
+        
     </div>
 
     <!-- ── Classes ── -->
@@ -736,6 +739,9 @@
                     <a href="{{ url_for('paiements.paiements_classe', classe_id=classe.id) }}" class="action-btn pay">
                         <i class="bi bi-cash-coin"></i> Paiements scolarité
                     </a>
+
+                    
+                    
                 </div>
             </div>
             {% endfor %}
