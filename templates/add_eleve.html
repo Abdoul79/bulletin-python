@@ -22,7 +22,6 @@
         .bg-decor::after  { content:''; position:absolute; bottom:-150px; left:-150px; width:500px; height:500px; background:radial-gradient(circle,rgba(196,98,45,0.07) 0%,transparent 70%); border-radius:50%; }
         .grid-dots { position:fixed; inset:0; z-index:0; background-image:radial-gradient(circle,#c9a84c18 1px,transparent 1px); background-size:32px 32px; }
 
-        /* Navbar */
         .navbar { position:sticky; top:0; z-index:100; background:rgba(245,240,232,0.92); backdrop-filter:blur(16px); border-bottom:1px solid rgba(201,168,76,0.2); padding:0 40px; height:64px; display:flex; align-items:center; justify-content:space-between; }
         .nav-brand { display:flex; align-items:center; gap:10px; font-family:'DM Serif Display',serif; font-size:1.3rem; color:var(--ink); text-decoration:none; }
         .nav-brand .brand-icon { width:36px; height:36px; background:var(--ink); border-radius:10px; display:flex; align-items:center; justify-content:center; color:var(--gold); font-size:1rem; }
@@ -30,10 +29,8 @@
         .btn-back { display:flex; align-items:center; gap:8px; padding:8px 18px; background:transparent; border:1.5px solid var(--border); border-radius:50px; font-size:0.85rem; font-weight:600; color:var(--text-muted); text-decoration:none; transition:all 0.2s; }
         .btn-back:hover { border-color:var(--ink); color:var(--ink); }
 
-        /* Content */
         .page-content { position:relative; z-index:1; padding:40px; max-width:1200px; margin:0 auto; }
 
-        /* Flash */
         .flash-msg { padding:14px 18px; border-radius:14px; font-size:0.88rem; margin-bottom:16px; display:flex; align-items:center; gap:10px; animation:slideDown 0.4s ease; }
         @keyframes slideDown { from{opacity:0;transform:translateY(-10px)} to{opacity:1;transform:translateY(0)} }
         .flash-success { background:var(--success-bg); border:1px solid rgba(39,174,96,0.2); color:var(--success-color); }
@@ -41,7 +38,6 @@
         .flash-warning { background:rgba(201,168,76,0.1); border:1px solid rgba(201,168,76,0.3); color:#7a5c10; }
         .flash-close   { margin-left:auto; background:none; border:none; cursor:pointer; color:inherit; opacity:0.6; }
 
-        /* Hero */
         .hero { background:var(--ink); border-radius:24px; padding:40px 48px; margin-bottom:32px; position:relative; overflow:hidden; display:flex; align-items:center; justify-content:space-between; animation:fadeUp 0.6s ease both; }
         .hero::before { content:''; position:absolute; top:-80px; right:-80px; width:300px; height:300px; background:radial-gradient(circle,rgba(201,168,76,0.1) 0%,transparent 70%); border-radius:50%; }
         .hero-label { display:inline-flex; align-items:center; gap:8px; background:rgba(201,168,76,0.12); border:1px solid rgba(201,168,76,0.25); color:var(--gold); padding:6px 14px; border-radius:50px; font-size:0.75rem; font-weight:600; letter-spacing:0.5px; text-transform:uppercase; margin-bottom:14px; }
@@ -52,12 +48,55 @@
         .hero-stat .num { font-family:'DM Serif Display',serif; font-size:3rem; color:var(--gold); line-height:1; }
         .hero-stat .lbl { color:#4a5568; font-size:0.8rem; margin-top:4px; }
 
-        /* Form card */
         .form-card { background:white; border:1px solid var(--border); border-radius:24px; padding:36px; margin-bottom:32px; animation:fadeUp 0.6s ease 0.1s both; }
         .form-card-header { display:flex; align-items:center; gap:12px; margin-bottom:28px; }
         .form-card-icon { width:42px; height:42px; background:var(--ink); border-radius:12px; display:flex; align-items:center; justify-content:center; color:var(--gold); font-size:1.1rem; }
         .form-card-title { font-family:'DM Serif Display',serif; font-size:1.3rem; color:var(--ink); }
         .form-card-sub { color:var(--text-muted); font-size:0.83rem; }
+
+        /* ══ PHOTO UPLOAD ══ */
+        .photo-section {
+            display: flex; align-items: flex-start; gap: 20px;
+            background: linear-gradient(135deg,rgba(201,168,76,0.06),rgba(196,98,45,0.03));
+            border: 1.5px dashed rgba(201,168,76,0.35); border-radius: 16px;
+            padding: 20px; margin-bottom: 20px;
+        }
+        .photo-preview-wrap { flex-shrink: 0; }
+        .photo-preview {
+            width: 90px; height: 110px; border-radius: 10px;
+            background: var(--mist); border: 2px solid var(--border);
+            display: flex; align-items: center; justify-content: center;
+            overflow: hidden; cursor: pointer; transition: all 0.2s;
+            position: relative;
+        }
+        .photo-preview:hover { border-color: var(--gold); }
+        .photo-preview img { width: 100%; height: 100%; object-fit: cover; display: none; }
+        .photo-preview .photo-placeholder-icon { font-size: 2rem; color: #c8d0da; transition: all 0.2s; }
+        .photo-preview:hover .photo-placeholder-icon { color: var(--gold); }
+        .photo-preview .photo-overlay {
+            position: absolute; inset: 0; background: rgba(13,17,23,0.55);
+            display: none; align-items: center; justify-content: center;
+            border-radius: 8px; color: white; font-size: 0.75rem; font-weight: 700;
+            flex-direction: column; gap: 4px;
+        }
+        .photo-preview:hover .photo-overlay { display: flex; }
+
+        .photo-info { flex: 1; }
+        .photo-info label { display: flex; align-items: center; gap: 8px; font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+        .photo-info label span { font-weight: 400; text-transform: none; letter-spacing: 0; color: #aab0ba; font-size: 0.75rem; }
+        .photo-upload-btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 9px 18px; background: var(--ink); color: var(--gold);
+            border: none; border-radius: 10px; font-family: 'DM Sans',sans-serif;
+            font-size: 0.85rem; font-weight: 700; cursor: pointer; transition: all 0.2s;
+            margin-bottom: 8px;
+        }
+        .photo-upload-btn:hover { background: #1a2332; transform: translateY(-1px); }
+        .photo-hints { font-size: 0.75rem; color: var(--text-muted); line-height: 1.6; }
+        .photo-hints i { color: var(--gold); }
+        .photo-name { font-size: 0.78rem; color: var(--success-color); font-weight: 600; margin-top: 6px; display: none; }
+        .photo-name i { color: var(--success-color); }
+        .btn-remove-photo { display: none; align-items: center; gap: 5px; padding: 5px 12px; background: rgba(196,98,45,0.08); border: 1px solid rgba(196,98,45,0.2); border-radius: 8px; color: var(--rust); font-size: 0.78rem; font-weight: 700; cursor: pointer; margin-top: 6px; font-family: 'DM Sans',sans-serif; }
 
         /* Matricule */
         .matricule-box { background:linear-gradient(135deg,rgba(201,168,76,0.07),rgba(196,98,45,0.04)); border:1.5px dashed rgba(201,168,76,0.4); border-radius:16px; padding:20px; margin-bottom:20px; }
@@ -69,7 +108,6 @@
         .matricule-input:focus { border-color:var(--gold); background:white; }
         .matricule-hint { font-size:0.78rem; color:var(--text-muted); display:flex; align-items:center; gap:6px; }
 
-        /* Fields */
         .form-row { display:grid; gap:14px; }
         .row-5 { grid-template-columns:1fr 1fr 1fr 1fr auto; }
         .row-3 { grid-template-columns:1fr 1fr auto; }
@@ -84,31 +122,31 @@
         .btn-reset { display:flex; align-items:center; justify-content:center; gap:8px; background:var(--mist); color:var(--text-muted); padding:12px 20px; border-radius:12px; border:none; font-family:'DM Sans',sans-serif; font-size:0.88rem; font-weight:600; cursor:pointer; transition:background 0.2s; white-space:nowrap; align-self:end; }
         .btn-reset:hover { background:var(--border); color:var(--ink); }
 
-        /* Table card */
         .table-card { background:white; border:1px solid var(--border); border-radius:24px; overflow:hidden; animation:fadeUp 0.6s ease 0.2s both; }
         .table-header { padding:24px 28px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid var(--border); flex-wrap:wrap; gap:16px; }
         .table-title { font-family:'DM Serif Display',serif; font-size:1.3rem; color:var(--ink); display:flex; align-items:center; gap:10px; }
         .count-badge { background:var(--ink); color:var(--gold); padding:3px 12px; border-radius:50px; font-family:'DM Sans',sans-serif; font-size:0.75rem; font-weight:600; }
         .table-actions { display:flex; gap:8px; flex-wrap:wrap; }
-
         .btn-tbl { display:flex; align-items:center; gap:7px; padding:8px 16px; border-radius:10px; font-size:0.82rem; font-weight:600; cursor:pointer; transition:all 0.2s; font-family:'DM Sans',sans-serif; border:1.5px solid; }
         .btn-tbl-red  { border-color:rgba(196,98,45,0.3); background:rgba(196,98,45,0.06); color:var(--rust); }
         .btn-tbl-red:hover  { background:rgba(196,98,45,0.12); }
         .btn-tbl-green { border-color:rgba(39,174,96,0.3); background:rgba(39,174,96,0.06); color:var(--success-color); }
         .btn-tbl-green:hover { background:rgba(39,174,96,0.12); }
 
-        /* Search */
         .search-wrap { padding:20px 28px; border-bottom:1px solid var(--border); position:relative; }
         .search-wrap i { position:absolute; left:44px; top:50%; transform:translateY(-50%); color:#c8d0da; }
         .search-input { width:100%; background:var(--mist); border:1.5px solid var(--border); border-radius:12px; padding:12px 16px 12px 40px; color:var(--ink); font-family:'DM Sans',sans-serif; font-size:0.92rem; outline:none; transition:all 0.2s; }
         .search-input:focus { border-color:var(--gold); background:white; box-shadow:0 0 0 3px rgba(201,168,76,0.12); }
 
-        /* Table */
         .eleves-table { width:100%; border-collapse:collapse; }
         .eleves-table th { padding:12px 16px; text-align:left; font-size:0.72rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; background:var(--mist); border-bottom:1px solid var(--border); }
-        .eleves-table td { padding:14px 16px; border-bottom:1px solid var(--border); font-size:0.88rem; color:var(--ink); }
+        .eleves-table td { padding:12px 16px; border-bottom:1px solid var(--border); font-size:0.88rem; color:var(--ink); vertical-align:middle; }
         .eleves-table tbody tr:last-child td { border-bottom:none; }
         .eleves-table tbody tr:hover td { background:rgba(201,168,76,0.03); }
+
+        /* Photo dans la table */
+        .tbl-photo { width:38px; height:46px; border-radius:7px; object-fit:cover; border:2px solid var(--border); display:block; }
+        .tbl-photo-placeholder { width:38px; height:46px; border-radius:7px; background:var(--mist); border:2px solid var(--border); display:flex; align-items:center; justify-content:center; color:#c8d0da; font-size:1.1rem; }
 
         .m-badge { display:inline-flex; align-items:center; gap:5px; background:rgba(13,17,23,0.06); border:1px solid rgba(13,17,23,0.12); color:var(--ink); border-radius:50px; padding:4px 12px; font-size:0.78rem; font-weight:700; }
         .m-badge i { color:var(--gold); font-size:0.7rem; }
@@ -120,19 +158,17 @@
         .icon-btn { width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center; border:1.5px solid var(--border); background:transparent; color:var(--text-muted); cursor:pointer; transition:all 0.2s; font-size:0.85rem; }
         .icon-btn.edit:hover { background:var(--ink); border-color:var(--ink); color:var(--cream); }
         .icon-btn.del:hover  { background:rgba(196,98,45,0.1); border-color:rgba(196,98,45,0.3); color:var(--rust); }
+        .icon-btn.carte:hover { background:rgba(201,168,76,0.1); border-color:rgba(201,168,76,0.3); color:#7a5c10; }
 
-        /* Tip */
         .tip-bar { margin:20px 28px 0; background:rgba(201,168,76,0.08); border:1px solid rgba(201,168,76,0.25); border-radius:12px; padding:12px 16px; display:flex; align-items:center; gap:10px; font-size:0.83rem; color:#7a5c10; }
         .progress-bg { flex:1; height:4px; background:rgba(201,168,76,0.2); border-radius:4px; margin-top:4px; }
         .progress-fill { height:4px; background:var(--gold); border-radius:4px; }
 
-        /* Empty */
         .empty-state { padding:72px 40px; text-align:center; }
         .empty-icon { width:80px; height:80px; background:var(--mist); border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 24px; font-size:2rem; color:#c8d0da; }
         .empty-state h3 { font-family:'DM Serif Display',serif; font-size:1.5rem; color:var(--ink); margin-bottom:8px; }
         .empty-state p { color:var(--text-muted); font-size:0.9rem; }
 
-        /* Modals */
         .modal-overlay { display:none; position:fixed; inset:0; z-index:500; background:rgba(13,17,23,0.5); backdrop-filter:blur(4px); align-items:center; justify-content:center; padding:24px; }
         .modal-overlay.open { display:flex; }
         .modal-box { background:white; border-radius:24px; padding:36px; width:100%; max-width:480px; box-shadow:0 32px 80px rgba(0,0,0,0.2); animation:popIn 0.3s cubic-bezier(0.22,1,0.36,1); }
@@ -143,7 +179,7 @@
         .delete-name { font-family:'DM Serif Display',serif; font-size:1.2rem; color:var(--ink); margin-bottom:8px; }
         .delete-warn { font-size:0.8rem; color:var(--text-muted); display:flex; align-items:center; gap:6px; margin-top:8px; }
         .modal-footer-btns { display:flex; gap:10px; margin-top:24px; }
-        .btn-cancel  { flex:1; padding:13px; background:var(--mist); border:none; border-radius:12px; font-family:'DM Sans',sans-serif; font-size:0.9rem; font-weight:600; color:var(--text-muted); cursor:pointer; transition:background 0.2s; }
+        .btn-cancel  { flex:1; padding:13px; background:var(--mist); border:none; border-radius:12px; font-family:'DM Sans',sans-serif; font-size:0.9rem; font-weight:600; color:var(--text-muted); cursor:pointer; }
         .btn-cancel:hover { background:var(--border); }
         .btn-confirm { flex:2; padding:13px; background:var(--ink); border:none; border-radius:12px; font-family:'DM Sans',sans-serif; font-size:0.9rem; font-weight:600; color:var(--cream); cursor:pointer; transition:all 0.2s; display:flex; align-items:center; justify-content:center; gap:8px; }
         .btn-confirm:hover { background:#1a2332; transform:translateY(-1px); }
@@ -151,13 +187,13 @@
         .btn-confirm.danger:hover { background:#a0522d; }
 
         @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
-
         @media (max-width:900px) {
             .navbar { padding:0 20px; }
             .page-content { padding:24px 16px; }
             .hero { flex-direction:column; padding:32px 24px; }
             .row-5 { grid-template-columns:1fr 1fr; }
             .row-3 { grid-template-columns:1fr; }
+            .photo-section { flex-direction:column; align-items:center; text-align:center; }
         }
     </style>
 </head>
@@ -192,7 +228,6 @@
         {% endfor %}{% endif %}
     {% endwith %}
 
-    <!-- Hero -->
     <div class="hero">
         <div>
             <div class="hero-label"><i class="bi bi-people"></i> Gestion des élèves</div>
@@ -215,10 +250,45 @@
             </div>
         </div>
 
-        <form method="POST" id="eleveForm">
+        <form method="POST" id="eleveForm" enctype="multipart/form-data">
             <input type="hidden" name="action" value="add" id="formAction">
             <input type="hidden" name="eleve_id" id="eleveId">
 
+            <!-- ══ PHOTO ══ -->
+            <div class="photo-section">
+                <div class="photo-preview-wrap">
+                    <div class="photo-preview" id="photoPreview" onclick="document.getElementById('photoInput').click()">
+                        <i class="bi bi-person-fill photo-placeholder-icon" id="photoIcon"></i>
+                        <img id="photoImg" src="" alt="Photo">
+                        <div class="photo-overlay">
+                            <i class="bi bi-camera" style="font-size:1.2rem;"></i>
+                            <span>Changer</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="photo-info">
+                    <label for="photoInput">
+                        <i class="bi bi-camera" style="color:var(--gold);"></i>
+                        Photo de l'élève
+                        <span>— optionnel, recommandé pour la carte scolaire</span>
+                    </label>
+                    <input type="file" name="photo" id="photoInput" accept="image/jpeg,image/png,image/webp" style="display:none;">
+                    <button type="button" class="photo-upload-btn" onclick="document.getElementById('photoInput').click()">
+                        <i class="bi bi-upload"></i> Choisir une photo
+                    </button>
+                    <div class="photo-name" id="photoName"><i class="bi bi-check-circle-fill"></i> <span id="photoNameText"></span></div>
+                    <button type="button" class="btn-remove-photo" id="removePhotoBtn">
+                        <i class="bi bi-x-circle"></i> Supprimer la photo
+                    </button>
+                    <div class="photo-hints">
+                        <i class="bi bi-info-circle"></i> Format JPG, PNG ou WEBP — max 5 Mo<br>
+                        <i class="bi bi-aspect-ratio"></i> Idéalement une photo portrait (3×4)<br>
+                        <i class="bi bi-id-card"></i> Utilisée sur la carte scolaire et les bulletins
+                    </div>
+                </div>
+            </div>
+
+            <!-- Matricule -->
             <div class="matricule-box">
                 <label>
                     <i class="bi bi-hash" style="color:var(--gold);"></i>
@@ -236,6 +306,7 @@
                 </div>
             </div>
 
+            <!-- Champs principaux -->
             <div class="form-row row-5">
                 <div class="field">
                     <label>Prénom <span style="color:var(--rust)">*</span></label>
@@ -264,11 +335,11 @@
 
             <div class="form-row row-3 mt-14">
                 <div class="field">
-                    <label>Nom du père</label>
+                    <label>Nom du père / tuteur</label>
                     <input type="text" name="tuteur" id="tuteur" placeholder="Abdoulaye Coulibaly">
                 </div>
                 <div class="field">
-                    <label>Téléphone du père</label>
+                    <label>Téléphone</label>
                     <input type="text" name="telephone_tuteur" id="telephone_tuteur" placeholder="+225 XX XX XX XX">
                 </div>
                 <button type="button" id="resetFormBtn" class="btn-reset">
@@ -321,14 +392,14 @@
                     <thead>
                         <tr>
                             <th>#</th>
+                            <th>Photo</th>
                             <th>Matricule</th>
                             <th>Prénom</th>
                             <th>Nom</th>
                             <th>Naissance</th>
                             <th>Sexe</th>
-                            <th>Père</th>
+                            <th>Père / Tuteur</th>
                             <th>Téléphone</th>
-                            <th>Enregistré le</th>
                             <th style="text-align:right;">Actions</th>
                         </tr>
                     </thead>
@@ -336,6 +407,13 @@
                         {% for e in eleves %}
                         <tr>
                             <td><strong>{{ loop.index }}</strong></td>
+                            <td>
+                                {% if e.photo_url %}
+                                <img src="{{ e.photo_url }}" class="tbl-photo" alt="{{ e.prenom }}">
+                                {% else %}
+                                <div class="tbl-photo-placeholder"><i class="bi bi-person"></i></div>
+                                {% endif %}
+                            </td>
                             <td class="searchable"><span class="m-badge"><i class="bi bi-hash"></i>{{ e.matricule }}</span></td>
                             <td class="searchable">{{ e.prenom }}</td>
                             <td class="searchable">{{ e.nom }}</td>
@@ -343,15 +421,19 @@
                             <td><span class="s-badge {{ 'm' if e.sexe == 'M' else 'f' }}"><i class="bi bi-gender-{{ 'male' if e.sexe == 'M' else 'female' }}"></i>{{ 'M' if e.sexe == 'M' else 'F' }}</span></td>
                             <td class="searchable">{{ e.tuteur or '–' }}</td>
                             <td class="searchable">{{ e.telephone_tuteur or '–' }}</td>
-                            <td style="color:var(--text-muted);font-size:0.8rem;">{{ e.date_enregistrement.strftime('%d/%m/%Y') if e.date_enregistrement else '–' }}</td>
                             <td>
                                 <div class="row-actions">
+                                    <a href="{{ url_for('analytics.carte_scolaire', eleve_id=e.id) }}" class="icon-btn carte" title="Carte scolaire" target="_blank">
+                                        <i class="bi bi-person-badge"></i>
+                                    </a>
                                     <button class="icon-btn edit btn-modifier"
                                             data-id="{{ e.id }}" data-matricule="{{ e.matricule }}"
                                             data-prenom="{{ e.prenom }}" data-nom="{{ e.nom }}"
                                             data-date="{{ e.date_naissance.strftime('%Y-%m-%d') if e.date_naissance else '' }}"
                                             data-sexe="{{ e.sexe or '' }}" data-tuteur="{{ e.tuteur or '' }}"
-                                            data-tel="{{ e.telephone_tuteur or '' }}" title="Modifier">
+                                            data-tel="{{ e.telephone_tuteur or '' }}"
+                                            data-photo="{{ e.photo_url or '' }}"
+                                            title="Modifier">
                                         <i class="bi bi-pencil"></i>
                                     </button>
                                     <button class="icon-btn del btn-supprimer"
@@ -422,85 +504,151 @@
 </div>
 
 <script>
-    const SUGGESTED = "{{ suggested_matricule }}";
-    function openModal(id) { document.getElementById(id).classList.add('open'); }
-    function closeModal(id) { document.getElementById(id).classList.remove('open'); }
-    document.querySelectorAll('.modal-overlay').forEach(o => o.addEventListener('click', e => { if(e.target===o) o.classList.remove('open'); }));
-    document.addEventListener('keydown', e => { if(e.key==='Escape') document.querySelectorAll('.modal-overlay.open').forEach(m=>m.classList.remove('open')); });
+const SUGGESTED = "{{ suggested_matricule }}";
 
-    document.getElementById('resetFormBtn').addEventListener('click', () => {
-        document.getElementById('eleveForm').reset();
-        document.getElementById('form-title').textContent = 'Ajouter un élève';
-        document.getElementById('formAction').value = 'add';
-        document.getElementById('eleveId').value = '';
-        document.getElementById('matricule').value = SUGGESTED;
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(o => o.addEventListener('click', e => { if(e.target===o) o.classList.remove('open'); }));
+document.addEventListener('keydown', e => { if(e.key==='Escape') document.querySelectorAll('.modal-overlay.open').forEach(m=>m.classList.remove('open')); });
+
+// ── Photo handling ──────────────────────────────────────────
+const photoInput   = document.getElementById('photoInput');
+const photoImg     = document.getElementById('photoImg');
+const photoIcon    = document.getElementById('photoIcon');
+const photoName    = document.getElementById('photoName');
+const photoNameTxt = document.getElementById('photoNameText');
+const removeBtn    = document.getElementById('removePhotoBtn');
+
+photoInput.addEventListener('change', function() {
+    if (!this.files || !this.files[0]) return;
+    const file = this.files[0];
+    // Validation taille (5 Mo)
+    if (file.size > 5 * 1024 * 1024) {
+        alert('La photo ne doit pas dépasser 5 Mo.');
+        this.value = ''; return;
+    }
+    const reader = new FileReader();
+    reader.onload = e => {
+        photoImg.src = e.target.result;
+        photoImg.style.display = 'block';
+        photoIcon.style.display = 'none';
+        photoName.style.display = 'flex';
+        photoName.style.alignItems = 'center';
+        photoName.style.gap = '5px';
+        photoNameTxt.textContent = file.name;
+        removeBtn.style.display = 'flex';
+    };
+    reader.readAsDataURL(file);
+});
+
+removeBtn.addEventListener('click', function() {
+    photoInput.value = '';
+    photoImg.src = '';
+    photoImg.style.display = 'none';
+    photoIcon.style.display = '';
+    photoName.style.display = 'none';
+    removeBtn.style.display = 'none';
+});
+
+function setPhotoFromUrl(url) {
+    if (url) {
+        photoImg.src = url;
+        photoImg.style.display = 'block';
+        photoIcon.style.display = 'none';
+        removeBtn.style.display = 'flex';
+    } else {
+        photoImg.src = '';
+        photoImg.style.display = 'none';
+        photoIcon.style.display = '';
+        photoName.style.display = 'none';
+        removeBtn.style.display = 'none';
+    }
+}
+
+// ── Reset form ──────────────────────────────────────────────
+document.getElementById('resetFormBtn').addEventListener('click', () => {
+    document.getElementById('eleveForm').reset();
+    document.getElementById('form-title').textContent = 'Ajouter un élève';
+    document.getElementById('formAction').value = 'add';
+    document.getElementById('eleveId').value = '';
+    document.getElementById('matricule').value = SUGGESTED;
+    setPhotoFromUrl('');
+    photoName.style.display = 'none';
+    photoInput.value = '';
+});
+
+// ── Modifier ────────────────────────────────────────────────
+document.querySelectorAll('.btn-modifier').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.getElementById('form-title').textContent = "Modifier l'élève";
+        document.getElementById('formAction').value = 'edit';
+        document.getElementById('eleveId').value = btn.dataset.id;
+        document.getElementById('matricule').value = btn.dataset.matricule;
+        document.getElementById('prenom').value = btn.dataset.prenom;
+        document.getElementById('nom').value = btn.dataset.nom;
+        document.getElementById('date_naissance').value = btn.dataset.date;
+        document.getElementById('sexe').value = btn.dataset.sexe;
+        document.getElementById('tuteur').value = btn.dataset.tuteur;
+        document.getElementById('telephone_tuteur').value = btn.dataset.tel;
+        setPhotoFromUrl(btn.dataset.photo);
+        document.getElementById('eleveForm').scrollIntoView({behavior:'smooth'});
     });
+});
 
-    document.querySelectorAll('.btn-modifier').forEach(btn => {
-        btn.addEventListener('click', () => {
-            document.getElementById('form-title').textContent = "Modifier l'élève";
-            document.getElementById('formAction').value = 'edit';
-            document.getElementById('eleveId').value = btn.dataset.id;
-            document.getElementById('matricule').value = btn.dataset.matricule;
-            document.getElementById('prenom').value = btn.dataset.prenom;
-            document.getElementById('nom').value = btn.dataset.nom;
-            document.getElementById('date_naissance').value = btn.dataset.date;
-            document.getElementById('sexe').value = btn.dataset.sexe;
-            document.getElementById('tuteur').value = btn.dataset.tuteur;
-            document.getElementById('telephone_tuteur').value = btn.dataset.tel;
-            document.getElementById('eleveForm').scrollIntoView({behavior:'smooth'});
-        });
+// ── Supprimer ───────────────────────────────────────────────
+document.querySelectorAll('.btn-supprimer').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.getElementById('deleteNom').textContent = btn.dataset.nom;
+        document.getElementById('deleteMatricule').innerHTML = '<i class="bi bi-hash"></i>' + btn.dataset.matricule;
+        document.getElementById('deleteEleveId').value = btn.dataset.id;
+        openModal('deleteModal');
     });
+});
 
-    document.querySelectorAll('.btn-supprimer').forEach(btn => {
-        btn.addEventListener('click', () => {
-            document.getElementById('deleteNom').textContent = btn.dataset.nom;
-            document.getElementById('deleteMatricule').innerHTML = '<i class="bi bi-hash"></i>' + btn.dataset.matricule;
-            document.getElementById('deleteEleveId').value = btn.dataset.id;
-            openModal('deleteModal');
-        });
+document.getElementById('deleteAllBtn')?.addEventListener('click', () => openModal('deleteAllModal'));
+
+// ── Recherche ───────────────────────────────────────────────
+document.getElementById('searchInput')?.addEventListener('input', function() {
+    const term = this.value.toLowerCase();
+    document.querySelectorAll('#elevesTable tbody tr').forEach(row => {
+        const match = [...row.querySelectorAll('.searchable')].some(td => td.textContent.toLowerCase().includes(term));
+        row.style.display = term && !match ? 'none' : '';
     });
+});
 
-    document.getElementById('deleteAllBtn')?.addEventListener('click', () => openModal('deleteAllModal'));
-
-    document.getElementById('searchInput')?.addEventListener('input', function() {
-        const term = this.value.toLowerCase();
-        document.querySelectorAll('#elevesTable tbody tr').forEach(row => {
-            const match = [...row.querySelectorAll('.searchable')].some(td => td.textContent.toLowerCase().includes(term));
-            row.style.display = term && !match ? 'none' : '';
-        });
+// ── Export PDF ──────────────────────────────────────────────
+document.getElementById('exportPdf')?.addEventListener('click', function() {
+    const cn = this.dataset.classe, an = this.dataset.annee, nb = this.dataset.total;
+    const div = document.createElement('div');
+    div.style.cssText = 'padding:20px;font-family:Arial,sans-serif;position:absolute;left:-9999px;';
+    div.innerHTML = `<div style="text-align:center;margin-bottom:20px;"><h2 style="color:#0d1117;">Liste des élèves</h2><h3 style="color:#c9a84c;">${cn}</h3><p style="color:#6b7685;">Année ${an} • ${nb} élève(s)</p></div>`;
+    const tbl = document.createElement('table');
+    tbl.style.cssText = 'width:100%;border-collapse:collapse;';
+    tbl.innerHTML = `<thead><tr style="background:#0d1117;color:white;"><th style="padding:10px;">#</th><th style="padding:10px;">Matricule</th><th style="padding:10px;">Prénom</th><th style="padding:10px;">Nom</th><th style="padding:10px;">Naissance</th><th style="padding:10px;">Sexe</th><th style="padding:10px;">Père</th><th style="padding:10px;">Téléphone</th></tr></thead>`;
+    const tb = document.createElement('tbody');
+    document.querySelectorAll('#elevesTable tbody tr').forEach((tr,i) => {
+        const td = tr.querySelectorAll('td');
+        const row = document.createElement('tr');
+        row.style.background = i%2===0?'#f9f7f3':'white';
+        row.style.borderBottom='1px solid #eee';
+        // td[0]=num, td[1]=photo, td[2]=matricule, td[3]=prenom, td[4]=nom, td[5]=naiss, td[6]=sexe, td[7]=tuteur, td[8]=tel
+        row.innerHTML = `<td style="padding:10px;text-align:center;">${i+1}</td><td style="padding:10px;"><span style="background:#f0ebe0;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:700;">${td[2]?.textContent.trim()||'–'}</span></td><td style="padding:10px;">${td[3]?.textContent.trim()||'–'}</td><td style="padding:10px;">${td[4]?.textContent.trim()||'–'}</td><td style="padding:10px;">${td[5]?.textContent.trim()||'–'}</td><td style="padding:10px;">${td[6]?.textContent.trim()||'–'}</td><td style="padding:10px;">${td[7]?.textContent.trim()||'–'}</td><td style="padding:10px;">${td[8]?.textContent.trim()||'–'}</td>`;
+        tb.appendChild(row);
     });
-
-    document.getElementById('exportPdf')?.addEventListener('click', function() {
-        const cn = this.dataset.classe, an = this.dataset.annee, nb = this.dataset.total;
-        const div = document.createElement('div');
-        div.style.cssText = 'padding:20px;font-family:Arial,sans-serif;position:absolute;left:-9999px;';
-        div.innerHTML = `<div style="text-align:center;margin-bottom:20px;"><h2 style="color:#0d1117;">Liste des élèves</h2><h3 style="color:#c9a84c;">${cn}</h3><p style="color:#6b7685;">Année ${an} • ${nb} élève(s)</p></div>`;
-        const tbl = document.createElement('table');
-        tbl.style.cssText = 'width:100%;border-collapse:collapse;';
-        tbl.innerHTML = `<thead><tr style="background:#0d1117;color:white;"><th style="padding:10px;">#</th><th style="padding:10px;">Matricule</th><th style="padding:10px;">Prénom</th><th style="padding:10px;">Nom</th><th style="padding:10px;">Naissance</th><th style="padding:10px;">Sexe</th><th style="padding:10px;">Père</th><th style="padding:10px;">Téléphone</th></tr></thead>`;
-        const tb = document.createElement('tbody');
-        document.querySelectorAll('#elevesTable tbody tr').forEach((tr,i) => {
-            const td = tr.querySelectorAll('td');
-            const row = document.createElement('tr');
-            row.style.background = i%2===0?'#f9f7f3':'white';
-            row.style.borderBottom='1px solid #eee';
-            row.innerHTML = `<td style="padding:10px;text-align:center;">${i+1}</td><td style="padding:10px;"><span style="background:#f0ebe0;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:700;">${td[1]?.textContent.trim()||'–'}</span></td><td style="padding:10px;">${td[2]?.textContent.trim()||'–'}</td><td style="padding:10px;">${td[3]?.textContent.trim()||'–'}</td><td style="padding:10px;">${td[4]?.textContent.trim()||'–'}</td><td style="padding:10px;">${td[5]?.textContent.trim()||'–'}</td><td style="padding:10px;">${td[6]?.textContent.trim()||'–'}</td><td style="padding:10px;">${td[7]?.textContent.trim()||'–'}</td>`;
-            tb.appendChild(row);
-        });
-        tbl.appendChild(tb); div.appendChild(tbl); document.body.appendChild(div);
-        html2canvas(div).then(canvas => {
-            const img = canvas.toDataURL('image/png');
-            const w=210, h=(canvas.height*w)/canvas.width;
-            const pdf = new jspdf.jsPDF('p','mm','a4');
-            let pos=0, left=h;
-            pdf.addImage(img,'PNG',0,pos,w,h); left-=295;
-            while(left>=0){pos=left-h;pdf.addPage();pdf.addImage(img,'PNG',0,pos,w,h);left-=295;}
-            pdf.save(`eleves_${cn.replace(/\s+/g,'_')}.pdf`);
-            document.body.removeChild(div);
-        });
+    tbl.appendChild(tb); div.appendChild(tbl); document.body.appendChild(div);
+    html2canvas(div).then(canvas => {
+        const img = canvas.toDataURL('image/png');
+        const w=210, h=(canvas.height*w)/canvas.width;
+        const pdf = new jspdf.jsPDF('p','mm','a4');
+        let pos=0, left=h;
+        pdf.addImage(img,'PNG',0,pos,w,h); left-=295;
+        while(left>=0){pos=left-h;pdf.addPage();pdf.addImage(img,'PNG',0,pos,w,h);left-=295;}
+        pdf.save(`eleves_${cn.replace(/\s+/g,'_')}.pdf`);
+        document.body.removeChild(div);
     });
+});
 </script>
 </body>
 </html>
+
 
