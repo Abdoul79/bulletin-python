@@ -1,15 +1,31 @@
-from flask import Flask
+from flask import Flask, session, redirect, url_for, request, flash
 from dotenv import load_dotenv
 from config import Config
 from models import db, migrate
 from i18n import init_babel, get_current_language, get_available_languages
 from routes.analytics import analytics_bp
 from translations_manual import t
-
+from datetime import datetime, timedelta
 
 import os
 
 load_dotenv()  # ← charge .env au démarrage
+
+# ======================================
+# CONFIGURATION TIMEOUT DE SESSION
+# ======================================
+SESSION_TIMEOUT_MINUTES = 60  # 1 heure
+
+# Routes publiques qui ne déclenchent pas le timeout
+PUBLIC_ENDPOINTS = {
+    'auth.login',
+    'auth.admin_login',
+    'auth.index',
+    'auth.logout',
+    'auth.admin_logout',
+    'language.change_language',
+    'static',
+}
 
 
 def create_app():
@@ -35,6 +51,32 @@ def create_app():
     # ── Blueprints ─────────────────────────────────────
     register_routes(app)
 
+    # ── Timeout de session global (couvre tous les blueprints) ─
+    @app.before_request
+    def check_session_timeout():
+        """
+        Vérifie l'inactivité avant chaque requête.
+        Si la session est inactive depuis plus de 2h → déconnexion automatique.
+        """
+        # Ignorer les routes publiques et les fichiers statiques
+        if request.endpoint in PUBLIC_ENDPOINTS or request.endpoint is None:
+            return
+
+        if 'last_activity' in session:
+            last = datetime.fromisoformat(session['last_activity'])
+            if datetime.utcnow() - last > timedelta(minutes=SESSION_TIMEOUT_MINUTES):
+                user_type = session.get('user_type', 'ecole')
+                session.clear()
+                flash("⏰ Votre session a expiré après 2h d'inactivité. Veuillez vous reconnecter.", "warning")
+                if user_type == 'admin':
+                    return redirect(url_for('auth.admin_login'))
+                return redirect(url_for('auth.login'))
+
+        # Rafraîchir le timestamp à chaque action
+        if session.get('user_type') in ('admin', 'ecole'):
+            session['last_activity'] = datetime.utcnow().isoformat()
+            session.modified = True
+
     # ── Contexte global templates ──────────────────────
     @app.context_processor
     def inject_conf_vars():
@@ -53,8 +95,6 @@ def create_app():
             print(f"❌ Erreur création tables : {e}")
 
     return app
-
-# ... tout le reste du code ...
 
 
 def register_routes(app):
