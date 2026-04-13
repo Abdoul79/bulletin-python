@@ -1,12 +1,13 @@
-
 from flask import Blueprint, render_template, request, redirect, url_for, session, flash
 from werkzeug.security import generate_password_hash, check_password_hash
 from models import db, Ecole, Classe
 from utils import format_filename
+from datetime import datetime
 
 import os
 
 auth_bp = Blueprint('auth', __name__)
+
 
 # ======================================
 # CONFIGURATION ADMINISTRATEUR
@@ -45,38 +46,34 @@ def admin_login():
     if request.method == 'POST':
         email = request.form.get('email', '').strip()
         password = request.form.get('password', '')
-        
+
         if not email or not password:
             flash("Email et mot de passe administrateur requis.", "error")
             return render_template('admin_login.html')
-        
+
         if email == ADMIN_CREDENTIALS['email'] and password == ADMIN_CREDENTIALS['password']:
             session['admin_logged_in'] = True
             session['user_type'] = 'admin'
             session['admin_email'] = email
+            session['last_activity'] = datetime.utcnow().isoformat()  # ← démarre le timer
             flash("✅ Connexion administrateur réussie !", "success")
             return redirect(url_for('auth.register_ecole'))
         else:
             flash("❌ Identifiants administrateur incorrects", "error")
-    
+
     return render_template('admin_login.html')
-
-
-
-
-
 
 
 @auth_bp.route('/admin/register', methods=['GET', 'POST'])
 def register_ecole():
     """Enregistrement et gestion des écoles - RÉSERVÉ AUX ADMINISTRATEURS"""
-    
+
     if not is_admin_logged_in():
         flash("⚠️ Accès réservé aux administrateurs.", "warning")
         return redirect(url_for('auth.admin_login'))
-    
+
     ecoles = Ecole.query.order_by(Ecole.id.desc()).all()
-    
+
     if request.method == 'POST':
         nom = request.form.get('nom', '').strip()
         email = request.form.get('email', '').strip()
@@ -84,12 +81,12 @@ def register_ecole():
         directeur = request.form.get('directeur', '').strip()
         adresse = request.form.get('adresse', '').strip()
         telephone = request.form.get('telephone', '').strip()
-        type_ecole = request.form.get('type_ecole', 'francaise')  # NOUVEAU
-        
+        type_ecole = request.form.get('type_ecole', 'francaise')
+
         if not all([nom, email, password]):
             flash("Tous les champs obligatoires doivent être remplis.", "error")
             return render_template('register_ecole.html', ecoles=ecoles)
-        
+
         if Ecole.query.filter_by(email=email).first():
             flash("❌ Cet email est déjà utilisé par une autre école.", "error")
             return render_template('register_ecole.html', ecoles=ecoles)
@@ -114,14 +111,14 @@ def register_ecole():
                 adresse=adresse,
                 telephone=telephone,
                 logo=logo,
-                type_ecole=type_ecole  # NOUVEAU
+                type_ecole=type_ecole
             )
             db.session.add(ecole)
             db.session.commit()
-            
+
             flash(f"✅ École '{nom}' enregistrée avec succès !", "success")
             return redirect(url_for('auth.register_ecole'))
-            
+
         except Exception as e:
             db.session.rollback()
             flash("❌ Erreur lors de l'enregistrement de l'école.", "error")
@@ -130,22 +127,20 @@ def register_ecole():
     return render_template('register_ecole.html', ecoles=ecoles)
 
 
-
-
 @auth_bp.route('/admin/edit_ecole', methods=['POST'])
 def admin_edit_ecole():
     """Modifier une école"""
     if not is_admin_logged_in():
         flash("Accès réservé aux administrateurs", "error")
         return redirect(url_for('auth.admin_login'))
-    
+
     ecole_id = request.form.get('ecole_id')
     nom = request.form.get('nom')
     email = request.form.get('email')
     directeur = request.form.get('directeur')
     telephone = request.form.get('telephone')
     adresse = request.form.get('adresse')
-    
+
     try:
         ecole = Ecole.query.get(ecole_id)
         if ecole:
@@ -153,7 +148,7 @@ def admin_edit_ecole():
             if autre_ecole:
                 flash("Cet email est déjà utilisé par une autre école", "error")
                 return redirect(url_for('auth.register_ecole'))
-            
+
             ecole.nom = nom
             ecole.email = email
             ecole.directeur = directeur
@@ -167,7 +162,7 @@ def admin_edit_ecole():
         db.session.rollback()
         flash("Erreur lors de la modification", "error")
         print(f"Erreur: {e}")
-    
+
     return redirect(url_for('auth.register_ecole'))
 
 
@@ -177,22 +172,22 @@ def admin_toggle_status():
     if not is_admin_logged_in():
         flash("Accès réservé aux administrateurs", "error")
         return redirect(url_for('auth.admin_login'))
-    
+
     ecole_id = request.form.get('ecole_id')
     action = request.form.get('action')
-    
+
     try:
         ecole = Ecole.query.get(ecole_id)
         if ecole:
             nouveau_statut = 'suspendu' if action == 'suspendre' else 'actif'
-            
+
             if hasattr(ecole, 'statut'):
                 ecole.statut = nouveau_statut
             else:
                 setattr(ecole, 'statut', nouveau_statut)
-            
+
             db.session.commit()
-            
+
             action_text = 'suspendue' if nouveau_statut == 'suspendu' else 'activée'
             flash(f"École '{ecole.nom}' {action_text} avec succès", "success")
         else:
@@ -201,7 +196,7 @@ def admin_toggle_status():
         db.session.rollback()
         flash("Erreur lors du changement de statut", "error")
         print(f"Erreur: {e}")
-    
+
     return redirect(url_for('auth.register_ecole'))
 
 
@@ -211,14 +206,14 @@ def admin_delete_ecole():
     if not is_admin_logged_in():
         flash("Accès réservé aux administrateurs", "error")
         return redirect(url_for('auth.admin_login'))
-    
+
     ecole_id = request.form.get('ecole_id')
-    
+
     try:
         ecole = Ecole.query.get(ecole_id)
         if ecole:
             nom = ecole.nom
-            
+
             # Supprimer le logo si existe
             if hasattr(ecole, 'logo') and ecole.logo:
                 try:
@@ -227,34 +222,24 @@ def admin_delete_ecole():
                         os.remove(logo_path)
                 except Exception as e:
                     print(f"Erreur suppression logo: {e}")
-            
-            # Supprimer toutes les données liées manuellement
-            # Supprimer les notes liées aux élèves de cette école
+
             from models import Eleve, Note, Matiere
-            
-            # Récupérer toutes les classes de l'école
+
             classes = Classe.query.filter_by(ecole_id=ecole_id).all()
-            
+
             for classe in classes:
-                # Récupérer tous les élèves de la classe
                 eleves = Eleve.query.filter_by(classe_id=classe.id).all()
-                
+
                 for eleve in eleves:
-                    # Supprimer toutes les notes de l'élève
                     Note.query.filter_by(eleve_id=eleve.id).delete()
-                    # Supprimer l'élève
                     db.session.delete(eleve)
-                
-                # Supprimer les matières de la classe si elles existent
+
                 Matiere.query.filter_by(classe_id=classe.id).delete()
-                
-                # Supprimer la classe
                 db.session.delete(classe)
-            
-            # Maintenant supprimer l'école
+
             db.session.delete(ecole)
             db.session.commit()
-            
+
             flash(f"École '{nom}' et toutes ses données supprimées définitivement", "success")
         else:
             flash("École introuvable", "error")
@@ -264,7 +249,7 @@ def admin_delete_ecole():
         print(f"Erreur détaillée: {e}")
         import traceback
         traceback.print_exc()
-    
+
     return redirect(url_for('auth.register_ecole'))
 
 
@@ -286,37 +271,35 @@ def login():
     if request.method == 'POST':
         email = request.form.get('email', '').strip()
         password = request.form.get('password', '')
-        
+
         if not email or not password:
             flash("Email et mot de passe requis.", "error")
             return render_template('login.html')
-        
+
         ecole = Ecole.query.filter_by(email=email).first()
-        
+
         if ecole and check_password_hash(ecole.mot_de_passe, password):
-            # Vérifier si l'école est suspendue
             statut = getattr(ecole, 'statut', 'actif')
             if statut == 'suspendu':
                 flash("Votre école est actuellement suspendue. Contactez l'administrateur.", "error")
                 return render_template('login.html')
-            
-            session.clear()
 
+            session.clear()
             session['ecole_id'] = ecole.id
             session['ecole_nom'] = ecole.nom
             session['user_type'] = 'ecole'
-            session['type_ecole'] = ecole.type_ecole  # NOUVEAU
-            
+            session['type_ecole'] = ecole.type_ecole
+            session['last_activity'] = datetime.utcnow().isoformat()  # ← démarre le timer
+
             flash(f"Bienvenue {ecole.nom} !", "success")
-            
-            # Redirection selon le type d'école
+
             if ecole.type_ecole == 'franco-arabe':
-                return redirect(url_for('main.dashboard_ar'))  # Dashboard en arabe
+                return redirect(url_for('main.dashboard_ar'))
             else:
-                return redirect(url_for('main.dashboard'))  # Dashboard français
+                return redirect(url_for('main.dashboard'))
         else:
             flash("Email ou mot de passe incorrect", "error")
-    
+
     return render_template('login.html')
 
 
@@ -325,10 +308,10 @@ def logout():
     """Déconnexion (école ou admin)"""
     user_type = session.get('user_type')
     session.clear()
-    
+
     if user_type == 'admin':
         flash("Déconnexion administrateur réussie.", "info")
     else:
         flash("Vous avez été déconnecté.", "info")
-    
+
     return redirect(url_for('auth.index'))
