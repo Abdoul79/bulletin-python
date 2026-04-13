@@ -17,67 +17,38 @@
         .ctrl-btn.green     { background:#1a6b3c;color:white; }
         .ctrl-btn.secondary { background:#f0ede7;color:#0d1117;border:1.5px solid #e0e0e0; }
 
-        .page { width:210mm;min-height:297mm;background:white;margin:20px auto;box-shadow:0 4px 24px rgba(0,0,0,0.2);page-break-after:always;overflow:hidden; }
-        .page:last-child { page-break-after:avoid; }
+        .page { width:210mm;min-height:297mm;background:white;margin:20px auto;box-shadow:0 4px 24px rgba(0,0,0,0.2);overflow:hidden; }
 
-        /* PAGE 1 */
+        /* ══ PAGE UNIQUE ══ */
+        .page-inner { padding:10mm 14mm; position:relative; overflow:visible; }
+
+        /* بارة ثلاثية الألوان */
         .topbar { width:100%;border-collapse:collapse; }
-        .topbar td { height:10px;padding:0;border:none; }
+        .topbar td { height:8px;padding:0;border:none; }
         .tb-g{background:#228B22;width:33.3%;} .tb-w{background:#FFF;width:33.3%;} .tb-o{background:#FF8C00;width:33.4%;}
 
-        .hdr{width:100%;border-collapse:collapse;border-bottom:1px solid #eee;}
-        .hdr td{padding:12px 18px;vertical-align:middle;border:none;}
-        .hdr-edu{text-align:right;}
-        .edu-box{display:inline-block;width:26px;height:26px;background:#0d1117;border-radius:5px;text-align:center;line-height:26px;font-size:13px;vertical-align:middle;}
-        .edu-name{font-size:13px;font-weight:800;color:#0d1117;vertical-align:middle;margin-right:5px;}
-        .edu-sub{font-size:8px;color:#888;display:block;margin-right:31px;margin-top:1px;}
-        .hdr-school{text-align:left;font-size:13px;font-weight:800;color:#228B22;}
+        /* ── Header: صورة التلميذ يسار | اسم المدرسة وسط | دراب يمين ── */
+        /* في RTL: يمين = بداية، يسار = نهاية */
 
-        .main-title-wrap{text-align:center;padding:14px 20px 8px;}
-        .main-title{font-size:21px;font-weight:800;color:#0d1117;border-bottom:3px solid #FF8C00;display:inline-block;padding-bottom:4px;}
-        .main-sub{font-size:11px;color:#666;margin-top:4px;}
-
-        .fp-wrap{margin:8px 16px;border:1px solid #e0e0e0;border-radius:8px;background:#f9f9f9;overflow:hidden;}
-        .fp-tbl{width:100%;border-collapse:collapse;}
-        .fp-tbl td{border:none;vertical-align:middle;padding:14px;}
-        .flag-cell{width:170px;text-align:center;}
-        .flag-country{font-size:10px;font-weight:800;color:#228B22;margin-bottom:7px;}
-        .flag-css{border-collapse:collapse;margin:0 auto 6px;border:2px solid #bbb;}
-        .flag-css td{width:40px;height:68px;border:none;padding:0;}
+        /* دراب CI */
+        .flag-country{font-size:9px;font-weight:700;color:#228B22;margin-bottom:5px;text-align:center;}
+        .flag-css{border-collapse:collapse;margin:0 auto 5px;border:2px solid #bbb;}
+        .flag-css td{width:28px;height:48px;border:none;padding:0;}
         .f-o{background:#FF8C00;} .f-w{background:#FFF;border-left:1px solid #eee;border-right:1px solid #eee;} .f-g{background:#228B22;}
-        .flag-devise{font-size:8px;font-weight:700;color:#444;letter-spacing:0.3px;}
-        .sep-cell{width:1px;background:#ddd;padding:0;}
-        .pres-cell{padding-right:16px!important;}
-        .pres-tbl{border-collapse:collapse;} .pres-tbl td{border:none;vertical-align:top;padding:0;}
-        .pres-info{text-align:right;padding-left:14px;}
-        .pres-tag{font-size:8px;font-weight:700;color:#888;text-transform:uppercase;}
-        .pres-name{font-size:13px;font-weight:800;color:#000;line-height:1.3;margin:3px 0 5px;}
-        .pres-role{font-size:9px;color:#555;line-height:1.6;}
-        .pres-dates{font-size:8px;color:#999;margin-top:5px;}
-        .pres-img{width:72px;height:88px;object-fit:cover;border-radius:6px;border:2px solid #ccc;display:block;}
+        .flag-devise{font-size:7px;font-weight:700;color:#555;letter-spacing:0.2px;text-align:center;}
 
-        .hymne-wrap{margin:8px 16px;border:1.5px solid #228B22;border-radius:8px;overflow:hidden;}
-        .hymne-hdr{background:#228B22;color:white;text-align:center;padding:9px 12px;}
-        .hymne-hdr-title{font-size:14px;font-weight:800;}
-        .hymne-hdr-sub{font-size:9px;opacity:0.85;font-style:italic;margin-top:2px;}
-        .hymne-tbl{width:100%;border-collapse:collapse;}
-        .hymne-tbl td{border:none;vertical-align:top;width:50%;padding:10px;}
-        .verse-box{background:#f4fef4;border-right:3px solid #228B22;border-radius:4px;padding:8px 10px;font-size:10px;line-height:2;color:#222;text-align:right;}
-        .verse-title{font-size:8px;font-weight:800;color:#228B22;margin-bottom:5px;text-transform:uppercase;}
-        .refrain-td{padding:0 10px 10px!important;width:100%!important;}
-        .refrain-box{background:rgba(34,139,34,0.06);border:1px solid rgba(34,139,34,0.25);border-radius:6px;padding:9px 14px;text-align:center;font-size:10px;font-weight:700;color:#1a6b3c;line-height:2;}
-        .refrain-title{font-size:8px;font-weight:800;color:#FF8C00;margin-bottom:4px;text-transform:uppercase;}
-        .p1-foot{width:100%;border-collapse:collapse;border-top:1px solid #eee;margin-top:8px;}
-        .p1-foot td{padding:7px 18px;font-size:8px;color:#bbb;border:none;}
+        /* معلومات المدرسة */
+        .bh-edu    { font-size:8px;color:#999;font-weight:700;margin-bottom:4px; }
+        .bh-school { font-size:18px;font-weight:800;color:#228B22;line-height:1.2;margin-bottom:3px; }
+        .bh-title  { font-size:13px;font-weight:700;color:#0d1117;letter-spacing:0.4px;margin-bottom:2px; }
+        .bh-year   { font-size:10px;color:#666; }
 
-        /* PAGE 2 */
-        .page-2{padding:10mm 14mm;}
-        .bul-hdr{text-align:center;margin-bottom:12px;padding-bottom:10px;border-bottom:3px solid #FF8C00;}
-        .bul-edu{font-size:8px;color:#999;font-weight:700;margin-bottom:4px;}
-        .bul-school{font-size:20px;font-weight:800;color:#228B22;margin-bottom:4px;}
-        .bul-title{font-size:15px;font-weight:700;color:#000;margin-bottom:3px;}
-        .bul-year{font-size:11px;color:#666;}
+        /* صورة التلميذ */
+        .eleve-photo { width:64px;height:80px;object-fit:cover;border-radius:6px;border:2px solid #ccc;display:block;margin:0 auto; }
+        .eleve-photo-ph { width:64px;height:80px;background:#f0ede7;border:2px solid #e0e0e0;border-radius:6px;display:flex;align-items:center;justify-content:center;margin:0 auto;font-size:28px;color:#ccc; }
+        .photo-label { font-size:7px;color:#999;margin-top:4px;text-align:center; }
 
+        /* ── Sections ── */
         .sec{margin-bottom:10px;border:1px solid #ddd;border-radius:6px;overflow:hidden;}
         .sec-t{font-size:12px;font-weight:800;background:#FF8C00;color:white;padding:6px 12px;text-align:right;}
         .sec-b{padding:8px 10px;}
@@ -135,186 +106,185 @@
     <a href="{{ url_for('main.voir_classe_ar', classe_id=classe.id) }}" class="ctrl-btn secondary">← العودة</a>
 </div>
 
-<!-- PAGE 1 — COUVERTURE -->
+<!-- صفحة واحدة — النشرة -->
 <div class="page">
-    <table class="topbar"><tr><td class="tb-g"></td><td class="tb-w"></td><td class="tb-o"></td></tr></table>
 
-    <table class="hdr"><tr>
-        <td class="hdr-edu"><span class="edu-box">🎓</span><span class="edu-name">EduBulletin</span><span class="edu-sub">نظام إدارة البطاقات المدرسية</span></td>
-        <td class="hdr-school">{{ ecole.nom }}</td>
+    <!-- بارة ثلاثية الألوان — ترتيب RTL: أخضر | أبيض | برتقالي -->
+    <table class="topbar"><tr>
+        <td class="tb-g"></td><td class="tb-w"></td><td class="tb-o"></td>
     </tr></table>
 
-    <div class="main-title-wrap">
-        <div class="main-title">النشرة الدراسية السنوية</div>
-        <div class="main-sub">السنة الدراسية: {{ classe.annee_scolaire }}</div>
-    </div>
+    <div class="page-inner">
 
-    <div class="fp-wrap">
-        <table class="fp-tbl"><tr>
-            <td class="flag-cell">
-                <div class="flag-country">جمهورية كوت ديفوار</div>
-                <table class="flag-css"><tr><td class="f-o"></td><td class="f-w"></td><td class="f-g"></td></tr></table>
-                <div class="flag-devise">الاتحاد — الانضباط — العمل</div>
-            </td>
-            <td class="sep-cell"></td>
-            <td class="pres-cell">
-                <table class="pres-tbl"><tr>
-                    <td class="pres-info">
-                        <div class="pres-tag">مؤسس الجمهورية</div>
-                        <div class="pres-name">فيليكس هوفويه<br>بوايني</div>
-                        <div class="pres-role">أول رئيس لجمهورية كوت ديفوار<br>رائد الاستقلال الوطني<br>والتنمية الاقتصادية</div>
-                        <div class="pres-dates">١٩٦٠ — ١٩٩٣</div>
-                    </td>
-                    <td><img src="https://cdn.modernghana.com/content/600/360/felix_houphouet_boigny.jpg" alt="فيليكس هوفويه بوايني" class="pres-img"></td>
+        <!-- ══ HEADER RTL : صورة التلميذ يسار | المدرسة وسط | الدراب يمين ══ -->
+        <!--
+            في RTL:
+            - يمين الصفحة = بداية = الدراب (جمهورية كوت ديفوار)
+            - وسط = اسم المدرسة
+            - يسار الصفحة = نهاية = صورة التلميذ (بورد gauche en CSS)
+        -->
+        <div style="position:relative; border-bottom:3px solid #FF8C00; padding-bottom:10px; margin-bottom:12px; min-height:90px;">
+
+            <!-- الدراب — ملاصق للحافة اليمنى (بداية RTL) -->
+            <div style="position:absolute; right:0; top:50%; transform:translateY(-50%); text-align:center; width:110px;">
+                <div class="flag-country">جمهورية<br>كوت ديفوار</div>
+                <table class="flag-css"><tr>
+                    <!-- RTL: أخضر | أبيض | برتقالي -->
+                    <td class="f-g"></td>
+                    <td class="f-w"></td>
+                    <td class="f-o"></td>
                 </tr></table>
-            </td>
-        </tr></table>
-    </div>
+                <div class="flag-devise">الاتحاد — الانضباط — العمل</div>
+            </div>
 
-    <div class="hymne-wrap">
-        <div class="hymne-hdr">
-            <div class="hymne-hdr-title">النشيد الوطني لجمهورية كوت ديفوار — L'Abidjanaise</div>
-            <div class="hymne-hdr-sub">الأبيدجانية</div>
-        </div>
-        <table class="hymne-tbl">
-            <tr>
-                <td><div class="verse-box"><div class="verse-title">المقطع الأول</div>تحية أيتها أرض الأمل<br>بلاد الضيافة الكريمة<br>جيوشك المليئة بالشجاعة<br>أعادت إليك كرامتك</div></td>
-                <td><div class="verse-box"><div class="verse-title">المقطع الثاني</div>أبناءك يا كوت ديفوار العزيزة<br>صانعو عظمتك الأفخرون<br>مجتمعون جميعاً لمجدك<br>سيبنونك في السعادة</div></td>
-            </tr>
-            <tr><td colspan="2" class="refrain-td"><div class="refrain-box"><div class="refrain-title">اللازمة</div>أيها الإيفواريون الأفخرون، الوطن ينادينا<br>إذا أعدنا الحرية بالسلام، سيكون واجبنا أن نكون مثالاً للأمل الموعود للبشرية<br>ونحن نصوغ موحدين في الإيمان الجديد، وطن الأخوة الحقيقية</div></td></tr>
-        </table>
-    </div>
+            <!-- اسم المدرسة — في المنتصف تماماً -->
+            <div style="text-align:center; padding:10px 100px;">
+                <div class="bh-edu">🎓 EduBulletin — نظام إدارة المدارس</div>
+                <div class="bh-school">{{ ecole.nom }}</div>
+                <div class="bh-title">النشرة الدراسية السنوية</div>
+                <div class="bh-year">السنة الدراسية: {{ classe.annee_scolaire }}</div>
+            </div>
 
-    <table class="p1-foot"><tr>
-        <td style="text-align:right">{{ classe.annee_scolaire }}</td>
-        <td style="text-align:left">EduBulletin — {{ ecole.nom }}</td>
-    </tr></table>
-</div>
-
-<!-- PAGE 2 — BULLETIN -->
-<div class="page page-2">
-    <div class="bul-hdr">
-        <div class="bul-edu">🎓 EduBulletin</div>
-        <div class="bul-school">{{ ecole.nom }}</div>
-        <div class="bul-title">نشرة دراسية سنوية</div>
-        <div class="bul-year">السنة الدراسية: {{ classe.annee_scolaire }}</div>
-    </div>
-
-    <!-- معلومات التلميذ -->
-    <div class="sec">
-        <div class="sec-t">معلومات التلميذ</div>
-        <div class="sec-b">
-            <table class="info-t">
-                <tr>
-                    <td class="lbl">الاسم الكامل :</td><td>{{ eleve.prenom }} {{ eleve.nom }}</td>
-                    <td class="lbl">الجنس :</td><td>{{ 'ذكر' if eleve.sexe == 'M' else 'أنثى' }}</td>
-                </tr>
-                <tr>
-                    <td class="lbl">تاريخ الازدياد :</td><td>{{ eleve.date_naissance.strftime('%d/%m/%Y') if eleve.date_naissance else 'غير محدد' }}</td>
-                    <td class="lbl">القسم :</td><td>{{ classe.nom }}</td>
-                </tr>
-                <tr>
-                    <td class="lbl">الترتيب :</td><td>{{ rang }} من أصل {{ total_eleves }}</td>
-                    <td class="lbl">المعدل العام :</td><td><strong>{{ "%.2f"|format(moyenne) }}/20</strong></td>
-                </tr>
-                {% if eleve.matricule %}<tr><td class="lbl">الماتريكول :</td><td colspan="3">{{ eleve.matricule }}</td></tr>{% endif %}
-            </table>
-        </div>
-    </div>
-
-    <!-- المعدل العام -->
-    <div class="result-box">
-        <div style="font-size:11px;font-weight:700;margin-bottom:3px;">المعدل العام السنوي</div>
-        <div class="moy-gen">{{ "%.2f"|format(moyenne) }}/20</div>
-        <div class="mention">{% if moyenne >= 16 %}ممتاز{% elif moyenne >= 14 %}جيد جداً{% elif moyenne >= 12 %}جيد{% elif moyenne >= 10 %}مقبول{% else %}ضعيف{% endif %}</div>
-    </div>
-
-    <!-- ═══ TABLE VERTICALE RTL — 3 ثلاثيات ═══ -->
-    <div class="sec">
-        <div class="sec-t">📊 النقاط حسب المادة — الثلاثيات الثلاثة</div>
-        <div class="sec-b" style="padding:0;">
-            <table class="notes-v">
-                <thead>
-                    <tr>
-                        <th class="h-mat">المادة</th>
-                        <th class="h-t1">الثلاثي 1</th>
-                        <th class="h-t2">الثلاثي 2</th>
-                        <th class="h-t3">الثلاثي 3</th>
-                        <th class="h-moy">المعدل السنوي</th>
-                    </tr>
-                </thead>
-                <tbody>
-                {% set matieres_all = [] %}
-                {% for item in matieres_notes_t1 %}{% if item.matiere not in matieres_all %}{% set _ = matieres_all.append(item.matiere) %}{% endif %}{% endfor %}
-                {% for item in matieres_notes_t2 %}{% if item.matiere not in matieres_all %}{% set _ = matieres_all.append(item.matiere) %}{% endif %}{% endfor %}
-                {% for item in matieres_notes_t3 %}{% if item.matiere not in matieres_all %}{% set _ = matieres_all.append(item.matiere) %}{% endif %}{% endfor %}
-
-                {% for mat in matieres_all %}
-                    {% set n1 = namespace(v=none) %}
-                    {% set n2 = namespace(v=none) %}
-                    {% set n3 = namespace(v=none) %}
-                    {% for item in matieres_notes_t1 %}{% if item.matiere == mat %}{% set n1.v = item.note %}{% endif %}{% endfor %}
-                    {% for item in matieres_notes_t2 %}{% if item.matiere == mat %}{% set n2.v = item.note %}{% endif %}{% endfor %}
-                    {% for item in matieres_notes_t3 %}{% if item.matiere == mat %}{% set n3.v = item.note %}{% endif %}{% endfor %}
-
-                    {% set notes_mat = [] %}
-                    {% if n1.v is not none %}{% set _ = notes_mat.append(n1.v) %}{% endif %}
-                    {% if n2.v is not none %}{% set _ = notes_mat.append(n2.v) %}{% endif %}
-                    {% if n3.v is not none %}{% set _ = notes_mat.append(n3.v) %}{% endif %}
-                    {% set moy_mat = (notes_mat | sum / notes_mat | length) if notes_mat | length > 0 else none %}
-
-                    <tr>
-                        <td class="mat">{{ mat }}</td>
-                        <td>
-                            {% if n1.v is not none %}<span class="nv t1">{{ "%.2f"|format(n1.v) }}</span><span class="appr">{% if n1.v>=16 %}ممتاز{% elif n1.v>=14 %}جيد جداً{% elif n1.v>=12 %}جيد{% elif n1.v>=10 %}مقبول{% elif n1.v>=8 %}ضعيف{% else %}ضعيف جداً{% endif %}</span>{% else %}<span style="color:#ccc">–</span>{% endif %}
-                        </td>
-                        <td>
-                            {% if n2.v is not none %}<span class="nv t2">{{ "%.2f"|format(n2.v) }}</span><span class="appr">{% if n2.v>=16 %}ممتاز{% elif n2.v>=14 %}جيد جداً{% elif n2.v>=12 %}جيد{% elif n2.v>=10 %}مقبول{% elif n2.v>=8 %}ضعيف{% else %}ضعيف جداً{% endif %}</span>{% else %}<span style="color:#ccc">–</span>{% endif %}
-                        </td>
-                        <td>
-                            {% if n3.v is not none %}<span class="nv t3">{{ "%.2f"|format(n3.v) }}</span><span class="appr">{% if n3.v>=16 %}ممتاز{% elif n3.v>=14 %}جيد جداً{% elif n3.v>=12 %}جيد{% elif n3.v>=10 %}مقبول{% elif n3.v>=8 %}ضعيف{% else %}ضعيف جداً{% endif %}</span>{% else %}<span style="color:#ccc">–</span>{% endif %}
-                        </td>
-                        <td>
-                            {% if moy_mat is not none %}<span class="nv moy">{{ "%.2f"|format(moy_mat) }}</span><span class="appr">{% if moy_mat>=16 %}ممتاز{% elif moy_mat>=14 %}جيد جداً{% elif moy_mat>=12 %}جيد{% elif moy_mat>=10 %}مقبول{% elif moy_mat>=8 %}ضعيف{% else %}ضعيف جداً{% endif %}</span>{% else %}<span style="color:#ccc">–</span>{% endif %}
-                        </td>
-                    </tr>
-                {% endfor %}
-
-                <!-- سطر معدلات الفصول -->
-                <tr class="row-moy">
-                    <td class="mat">📊 معدل القسم</td>
-                    <td><span class="nv t1">{{ "%.2f"|format(moyennes['T1']) }}</span></td>
-                    <td><span class="nv t2">{{ "%.2f"|format(moyennes['T2']) }}</span></td>
-                    <td><span class="nv t3">{{ "%.2f"|format(moyennes['T3']) }}</span></td>
-                    <td><span class="nv moy">{{ "%.2f"|format(moyenne) }}</span></td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    <!-- ملاحظات -->
-    <div class="sec">
-        <div class="sec-t">ملاحظات عامة</div>
-        <div class="sec-b">
-            <div class="obs">
-                {% if moyenne >= 16 %}<strong>نتائج ممتازة!</strong> يُظهر التلميذ مستوىً عالياً في جميع المواد. يُتقن المهارات المطلوبة بشكل ممتاز. تهانينا!
-                {% elif moyenne >= 14 %}<strong>نتائج جيدة جداً.</strong> يُظهر التلميذ فهمًا متيناً للمفاهيم المدرّسة. بعض الجهود الإضافية ستمكنه من التميز.
-                {% elif moyenne >= 12 %}<strong>نتائج جيدة.</strong> يعمل التلميذ بجدية ويستوعب المعارف الأساسية. يجب الحفاظ على الجهود وتعميق المفاهيم.
-                {% elif moyenne >= 10 %}<strong>نتائج مقبولة.</strong> يجب بذل مزيد من الجهد. من الضروري مراجعة أساليب العمل وتكريس وقت أكثر للدراسة.
-                {% else %}<strong>نتائج ضعيفة.</strong> من الضروري توفير دعم خاص. التعاون الوثيق بين المدرسة والعائلة أمر لا غنى عنه.
+            <!-- صورة التلميذ — ملاصقة للحافة اليسرى (نهاية RTL) — تخترق الهامش -->
+            <div style="position:absolute;left:0;top:50%;transform:translateY(-50%);text-align:center;width:100px;">
+                {% if eleve.photo_url %}
+                <img src="{{ eleve.photo_url }}" class="eleve-photo" alt="{{ eleve.prenom }}">
+                {% else %}
+                <div class="eleve-photo-ph">👤</div>
                 {% endif %}
+                <div class="photo-label">{{ eleve.prenom }}<br>{{ eleve.nom }}</div>
+            </div>
+
+        </div>
+
+        <!-- معلومات التلميذ -->
+        <div class="sec">
+            <div class="sec-t">معلومات التلميذ</div>
+            <div class="sec-b">
+                <table class="info-t">
+                    <tr>
+                        <td class="lbl">الاسم الكامل :</td>
+                        <td>{{ eleve.prenom }} {{ eleve.nom }}</td>
+                        <td class="lbl">الجنس :</td>
+                        <td>{{ 'ذكر' if eleve.sexe == 'M' else 'أنثى' }}</td>
+                    </tr>
+                    <tr>
+                        <td class="lbl">تاريخ الازدياد :</td>
+                        <td>{{ eleve.date_naissance.strftime('%d/%m/%Y') if eleve.date_naissance else 'غير محدد' }}</td>
+                        <td class="lbl">القسم :</td>
+                        <td>{{ classe.nom }}</td>
+                    </tr>
+                    <tr>
+                        <td class="lbl">الترتيب :</td>
+                        <td>{{ rang }} من أصل {{ total_eleves }}</td>
+                        <td class="lbl">المعدل العام :</td>
+                        <td><strong>{{ "%.2f"|format(moyenne) }}/20</strong></td>
+                    </tr>
+                    {% if eleve.matricule %}
+                    <tr><td class="lbl">الماتريكول :</td><td colspan="3">{{ eleve.matricule }}</td></tr>
+                    {% endif %}
+                </table>
             </div>
         </div>
-    </div>
 
-    <!-- التوقيعات -->
-    <table class="sig-t"><tr>
-        <td><div class="sig-lbl">المدير</div><div class="sig-name">{{ ecole.directeur or 'المدير' }}</div><div class="sig-line"></div></td>
-        <td><div class="sig-lbl">توقيع الأولياء</div><div class="sig-name">الوالدان أو الوصي القانوني</div><div class="sig-line"></div></td>
-    </tr></table>
-</div>
+        <!-- المعدل العام -->
+        <div class="result-box">
+            <div style="font-size:11px;font-weight:700;margin-bottom:3px;">المعدل العام السنوي</div>
+            <div class="moy-gen">{{ "%.2f"|format(moyenne) }}/20</div>
+            <div class="mention">
+                {% if moyenne >= 16 %}ممتاز
+                {% elif moyenne >= 14 %}جيد جداً
+                {% elif moyenne >= 12 %}جيد
+                {% elif moyenne >= 10 %}مقبول
+                {% else %}ضعيف{% endif %}
+            </div>
+        </div>
+
+        <!-- جدول النقاط العمودي — الثلاثيات الثلاثة -->
+        <div class="sec">
+            <div class="sec-t">📊 النقاط حسب المادة — الثلاثيات الثلاثة</div>
+            <div class="sec-b" style="padding:0;">
+                <table class="notes-v">
+                    <thead>
+                        <tr>
+                            <th class="h-mat">المادة</th>
+                            <th class="h-t1">الثلاثي 1</th>
+                            <th class="h-t2">الثلاثي 2</th>
+                            <th class="h-t3">الثلاثي 3</th>
+                            <th class="h-moy">المعدل السنوي</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% set matieres_all = [] %}
+                    {% for item in matieres_notes_t1 %}{% if item.matiere not in matieres_all %}{% set _ = matieres_all.append(item.matiere) %}{% endif %}{% endfor %}
+                    {% for item in matieres_notes_t2 %}{% if item.matiere not in matieres_all %}{% set _ = matieres_all.append(item.matiere) %}{% endif %}{% endfor %}
+                    {% for item in matieres_notes_t3 %}{% if item.matiere not in matieres_all %}{% set _ = matieres_all.append(item.matiere) %}{% endif %}{% endfor %}
+
+                    {% for mat in matieres_all %}
+                        {% set n1 = namespace(v=none) %}
+                        {% set n2 = namespace(v=none) %}
+                        {% set n3 = namespace(v=none) %}
+                        {% for item in matieres_notes_t1 %}{% if item.matiere == mat %}{% set n1.v = item.note %}{% endif %}{% endfor %}
+                        {% for item in matieres_notes_t2 %}{% if item.matiere == mat %}{% set n2.v = item.note %}{% endif %}{% endfor %}
+                        {% for item in matieres_notes_t3 %}{% if item.matiere == mat %}{% set n3.v = item.note %}{% endif %}{% endfor %}
+
+                        {% set notes_mat = [] %}
+                        {% if n1.v is not none %}{% set _ = notes_mat.append(n1.v) %}{% endif %}
+                        {% if n2.v is not none %}{% set _ = notes_mat.append(n2.v) %}{% endif %}
+                        {% if n3.v is not none %}{% set _ = notes_mat.append(n3.v) %}{% endif %}
+                        {% set moy_mat = (notes_mat | sum / notes_mat | length) if notes_mat | length > 0 else none %}
+
+                        <tr>
+                            <td class="mat">{{ mat }}</td>
+                            <td>{% if n1.v is not none %}<span class="nv t1">{{ "%.2f"|format(n1.v) }}</span><span class="appr">{% if n1.v>=16 %}ممتاز{% elif n1.v>=14 %}جيد جداً{% elif n1.v>=12 %}جيد{% elif n1.v>=10 %}مقبول{% elif n1.v>=8 %}ضعيف{% else %}ضعيف جداً{% endif %}</span>{% else %}<span style="color:#ccc">–</span>{% endif %}</td>
+                            <td>{% if n2.v is not none %}<span class="nv t2">{{ "%.2f"|format(n2.v) }}</span><span class="appr">{% if n2.v>=16 %}ممتاز{% elif n2.v>=14 %}جيد جداً{% elif n2.v>=12 %}جيد{% elif n2.v>=10 %}مقبول{% elif n2.v>=8 %}ضعيف{% else %}ضعيف جداً{% endif %}</span>{% else %}<span style="color:#ccc">–</span>{% endif %}</td>
+                            <td>{% if n3.v is not none %}<span class="nv t3">{{ "%.2f"|format(n3.v) }}</span><span class="appr">{% if n3.v>=16 %}ممتاز{% elif n3.v>=14 %}جيد جداً{% elif n3.v>=12 %}جيد{% elif n3.v>=10 %}مقبول{% elif n3.v>=8 %}ضعيف{% else %}ضعيف جداً{% endif %}</span>{% else %}<span style="color:#ccc">–</span>{% endif %}</td>
+                            <td>{% if moy_mat is not none %}<span class="nv moy">{{ "%.2f"|format(moy_mat) }}</span><span class="appr">{% if moy_mat>=16 %}ممتاز{% elif moy_mat>=14 %}جيد جداً{% elif moy_mat>=12 %}جيد{% elif moy_mat>=10 %}مقبول{% elif moy_mat>=8 %}ضعيف{% else %}ضعيف جداً{% endif %}</span>{% else %}<span style="color:#ccc">–</span>{% endif %}</td>
+                        </tr>
+                    {% endfor %}
+
+                    <tr class="row-moy">
+                        <td class="mat">📊 معدل القسم</td>
+                        <td><span class="nv t1">{{ "%.2f"|format(moyennes['T1']) }}</span></td>
+                        <td><span class="nv t2">{{ "%.2f"|format(moyennes['T2']) }}</span></td>
+                        <td><span class="nv t3">{{ "%.2f"|format(moyennes['T3']) }}</span></td>
+                        <td><span class="nv moy">{{ "%.2f"|format(moyenne) }}</span></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ملاحظات عامة -->
+        <div class="sec">
+            <div class="sec-t">ملاحظات عامة</div>
+            <div class="sec-b">
+                <div class="obs">
+                    {% if moyenne >= 16 %}<strong>نتائج ممتازة!</strong> يُظهر التلميذ مستوىً عالياً في جميع المواد. يُتقن المهارات المطلوبة بشكل ممتاز. تهانينا!
+                    {% elif moyenne >= 14 %}<strong>نتائج جيدة جداً.</strong> يُظهر التلميذ فهمًا متيناً للمفاهيم المدرّسة. بعض الجهود الإضافية ستمكنه من التميز.
+                    {% elif moyenne >= 12 %}<strong>نتائج جيدة.</strong> يعمل التلميذ بجدية ويستوعب المعارف الأساسية. يجب الحفاظ على الجهود وتعميق المفاهيم.
+                    {% elif moyenne >= 10 %}<strong>نتائج مقبولة.</strong> يجب بذل مزيد من الجهد. من الضروري مراجعة أساليب العمل وتكريس وقت أكثر للدراسة.
+                    {% else %}<strong>نتائج ضعيفة.</strong> من الضروري توفير دعم خاص. التعاون الوثيق بين المدرسة والعائلة أمر لا غنى عنه.
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- التوقيعات -->
+        <table class="sig-t"><tr>
+            <td>
+                <div class="sig-lbl">المدير</div>
+                <div class="sig-name">{{ ecole.directeur or 'المدير' }}</div>
+                <div class="sig-line"></div>
+            </td>
+            <td>
+                <div class="sig-lbl">توقيع الأولياء</div>
+                <div class="sig-name">الوالدان أو الوصي القانوني</div>
+                <div class="sig-line"></div>
+            </td>
+        </tr></table>
+
+    </div><!-- end page-inner -->
+</div><!-- end page -->
 </body>
 </html>
-
-
