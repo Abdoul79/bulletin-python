@@ -199,3 +199,29 @@ class Note(db.Model):
         return f'<Note {self.note} - Élève:{self.eleve_id} Matière:{self.matiere_id}>'
 
 
+# ============================================================
+# 1. À AJOUTER dans models.py
+# ============================================================
+ 
+class Config(db.Model):
+    """Table clé-valeur pour les paramètres globaux de l'application."""
+    __tablename__ = 'config'
+ 
+    id    = db.Column(db.Integer, primary_key=True)
+    cle   = db.Column(db.String(100), unique=True, nullable=False)   # ex: 'whatsapp_number'
+    valeur = db.Column(db.String(255), nullable=True)
+ 
+    @staticmethod
+    def get(cle, default=None):
+        row = Config.query.filter_by(cle=cle).first()
+        return row.valeur if row else default
+ 
+    @staticmethod
+    def set(cle, valeur):
+        row = Config.query.filter_by(cle=cle).first()
+        if row:
+            row.valeur = valeur
+        else:
+            row = Config(cle=cle, valeur=valeur)
+            db.session.add(row)
+        db.session.commit()
