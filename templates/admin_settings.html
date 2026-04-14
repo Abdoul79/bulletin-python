@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paramètres — EduBulletin Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --ink: #0d1117;
+            --cream: #f5f0e8;
+            --gold: #c9a84c;
+            --whatsapp: #25d366;
+            --whatsapp-dark: #128c7e;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: #f0f2f5;
+            min-height: 100vh;
+        }
+
+        /* ── Navbar ── */
+        .admin-nav {
+            background: var(--ink);
+            padding: 14px 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .admin-nav .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--gold);
+            font-weight: 700;
+            font-size: 1rem;
+            text-decoration: none;
+            letter-spacing: 0.5px;
+        }
+
+        .admin-nav .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .admin-nav .nav-links a {
+            color: #8a94a0;
+            font-size: 0.85rem;
+            text-decoration: none;
+            padding: 6px 14px;
+            border-radius: 8px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .admin-nav .nav-links a:hover,
+        .admin-nav .nav-links a.active {
+            background: rgba(255,255,255,0.08);
+            color: #fff;
+        }
+
+        /* ── Contenu ── */
+        .page-content {
+            max-width: 680px;
+            margin: 48px auto;
+            padding: 0 20px;
+        }
+
+        .page-header {
+            margin-bottom: 32px;
+        }
+
+        .page-header h1 {
+            font-family: 'DM Serif Display', serif;
+            font-size: 1.9rem;
+            color: var(--ink);
+            margin-bottom: 6px;
+        }
+
+        .page-header p {
+            color: #6b7685;
+            font-size: 0.9rem;
+        }
+
+        /* ── Card ── */
+        .settings-card {
+            background: #fff;
+            border-radius: 20px;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.06);
+            overflow: hidden;
+        }
+
+        .card-section {
+            padding: 28px 32px;
+            border-bottom: 1px solid #f0f2f5;
+        }
+
+        .card-section:last-child { border-bottom: none; }
+
+        .section-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #8a94a0;
+            margin-bottom: 20px;
+        }
+
+        .section-label .dot {
+            width: 8px; height: 8px;
+            background: var(--whatsapp);
+            border-radius: 50%;
+        }
+
+        /* ── Input numéro ── */
+        .wa-input-wrap {
+            display: flex;
+            align-items: center;
+            gap: 0;
+            border: 2px solid #e8edf2;
+            border-radius: 14px;
+            overflow: hidden;
+            transition: border-color 0.2s;
+        }
+
+        .wa-input-wrap:focus-within {
+            border-color: var(--whatsapp);
+        }
+
+        .wa-prefix {
+            background: #f8fffe;
+            border-right: 2px solid #e8edf2;
+            padding: 14px 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--whatsapp-dark);
+            font-weight: 600;
+            font-size: 0.95rem;
+            flex-shrink: 0;
+        }
+
+        .wa-prefix i { font-size: 1.1rem; }
+
+        .wa-input-wrap input {
+            border: none;
+            outline: none;
+            padding: 14px 18px;
+            font-size: 1rem;
+            font-family: 'DM Sans', sans-serif;
+            width: 100%;
+            color: var(--ink);
+        }
+
+        .wa-input-wrap input::placeholder { color: #b0b8c4; }
+
+        .input-hint {
+            margin-top: 10px;
+            font-size: 0.8rem;
+            color: #8a94a0;
+            display: flex;
+            align-items: flex-start;
+            gap: 6px;
+        }
+
+        /* ── Aperçu ── */
+        .wa-preview-box {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            border-radius: 14px;
+            padding: 18px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 20px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .wa-preview-box .preview-label {
+            font-size: 0.8rem;
+            color: #15803d;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .wa-preview-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--whatsapp);
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-decoration: none;
+            transition: background 0.2s;
+        }
+
+        .wa-preview-btn:hover { background: var(--whatsapp-dark); color: #fff; }
+
+        /* ── Boutons action ── */
+        .action-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 24px;
+            flex-wrap: wrap;
+        }
+
+        .btn-save {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--ink);
+            color: #fff;
+            border: none;
+            padding: 13px 28px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-save:hover {
+            background: #1e2530;
+            transform: translateY(-1px);
+        }
+
+        .btn-delete {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: transparent;
+            color: #ef4444;
+            border: 2px solid #fecaca;
+            padding: 11px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-delete:hover {
+            background: #fef2f2;
+            border-color: #ef4444;
+        }
+
+        /* ── Flash messages ── */
+        .flash-zone {
+            margin-bottom: 24px;
+        }
+
+        .flash-msg {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 18px;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .flash-success {
+            background: #f0fdf4;
+            color: #15803d;
+            border: 1px solid #bbf7d0;
+        }
+
+        .flash-error {
+            background: #fef2f2;
+            color: #dc2626;
+            border: 1px solid #fecaca;
+        }
+
+        .flash-warning {
+            background: #fffbeb;
+            color: #d97706;
+            border: 1px solid #fde68a;
+        }
+    </style>
+</head>
+<body>
+
+<!-- ── Navbar admin ── -->
+<nav class="admin-nav">
+    <a href="{{ url_for('auth.register_ecole') }}" class="brand">
+        <i class="bi bi-mortarboard-fill"></i>
+        EduBulletin Admin
+    </a>
+    <div class="nav-links">
+        <a href="{{ url_for('auth.register_ecole') }}">
+            <i class="bi bi-building"></i> Écoles
+        </a>
+        <a href="{{ url_for('auth.admin_settings') }}" class="active">
+            <i class="bi bi-gear"></i> Paramètres
+        </a>
+        <a href="{{ url_for('auth.admin_logout') }}">
+            <i class="bi bi-box-arrow-right"></i> Déconnexion
+        </a>
+    </div>
+</nav>
+
+<!-- ── Contenu ── -->
+<div class="page-content">
+
+    <!-- Flash messages -->
+    <div class="flash-zone">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for category, message in messages %}
+            <div class="flash-msg flash-{{ category }}">
+                <i class="bi bi-{{ 'check-circle' if category == 'success' else 'exclamation-circle' }}-fill"></i>
+                {{ message }}
+            </div>
+            {% endfor %}
+        {% endwith %}
+    </div>
+
+    <div class="page-header">
+        <h1>Paramètres généraux</h1>
+        <p>Configurez les informations de contact affichées sur la page d'accueil.</p>
+    </div>
+
+    <div class="settings-card">
+        <div class="card-section">
+
+            <div class="section-label">
+                <span class="dot"></span>
+                Contact WhatsApp
+            </div>
+
+            <form method="POST" action="{{ url_for('auth.admin_settings') }}">
+
+                <div class="wa-input-wrap">
+                    <div class="wa-prefix">
+                        <i class="bi bi-whatsapp"></i>
+                        +
+                    </div>
+                    <input
+                        type="tel"
+                        name="whatsapp_number"
+                        placeholder="22369000000"
+                        value="{{ whatsapp_number }}"
+                        inputmode="numeric"
+                    >
+                </div>
+
+                <p class="input-hint">
+                    <i class="bi bi-info-circle"></i>
+                    Numéro international sans le <strong>+</strong> ni espaces.
+                    Exemple Guinée : <strong>224621000000</strong>
+                </p>
+
+                <!-- Aperçu si numéro déjà enregistré -->
+                {% if whatsapp_number %}
+                <div class="wa-preview-box">
+                    <span class="preview-label">
+                        <i class="bi bi-eye"></i>
+                        Aperçu du bouton sur la page d'accueil
+                    </span>
+                    <a href="https://wa.me/{{ whatsapp_number }}" target="_blank" class="wa-preview-btn">
+                        <i class="bi bi-whatsapp"></i>
+                        Nous contacter
+                    </a>
+                </div>
+                {% endif %}
+
+                <div class="action-bar">
+                    <button type="submit" class="btn-save">
+                        <i class="bi bi-check-lg"></i>
+                        Enregistrer
+                    </button>
+
+                    {% if whatsapp_number %}
+                    <button
+                        type="submit"
+                        name="whatsapp_number"
+                        value=""
+                        class="btn-delete"
+                        onclick="return confirm('Supprimer le numéro WhatsApp ?')">
+                        <i class="bi bi-trash"></i>
+                        Supprimer le numéro
+                    </button>
+                    {% endif %}
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
