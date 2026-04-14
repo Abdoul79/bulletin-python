@@ -209,6 +209,10 @@
         <button class="btn-nav" onclick="location.reload()">
             <i class="bi bi-arrow-clockwise"></i> Actualiser
         </button>
+        <a href="{{ url_for('auth.admin_settings') }}">
+            <i class="bi bi-gear"></i> Paramètres
+        </a>
+
         <a href="{{ url_for('auth.admin_logout') }}" class="btn-nav danger">
             <i class="bi bi-box-arrow-right"></i> Déconnexion
         </a>
