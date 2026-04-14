@@ -25,6 +25,7 @@ PUBLIC_ENDPOINTS = {
     'auth.admin_logout',
     'language.change_language',
     'static',
+    # ← pas besoin d'ajouter admin_settings, il est protégé
 }
 
 
