@@ -32,8 +32,11 @@ def is_ecole_logged_in():
 
 @auth_bp.route('/')
 def index():
-    """Page d'accueil"""
-    return render_template('index.html')
+    """Page d'accueil avec bouton WhatsApp si numéro configuré"""
+    from models import Config
+    whatsapp_number = Config.get('whatsapp_number', '')
+    whatsapp_clean = ''.join(filter(str.isdigit, whatsapp_number))
+    return render_template('index.html', whatsapp_number=whatsapp_clean)
 
 
 # ======================================
@@ -127,6 +130,25 @@ def register_ecole():
     return render_template('register_ecole.html', ecoles=ecoles)
 
 
+@auth_bp.route('/admin/settings', methods=['GET', 'POST'])
+def admin_settings():
+    """Paramètres admin : numéro WhatsApp, etc."""
+    if not is_admin_logged_in():
+        flash("⚠️ Accès réservé aux administrateurs.", "warning")
+        return redirect(url_for('auth.admin_login'))
+
+    from models import Config
+
+    if request.method == 'POST':
+        whatsapp = request.form.get('whatsapp_number', '').strip()
+        Config.set('whatsapp_number', whatsapp)
+        flash("✅ Paramètres enregistrés avec succès !", "success")
+        return redirect(url_for('auth.admin_settings'))
+
+    whatsapp_number = Config.get('whatsapp_number', '')
+    return render_template('admin_settings.html', whatsapp_number=whatsapp_number)
+
+
 @auth_bp.route('/admin/edit_ecole', methods=['POST'])
 def admin_edit_ecole():
     """Modifier une école"""
@@ -214,7 +236,6 @@ def admin_delete_ecole():
         if ecole:
             nom = ecole.nom
 
-            # Supprimer le logo si existe
             if hasattr(ecole, 'logo') and ecole.logo:
                 try:
                     logo_path = os.path.join('static/img', ecole.logo)
