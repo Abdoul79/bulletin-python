@@ -58,7 +58,7 @@ def admin_login():
             session['admin_logged_in'] = True
             session['user_type'] = 'admin'
             session['admin_email'] = email
-            session['last_activity'] = datetime.utcnow().isoformat()  # ← démarre le timer
+            session['last_activity'] = datetime.utcnow().isoformat()
             flash("✅ Connexion administrateur réussie !", "success")
             return redirect(url_for('auth.register_ecole'))
         else:
@@ -75,7 +75,10 @@ def register_ecole():
         flash("⚠️ Accès réservé aux administrateurs.", "warning")
         return redirect(url_for('auth.admin_login'))
 
-    ecoles = Ecole.query.order_by(Ecole.id.desc()).all()
+    # Écoles actives/suspendues (pas les demandes en attente)
+    ecoles = Ecole.query.filter(Ecole.statut != 'en_attente').order_by(Ecole.id.desc()).all()
+    # Demandes d'inscription en attente de validation
+    demandes = Ecole.query.filter_by(statut='en_attente').order_by(Ecole.id.desc()).all()
 
     if request.method == 'POST':
         nom = request.form.get('nom', '').strip()
@@ -88,11 +91,11 @@ def register_ecole():
 
         if not all([nom, email, password]):
             flash("Tous les champs obligatoires doivent être remplis.", "error")
-            return render_template('register_ecole.html', ecoles=ecoles)
+            return render_template('register_ecole.html', ecoles=ecoles, demandes=demandes)
 
         if Ecole.query.filter_by(email=email).first():
             flash("❌ Cet email est déjà utilisé par une autre école.", "error")
-            return render_template('register_ecole.html', ecoles=ecoles)
+            return render_template('register_ecole.html', ecoles=ecoles, demandes=demandes)
 
         logo = None
         if 'logo' in request.files:
@@ -114,7 +117,8 @@ def register_ecole():
                 adresse=adresse,
                 telephone=telephone,
                 logo=logo,
-                type_ecole=type_ecole
+                type_ecole=type_ecole,
+                statut='actif'          # Ajout admin → directement actif
             )
             db.session.add(ecole)
             db.session.commit()
@@ -125,9 +129,9 @@ def register_ecole():
         except Exception as e:
             db.session.rollback()
             flash("❌ Erreur lors de l'enregistrement de l'école.", "error")
-            return render_template('register_ecole.html', ecoles=ecoles)
+            return render_template('register_ecole.html', ecoles=ecoles, demandes=demandes)
 
-    return render_template('register_ecole.html', ecoles=ecoles)
+    return render_template('register_ecole.html', ecoles=ecoles, demandes=demandes)
 
 
 @auth_bp.route('/admin/settings', methods=['GET', 'POST'])
@@ -162,6 +166,7 @@ def admin_edit_ecole():
     directeur = request.form.get('directeur')
     telephone = request.form.get('telephone')
     adresse = request.form.get('adresse')
+    type_ecole = request.form.get('type_ecole', 'francaise')
 
     try:
         ecole = Ecole.query.get(ecole_id)
@@ -176,6 +181,7 @@ def admin_edit_ecole():
             ecole.directeur = directeur
             ecole.telephone = telephone
             ecole.adresse = adresse
+            ecole.type_ecole = type_ecole
             db.session.commit()
             flash(f"École '{nom}' modifiée avec succès", "success")
         else:
@@ -201,16 +207,9 @@ def admin_toggle_status():
     try:
         ecole = Ecole.query.get(ecole_id)
         if ecole:
-            nouveau_statut = 'suspendu' if action == 'suspendre' else 'actif'
-
-            if hasattr(ecole, 'statut'):
-                ecole.statut = nouveau_statut
-            else:
-                setattr(ecole, 'statut', nouveau_statut)
-
+            ecole.statut = 'suspendu' if action == 'suspendre' else 'actif'
             db.session.commit()
-
-            action_text = 'suspendue' if nouveau_statut == 'suspendu' else 'activée'
+            action_text = 'suspendue' if ecole.statut == 'suspendu' else 'activée'
             flash(f"École '{ecole.nom}' {action_text} avec succès", "success")
         else:
             flash("École introuvable", "error")
@@ -250,11 +249,9 @@ def admin_delete_ecole():
 
             for classe in classes:
                 eleves = Eleve.query.filter_by(classe_id=classe.id).all()
-
                 for eleve in eleves:
                     Note.query.filter_by(eleve_id=eleve.id).delete()
                     db.session.delete(eleve)
-
                 Matiere.query.filter_by(classe_id=classe.id).delete()
                 db.session.delete(classe)
 
@@ -272,6 +269,65 @@ def admin_delete_ecole():
         traceback.print_exc()
 
     return redirect(url_for('auth.register_ecole'))
+
+
+@auth_bp.route('/admin/approve_ecole', methods=['POST'])
+def admin_approve_ecole():
+    """Accepter une demande d'inscription d'école"""
+    if not is_admin_logged_in():
+        flash("Accès réservé aux administrateurs", "error")
+        return redirect(url_for('auth.admin_login'))
+
+    ecole_id = request.form.get('ecole_id')
+
+    try:
+        ecole = Ecole.query.get(ecole_id)
+        if ecole and ecole.statut == 'en_attente':
+            ecole.statut = 'actif'
+            db.session.commit()
+            flash(f"✅ Demande de '{ecole.nom}' acceptée. L'école est maintenant active.", "success")
+        else:
+            flash("Demande introuvable ou déjà traitée.", "error")
+    except Exception as e:
+        db.session.rollback()
+        flash("Erreur lors de l'approbation.", "error")
+        print(f"Erreur: {e}")
+
+    return redirect(url_for('auth.register_ecole', tab='demandes'))
+
+
+@auth_bp.route('/admin/reject_ecole', methods=['POST'])
+def admin_reject_ecole():
+    """Refuser et supprimer une demande d'inscription d'école"""
+    if not is_admin_logged_in():
+        flash("Accès réservé aux administrateurs", "error")
+        return redirect(url_for('auth.admin_login'))
+
+    ecole_id = request.form.get('ecole_id')
+
+    try:
+        ecole = Ecole.query.get(ecole_id)
+        if ecole and ecole.statut == 'en_attente':
+            nom = ecole.nom
+            # Supprimer le logo si présent
+            if ecole.logo:
+                try:
+                    logo_path = os.path.join('static/img', ecole.logo)
+                    if os.path.exists(logo_path):
+                        os.remove(logo_path)
+                except Exception as e:
+                    print(f"Erreur suppression logo: {e}")
+            db.session.delete(ecole)
+            db.session.commit()
+            flash(f"❌ Demande de '{nom}' refusée et supprimée.", "warning")
+        else:
+            flash("Demande introuvable ou déjà traitée.", "error")
+    except Exception as e:
+        db.session.rollback()
+        flash("Erreur lors du refus.", "error")
+        print(f"Erreur: {e}")
+
+    return redirect(url_for('auth.register_ecole', tab='demandes'))
 
 
 @auth_bp.route('/admin/logout')
@@ -301,6 +357,11 @@ def login():
 
         if ecole and check_password_hash(ecole.mot_de_passe, password):
             statut = getattr(ecole, 'statut', 'actif')
+
+            if statut == 'en_attente':
+                flash("⏳ Votre demande d'inscription est en attente de validation par l'administrateur.", "error")
+                return render_template('login.html')
+
             if statut == 'suspendu':
                 flash("Votre école est actuellement suspendue. Contactez l'administrateur.", "error")
                 return render_template('login.html')
@@ -310,7 +371,7 @@ def login():
             session['ecole_nom'] = ecole.nom
             session['user_type'] = 'ecole'
             session['type_ecole'] = ecole.type_ecole
-            session['last_activity'] = datetime.utcnow().isoformat()  # ← démarre le timer
+            session['last_activity'] = datetime.utcnow().isoformat()
 
             flash(f"Bienvenue {ecole.nom} !", "success")
 
@@ -322,6 +383,69 @@ def login():
             flash("Email ou mot de passe incorrect", "error")
 
     return render_template('login.html')
+
+
+@auth_bp.route('/register', methods=['GET', 'POST'])
+def ecole_register():
+    """Auto-inscription d'une école — compte créé avec statut 'en_attente'"""
+    if request.method == 'POST':
+        nom = request.form.get('nom', '').strip()
+        email = request.form.get('email', '').strip()
+        password = request.form.get('password', '')
+        directeur = request.form.get('directeur', '').strip()
+        adresse = request.form.get('adresse', '').strip()
+        telephone = request.form.get('telephone', '').strip()
+        type_ecole = request.form.get('type_ecole', 'francaise')
+
+        if not all([nom, email, password]):
+            flash("Nom, email et mot de passe sont obligatoires.", "error")
+            return render_template('login.html', open_register=True)
+
+        if len(password) < 6:
+            flash("Le mot de passe doit contenir au moins 6 caractères.", "error")
+            return render_template('login.html', open_register=True)
+
+        if Ecole.query.filter_by(email=email).first():
+            flash("❌ Cet email est déjà utilisé.", "error")
+            return render_template('login.html', open_register=True)
+
+        logo = None
+        if 'logo' in request.files:
+            file = request.files['logo']
+            if file.filename != '':
+                filename = format_filename(file.filename, f"logo_{email.replace('@', '_').replace('.', '_')}")
+                upload_dir = 'static/img'
+                os.makedirs(upload_dir, exist_ok=True)
+                filepath = os.path.join(upload_dir, filename)
+                file.save(filepath)
+                logo = filename
+
+        try:
+            ecole = Ecole(
+                nom=nom,
+                email=email,
+                mot_de_passe=generate_password_hash(password),
+                directeur=directeur,
+                adresse=adresse,
+                telephone=telephone,
+                logo=logo,
+                type_ecole=type_ecole,
+                statut='en_attente'     # ← En attente de validation admin
+            )
+            db.session.add(ecole)
+            db.session.commit()
+
+            # Redirige vers login avec indicateur de succès
+            return redirect(url_for('auth.login', registered=1))
+
+        except Exception as e:
+            db.session.rollback()
+            flash("❌ Erreur lors de l'inscription. Veuillez réessayer.", "error")
+            print(f"Erreur inscription: {e}")
+            return render_template('login.html', open_register=True)
+
+    # GET → affiche le formulaire d'inscription
+    return render_template('login.html', open_register=True)
 
 
 @auth_bp.route('/logout')
