@@ -25,6 +25,8 @@ class Ecole(db.Model):
     logo         = db.Column(db.String(100))
     statut       = db.Column(db.String(20), default='actif')
     type_ecole   = db.Column(db.String(20), default='francaise')
+    is_active        = db.Column(db.Boolean, default=False, nullable=False)  # ← NOUVEAU
+    date_inscription = db.Column(db.DateTime, nullable=True)                 # ← NOUVEAU
 
     classes           = db.relationship('Classe',        backref='ecole', lazy=True, cascade='all, delete-orphan')
     matricules_utilises = db.relationship('MatriculeUsed', backref='ecole', lazy=True, cascade='all, delete-orphan')
