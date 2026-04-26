@@ -50,19 +50,21 @@
         .hero-sub { color:#4a5568; font-size:0.9rem; }
 
         /* Stat cards */
-        .stats-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:32px; }
+        .stats-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:16px; margin-bottom:32px; }
         .stat-card { background:white; border:1.5px solid var(--border); border-radius:20px; padding:24px 20px; cursor:pointer; transition:all 0.25s; animation:fadeUp 0.6s ease both; position:relative; overflow:hidden; }
         .stat-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; }
         .stat-card.blue::before   { background:linear-gradient(90deg,#6366f1,#818cf8); }
         .stat-card.green::before  { background:linear-gradient(90deg,var(--success-color),#4ade80); }
         .stat-card.gold::before   { background:linear-gradient(90deg,var(--gold),#f59e0b); }
         .stat-card.rust::before   { background:linear-gradient(90deg,var(--rust),#f87171); }
+        .stat-card.purple::before { background:linear-gradient(90deg,#8b5cf6,#c4b5fd); }
         .stat-card:hover { border-color:var(--gold); box-shadow:0 12px 32px rgba(13,17,23,0.07); transform:translateY(-3px); }
         .stat-icon { width:46px; height:46px; border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:1.2rem; margin-bottom:14px; }
-        .stat-icon.blue  { background:rgba(99,102,241,0.1); color:#6366f1; }
-        .stat-icon.green { background:rgba(39,174,96,0.1); color:var(--success-color); }
-        .stat-icon.gold  { background:rgba(201,168,76,0.12); color:#7a5c10; }
-        .stat-icon.rust  { background:rgba(196,98,45,0.1); color:var(--rust); }
+        .stat-icon.blue   { background:rgba(99,102,241,0.1); color:#6366f1; }
+        .stat-icon.green  { background:rgba(39,174,96,0.1); color:var(--success-color); }
+        .stat-icon.gold   { background:rgba(201,168,76,0.12); color:#7a5c10; }
+        .stat-icon.rust   { background:rgba(196,98,45,0.1); color:var(--rust); }
+        .stat-icon.purple { background:rgba(139,92,246,0.1); color:#7c3aed; }
         .stat-num   { font-family:'DM Serif Display',serif; font-size:2.2rem; color:var(--ink); line-height:1; margin-bottom:4px; }
         .stat-label { font-size:0.82rem; color:var(--text-muted); font-weight:500; }
         .stat-hint  { font-size:0.72rem; color:#c8d0da; margin-top:4px; }
@@ -72,6 +74,29 @@
         .tab-btn { flex:1; padding:11px 16px; border:none; border-radius:12px; background:transparent; font-family:'DM Sans',sans-serif; font-size:0.88rem; font-weight:600; color:var(--text-muted); cursor:pointer; transition:all 0.2s; display:flex; align-items:center; justify-content:center; gap:8px; }
         .tab-btn.active { background:var(--ink); color:var(--gold); }
         .tab-btn:hover:not(.active) { background:var(--mist); color:var(--ink); }
+
+        /* Badge alerte sur l'onglet Demandes */
+        .tab-badge-alert {
+            background: var(--rust);
+            color: white;
+            border-radius: 50px;
+            padding: 1px 8px;
+            font-size: 0.68rem;
+            font-weight: 700;
+            animation: pulse-badge 2s infinite;
+        }
+        @keyframes pulse-badge {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(196,98,45,0.4); }
+            50%       { box-shadow: 0 0 0 5px rgba(196,98,45,0); }
+        }
+        .tab-badge {
+            background: var(--gold);
+            color: var(--ink);
+            border-radius: 50px;
+            padding: 1px 8px;
+            font-size: 0.7rem;
+            font-weight: 700;
+        }
 
         /* Tab panels */
         .tab-panel { display:none; animation:fadeUp 0.4s ease; }
@@ -123,6 +148,7 @@
         .status-pill { display:inline-flex; align-items:center; gap:5px; border-radius:50px; padding:5px 12px; font-size:0.75rem; font-weight:700; }
         .status-active   { background:rgba(39,174,96,0.1); color:var(--success-color); }
         .status-suspended { background:rgba(201,168,76,0.1); color:#7a5c10; }
+        .status-pending   { background:rgba(139,92,246,0.1); color:#7c3aed; }
 
         .table-actions { display:flex; gap:6px; align-items:center; flex-wrap:wrap; }
         .icon-btn-table { display:flex; align-items:center; gap:6px; padding:7px 12px; border-radius:9px; border:1.5px solid var(--border); background:transparent; font-family:'DM Sans',sans-serif; font-size:0.78rem; font-weight:600; color:var(--text-muted); cursor:pointer; transition:all 0.2s; white-space:nowrap; }
@@ -130,6 +156,108 @@
         .icon-btn-table.activate:hover { background:rgba(39,174,96,0.1); border-color:rgba(39,174,96,0.3); color:var(--success-color); }
         .icon-btn-table.suspend:hover  { background:rgba(201,168,76,0.1); border-color:rgba(201,168,76,0.3); color:#7a5c10; }
         .icon-btn-table.del:hover      { background:rgba(196,98,45,0.1); border-color:rgba(196,98,45,0.3); color:var(--rust); }
+        .icon-btn-table.approve        { border-color:rgba(39,174,96,0.3); color:var(--success-color); }
+        .icon-btn-table.approve:hover  { background:rgba(39,174,96,0.1); border-color:rgba(39,174,96,0.5); }
+        .icon-btn-table.reject:hover   { background:rgba(196,98,45,0.1); border-color:rgba(196,98,45,0.3); color:var(--rust); }
+
+        /* ── Section demandes ── */
+        .pending-header-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 28px;
+            border-bottom: 1px solid var(--border);
+            background: rgba(139,92,246,0.03);
+        }
+        .pending-header-bar .phb-left { display:flex; align-items:center; gap:12px; }
+        .pending-icon { width:40px; height:40px; background:rgba(139,92,246,0.1); border-radius:12px; display:flex; align-items:center; justify-content:center; color:#7c3aed; font-size:1rem; }
+        .pending-count-chip { background:rgba(139,92,246,0.1); color:#7c3aed; border:1px solid rgba(139,92,246,0.2); border-radius:50px; padding:4px 12px; font-size:0.75rem; font-weight:700; }
+
+        .pending-alert-banner {
+            margin: 0 28px 0;
+            padding: 14px 18px;
+            background: rgba(139,92,246,0.06);
+            border: 1px solid rgba(139,92,246,0.18);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.85rem;
+            color: #5b21b6;
+            margin: 20px 28px;
+        }
+        .pending-alert-banner i { font-size: 1.1rem; flex-shrink:0; }
+
+        /* Fiche demande (cards) */
+        .requests-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(340px,1fr)); gap:18px; padding:28px; }
+        .request-card {
+            border: 1.5px solid rgba(139,92,246,0.15);
+            border-radius: 18px;
+            overflow: hidden;
+            background: white;
+            transition: all 0.25s;
+            animation: fadeUp 0.4s ease;
+        }
+        .request-card:hover { border-color:rgba(139,92,246,0.35); box-shadow:0 8px 24px rgba(139,92,246,0.08); transform:translateY(-2px); }
+        .request-card-top {
+            background: linear-gradient(135deg,rgba(139,92,246,0.06),rgba(201,168,76,0.04));
+            padding: 20px 20px 16px;
+            border-bottom: 1px solid rgba(139,92,246,0.1);
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+        }
+        .request-logo-placeholder {
+            width: 48px; height: 48px; flex-shrink:0;
+            border-radius: 14px;
+            background: var(--ink);
+            color: var(--gold);
+            display: flex; align-items: center; justify-content: center;
+            font-family: 'DM Serif Display', serif;
+            font-size: 1.3rem;
+        }
+        .request-logo { width:48px; height:48px; border-radius:14px; object-fit:cover; border:1.5px solid var(--border); flex-shrink:0; }
+        .request-info { flex:1; min-width:0; }
+        .request-name { font-family:'DM Serif Display',serif; font-size:1.05rem; color:var(--ink); margin-bottom:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .request-email { font-size:0.75rem; color:var(--text-muted); margin-bottom:6px; }
+        .request-date { font-size:0.7rem; color:#c8d0da; display:flex; align-items:center; gap:4px; }
+        .request-card-body { padding:16px 20px; }
+        .req-detail-row { display:flex; align-items:center; gap:8px; font-size:0.82rem; color:var(--text-muted); margin-bottom:8px; }
+        .req-detail-row:last-child { margin-bottom:0; }
+        .req-detail-row i { width:16px; color:var(--gold); font-size:0.85rem; }
+        .req-detail-row strong { color:var(--ink); }
+        .request-card-footer {
+            padding: 14px 20px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 8px;
+        }
+        .btn-approve {
+            flex: 2;
+            display:flex; align-items:center; justify-content:center; gap:7px;
+            padding: 10px;
+            background: rgba(39,174,96,0.08);
+            border: 1.5px solid rgba(39,174,96,0.25);
+            border-radius: 10px;
+            font-family:'DM Sans',sans-serif; font-size:0.82rem; font-weight:700;
+            color: var(--success-color);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-approve:hover { background:var(--success-color); color:white; border-color:var(--success-color); }
+        .btn-reject {
+            flex: 1;
+            display:flex; align-items:center; justify-content:center; gap:7px;
+            padding: 10px;
+            background: transparent;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            font-family:'DM Sans',sans-serif; font-size:0.82rem; font-weight:700;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-reject:hover { background:rgba(196,98,45,0.08); border-color:rgba(196,98,45,0.3); color:var(--rust); }
 
         /* Empty */
         .empty-state { padding:64px 24px; text-align:center; }
@@ -149,13 +277,15 @@
         .num-chip { background:var(--ink); color:var(--gold); border-radius:50px; padding:3px 12px; font-size:0.78rem; font-weight:700; }
         .num-chip.green  { background:rgba(39,174,96,0.1); color:var(--success-color); }
         .num-chip.gold   { background:rgba(201,168,76,0.1); color:#7a5c10; }
+        .num-chip.purple { background:rgba(139,92,246,0.1); color:#7c3aed; }
 
         .progress-row { margin-bottom:16px; }
         .progress-label { display:flex; justify-content:space-between; font-size:0.8rem; color:var(--text-muted); margin-bottom:6px; }
         .progress-bar-wrap { background:var(--border); border-radius:50px; height:8px; overflow:hidden; }
         .progress-bar-fill { height:100%; border-radius:50px; transition:width 0.6s ease; }
-        .progress-bar-fill.green { background:linear-gradient(90deg,var(--success-color),#4ade80); }
-        .progress-bar-fill.gold  { background:linear-gradient(90deg,var(--gold),#f59e0b); }
+        .progress-bar-fill.green  { background:linear-gradient(90deg,var(--success-color),#4ade80); }
+        .progress-bar-fill.gold   { background:linear-gradient(90deg,var(--gold),#f59e0b); }
+        .progress-bar-fill.purple { background:linear-gradient(90deg,#8b5cf6,#c4b5fd); }
 
         /* Modal */
         .modal-overlay { display:none; position:fixed; inset:0; z-index:500; background:rgba(13,17,23,0.5); backdrop-filter:blur(4px); align-items:center; justify-content:center; padding:24px; }
@@ -169,22 +299,29 @@
         .btn-cancel:hover { background:var(--border); }
         .btn-confirm { flex:2; padding:13px; background:var(--ink); border:none; border-radius:12px; font-family:'DM Sans',sans-serif; font-size:0.9rem; font-weight:600; color:var(--cream); cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; transition:all 0.2s; }
         .btn-confirm:hover { background:#1a2332; }
+        .btn-confirm.green { background:var(--success-color); }
+        .btn-confirm.green:hover { background:#145c31; }
 
-        /* Delete modal */
+        /* Delete / Approve preview modals */
         .delete-info { background:rgba(196,98,45,0.06); border:1px solid rgba(196,98,45,0.18); border-radius:14px; padding:16px; margin-bottom:20px; }
+        .approve-info { background:rgba(39,174,96,0.06); border:1px solid rgba(39,174,96,0.18); border-radius:14px; padding:16px; margin-bottom:20px; }
         .delete-name { font-family:'DM Serif Display',serif; font-size:1.1rem; color:var(--ink); margin-bottom:6px; }
         .delete-warn { font-size:0.8rem; color:var(--text-muted); display:flex; align-items:center; gap:6px; }
         .btn-confirm.red { background:var(--rust); }
         .btn-confirm.red:hover { background:#a0522d; }
+
+        /* Reject modal */
+        .reject-info { background:rgba(196,98,45,0.06); border:1px solid rgba(196,98,45,0.18); border-radius:14px; padding:16px; margin-bottom:20px; }
 
         @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
 
         @media(max-width:900px) {
             .navbar { padding:0 20px; }
             .page-content { padding:24px 16px; }
-            .stats-grid { grid-template-columns:1fr 1fr; }
+            .stats-grid { grid-template-columns:repeat(3,1fr); }
             .form-grid { grid-template-columns:1fr; }
             .stats-summary { grid-template-columns:1fr; }
+            .requests-grid { grid-template-columns:1fr; padding:16px; }
         }
         @media(max-width:560px) {
             .stats-grid { grid-template-columns:1fr 1fr; }
@@ -209,10 +346,9 @@
         <button class="btn-nav" onclick="location.reload()">
             <i class="bi bi-arrow-clockwise"></i> Actualiser
         </button>
-        <a href="{{ url_for('auth.admin_settings') }}">
+        <a href="{{ url_for('auth.admin_settings') }}" class="btn-nav">
             <i class="bi bi-gear"></i> Paramètres
         </a>
-
         <a href="{{ url_for('auth.admin_logout') }}" class="btn-nav danger">
             <i class="bi bi-box-arrow-right"></i> Déconnexion
         </a>
@@ -236,13 +372,14 @@
     <div class="hero">
         <div class="hero-label"><i class="bi bi-shield-lock"></i> Zone d'administration</div>
         <h1>Gestion des Écoles<br><em>Tableau de bord admin</em></h1>
-        <p class="hero-sub">Gérez les établissements enregistrés sur la plateforme EduBulletin.</p>
+        <p class="hero-sub">Gérez les établissements enregistrés et les demandes d'inscription sur EduBulletin.</p>
     </div>
 
     <!-- Stats -->
-    {% set nb_total = ecoles|length %}
-    {% set nb_actifs = ecoles|selectattr('statut','equalto','actif')|list|length if ecoles else 0 %}
+    {% set nb_total     = ecoles|length %}
+    {% set nb_actifs    = ecoles|selectattr('statut','equalto','actif')|list|length if ecoles else 0 %}
     {% set nb_suspendus = ecoles|selectattr('statut','equalto','suspendu')|list|length if ecoles else 0 %}
+    {% set nb_demandes  = demandes|length if demandes else 0 %}
 
     <div class="stats-grid">
         <div class="stat-card blue" onclick="switchTab('gestion')" style="animation-delay:0.05s">
@@ -261,6 +398,12 @@
             <div class="stat-num">{{ nb_suspendus }}</div>
             <div class="stat-label">Écoles suspendues</div>
         </div>
+        <div class="stat-card purple" onclick="switchTab('demandes')" style="animation-delay:0.18s">
+            <div class="stat-icon purple"><i class="bi bi-hourglass-split"></i></div>
+            <div class="stat-num">{{ nb_demandes }}</div>
+            <div class="stat-label">Demandes en attente</div>
+            <div class="stat-hint">{% if nb_demandes > 0 %}⚠ Action requise{% else %}Aucune demande{% endif %}</div>
+        </div>
         <div class="stat-card rust" onclick="switchTab('ajout')" style="animation-delay:0.2s">
             <div class="stat-icon rust"><i class="bi bi-plus-circle-fill"></i></div>
             <div class="stat-num"><i class="bi bi-plus-lg" style="font-size:1.6rem;"></i></div>
@@ -276,14 +419,22 @@
         </button>
         <button class="tab-btn" id="tab-gestion" onclick="switchTab('gestion')">
             <i class="bi bi-list-ul"></i> Gestion des écoles
-            <span style="background:var(--gold);color:var(--ink);border-radius:50px;padding:1px 8px;font-size:0.7rem;">{{ nb_total }}</span>
+            <span class="tab-badge">{{ nb_total }}</span>
+        </button>
+        <button class="tab-btn" id="tab-demandes" onclick="switchTab('demandes')">
+            <i class="bi bi-hourglass-split"></i> Demandes
+            {% if nb_demandes > 0 %}
+            <span class="tab-badge-alert">{{ nb_demandes }}</span>
+            {% else %}
+            <span class="tab-badge">0</span>
+            {% endif %}
         </button>
         <button class="tab-btn" id="tab-stats" onclick="switchTab('stats')">
             <i class="bi bi-bar-chart-fill"></i> Statistiques
         </button>
     </div>
 
-    <!-- Tab: Ajouter -->
+    <!-- ══════════════ Tab: Ajouter ══════════════ -->
     <div class="tab-panel active" id="panel-ajout">
         <div class="content-card">
             <div class="content-card-header">
@@ -293,7 +444,7 @@
                 </div>
             </div>
             <div class="content-card-body">
-                <form method="POST" enctype="multipart/form-data">
+                <form method="POST" action="{{ url_for('auth.admin_edit_ecole') }}" enctype="multipart/form-data">
                     <div class="form-grid">
                         <div class="field">
                             <label><i class="bi bi-building"></i> Nom de l'école <span style="color:var(--rust)">*</span></label>
@@ -321,7 +472,7 @@
                         </div>
                         <div class="field">
                             <label><i class="bi bi-telephone"></i> Téléphone</label>
-                            <input type="tel" name="telephone" placeholder="+33 1 23 45 67 89">
+                            <input type="tel" name="telephone" placeholder="+213 5X XX XX XX">
                         </div>
                         <div class="field">
                             <label><i class="bi bi-image"></i> Logo</label>
@@ -343,7 +494,7 @@
         </div>
     </div>
 
-    <!-- Tab: Gestion -->
+    <!-- ══════════════ Tab: Gestion ══════════════ -->
     <div class="tab-panel" id="panel-gestion">
         <div class="content-card">
             <div class="content-card-header">
@@ -436,7 +587,105 @@
         </div>
     </div>
 
-    <!-- Tab: Stats -->
+    <!-- ══════════════ Tab: Demandes ══════════════ -->
+    <div class="tab-panel" id="panel-demandes">
+        <div class="content-card">
+
+            <!-- En-tête -->
+            <div class="pending-header-bar">
+                <div class="phb-left">
+                    <div class="pending-icon"><i class="bi bi-hourglass-split"></i></div>
+                    <div>
+                        <div class="content-card-title">Demandes d'inscription</div>
+                        <div style="font-size:0.8rem;color:var(--text-muted);margin-top:2px;">Écoles inscrites depuis la page de connexion</div>
+                    </div>
+                </div>
+                {% if nb_demandes > 0 %}
+                <span class="pending-count-chip"><i class="bi bi-clock"></i> {{ nb_demandes }} en attente</span>
+                {% endif %}
+            </div>
+
+            {% if demandes and nb_demandes > 0 %}
+
+            <!-- Bannière d'alerte -->
+            <div class="pending-alert-banner">
+                <i class="bi bi-info-circle-fill"></i>
+                <span>Ces écoles ont soumis une demande d'inscription. Elles <strong>n'ont pas encore accès</strong> à la plateforme. Acceptez ou refusez chaque demande.</span>
+            </div>
+
+            <!-- Grille de cartes -->
+            <div class="requests-grid">
+                {% for demande in demandes %}
+                <div class="request-card">
+                    <div class="request-card-top">
+                        {% if demande.logo %}
+                        <img src="{{ url_for('static', filename='img/' + demande.logo) }}" class="request-logo" alt="Logo">
+                        {% else %}
+                        <div class="request-logo-placeholder">{{ demande.nom[0] if demande.nom else 'E' }}</div>
+                        {% endif %}
+                        <div class="request-info">
+                            <div class="request-name">{{ demande.nom }}</div>
+                            <div class="request-email">{{ demande.email }}</div>
+                            <div class="request-date">
+                                <i class="bi bi-calendar3"></i>
+                                {{ demande.date_demande.strftime('%d/%m/%Y à %H:%M') if demande.date_demande else 'Date inconnue' }}
+                            </div>
+                        </div>
+                        <span class="status-pill status-pending" style="flex-shrink:0;"><i class="bi bi-hourglass"></i> Attente</span>
+                    </div>
+                    <div class="request-card-body">
+                        <div class="req-detail-row">
+                            <i class="bi bi-translate"></i>
+                            <span>Type : <strong>{{ 'Franco-Arabe' if demande.type_ecole == 'franco-arabe' else 'Française' }}</strong></span>
+                        </div>
+                        {% if demande.directeur %}
+                        <div class="req-detail-row">
+                            <i class="bi bi-person"></i>
+                            <span>Directeur : <strong>{{ demande.directeur }}</strong></span>
+                        </div>
+                        {% endif %}
+                        {% if demande.telephone %}
+                        <div class="req-detail-row">
+                            <i class="bi bi-telephone"></i>
+                            <span>{{ demande.telephone }}</span>
+                        </div>
+                        {% endif %}
+                        {% if demande.adresse %}
+                        <div class="req-detail-row">
+                            <i class="bi bi-geo-alt"></i>
+                            <span>{{ demande.adresse[:60] }}{% if demande.adresse|length > 60 %}…{% endif %}</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="request-card-footer">
+                        <!-- Formulaire Accepter -->
+                        <form method="POST" action="{{ url_for('auth.admin_approve_ecole') }}" style="flex:2;display:flex;">
+                            <input type="hidden" name="ecole_id" value="{{ demande.id }}">
+                            <button type="submit" class="btn-approve" style="width:100%;">
+                                <i class="bi bi-check-circle-fill"></i> Accepter
+                            </button>
+                        </form>
+                        <!-- Bouton Refuser (ouvre modal) -->
+                        <button class="btn-reject" onclick="openRejectModal({{ demande.id }}, '{{ demande.nom|e }}')">
+                            <i class="bi bi-x-circle"></i> Refuser
+                        </button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-icon"><i class="bi bi-inbox"></i></div>
+                <h3>Aucune demande en attente</h3>
+                <p>Les écoles qui s'inscrivent depuis la page de connexion apparaîtront ici pour validation.</p>
+            </div>
+            {% endif %}
+
+        </div>
+    </div>
+
+    <!-- ══════════════ Tab: Stats ══════════════ -->
     <div class="tab-panel" id="panel-stats">
         <div class="content-card">
             <div class="content-card-header">
@@ -459,6 +708,10 @@
                             <span class="summary-row-label">Écoles suspendues</span>
                             <span class="num-chip gold">{{ nb_suspendus }}</span>
                         </div>
+                        <div class="summary-row">
+                            <span class="summary-row-label">Demandes en attente</span>
+                            <span class="num-chip purple">{{ nb_demandes }}</span>
+                        </div>
                     </div>
                     <div class="summary-card">
                         <div class="summary-card-title"><i class="bi bi-pie-chart" style="color:var(--success-color);"></i> Répartition</div>
@@ -480,15 +733,24 @@
                                 <div class="progress-bar-fill gold" style="width:{{ (nb_suspendus / nb_total * 100)|int if nb_total > 0 else 0 }}%"></div>
                             </div>
                         </div>
+                        <div class="progress-row">
+                            <div class="progress-label">
+                                <span>En attente</span>
+                                <span>{{ nb_demandes }}</span>
+                            </div>
+                            <div class="progress-bar-wrap">
+                                <div class="progress-bar-fill purple" style="width:{{ [nb_demandes * 10, 100]|min }}%"></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-</div>
+</div><!-- /page-content -->
 
-<!-- Modal Modifier -->
+<!-- ══════════════ Modal Modifier ══════════════ -->
 <div class="modal-overlay" id="editModal">
     <div class="modal-box">
         <h3 class="modal-title">Modifier l'école</h3>
@@ -532,7 +794,7 @@
     </div>
 </div>
 
-<!-- Modal Supprimer -->
+<!-- ══════════════ Modal Supprimer ══════════════ -->
 <div class="modal-overlay" id="deleteModal">
     <div class="modal-box" style="max-width:440px;">
         <h3 class="modal-title">Supprimer l'école ?</h3>
@@ -546,6 +808,28 @@
             <div class="modal-footer-btns">
                 <button type="button" class="btn-cancel" onclick="closeModal('deleteModal')">Annuler</button>
                 <button type="submit" class="btn-confirm red"><i class="bi bi-trash"></i> Supprimer</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ══════════════ Modal Refuser demande ══════════════ -->
+<div class="modal-overlay" id="rejectModal">
+    <div class="modal-box" style="max-width:460px;">
+        <h3 class="modal-title">Refuser cette demande ?</h3>
+        <p class="modal-sub">L'école sera supprimée de la liste des demandes.</p>
+        <div class="reject-info">
+            <div class="delete-name" id="reject_nom_display"></div>
+            <div class="delete-warn" style="margin-top:8px;">
+                <i class="bi bi-info-circle" style="color:var(--rust);"></i>
+                L'établissement ne pourra pas accéder à la plateforme. Vous pouvez l'ajouter manuellement plus tard.
+            </div>
+        </div>
+        <form id="rejectForm" method="POST" action="{{ url_for('auth.admin_reject_ecole') }}">
+            <input type="hidden" id="reject_ecole_id" name="ecole_id">
+            <div class="modal-footer-btns">
+                <button type="button" class="btn-cancel" onclick="closeModal('rejectModal')">Annuler</button>
+                <button type="submit" class="btn-confirm red"><i class="bi bi-x-circle"></i> Refuser la demande</button>
             </div>
         </form>
     </div>
@@ -565,6 +849,11 @@
         document.getElementById('tab-' + name).classList.add('active');
         document.getElementById('panel-' + name).classList.add('active');
     }
+
+    // Ouvrir sur l'onglet "demandes" si des demandes existent et que l'URL le demande
+    {% if request.args.get('tab') == 'demandes' %}
+        switchTab('demandes');
+    {% endif %}
 
     // ── Modals ──
     function openModal(id) { document.getElementById(id).classList.add('open'); }
@@ -589,6 +878,13 @@
         document.getElementById('delete_ecole_id').value = id;
         document.getElementById('delete_nom_display').textContent = nom;
         openModal('deleteModal');
+    }
+
+    // ── Refuser une demande ──
+    function openRejectModal(id, nom) {
+        document.getElementById('reject_ecole_id').value = id;
+        document.getElementById('reject_nom_display').textContent = nom;
+        openModal('rejectModal');
     }
 
     // ── Toggle statut ──
