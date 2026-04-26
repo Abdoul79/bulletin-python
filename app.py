@@ -16,7 +16,6 @@ load_dotenv()  # ← charge .env au démarrage
 # ======================================
 SESSION_TIMEOUT_MINUTES = 60  # 1 heure
 
-# Routes publiques qui ne déclenchent pas le timeout
 PUBLIC_ENDPOINTS = {
     'auth.login',
     'auth.admin_login',
@@ -25,22 +24,84 @@ PUBLIC_ENDPOINTS = {
     'auth.admin_logout',
     'language.change_language',
     'static',
-    # ← pas besoin d'ajouter admin_settings, il est protégé
 }
+
+
+# ══════════════════════════════════════════════════════════════
+#  TEST DE CONNEXION — Supabase ou SQLite
+# ══════════════════════════════════════════════════════════════
+
+def test_db_connection(uri: str) -> bool:
+    """
+    Tente une connexion rapide à l'URI donnée.
+    Retourne True si la connexion réussit, False sinon.
+    """
+    try:
+        if 'postgresql' in uri or 'postgres' in uri:
+            import psycopg2
+            from urllib.parse import urlparse
+            parsed = urlparse(uri)
+            conn = psycopg2.connect(
+                host=parsed.hostname,
+                port=parsed.port or 5432,
+                user=parsed.username,
+                password=parsed.password,
+                dbname=parsed.path.lstrip('/'),
+                connect_timeout=5,          # ← timeout 5 secondes max
+                sslmode='require',
+            )
+            conn.close()
+            return True
+        else:
+            # SQLite → toujours disponible
+            return True
+    except Exception as e:
+        print(f"⚠️  Connexion DB échouée : {e}")
+        return False
+
+
+def get_db_uri() -> str:
+    """
+    Retourne l'URI à utiliser :
+    1. Essaie DATABASE_URL (Supabase)
+    2. Si indisponible → bascule sur SQLite local
+    """
+    supabase_uri = os.environ.get('DATABASE_URL', '')
+
+    # Normaliser postgres:// → postgresql:// (SQLAlchemy exige postgresql://)
+    if supabase_uri.startswith('postgres://'):
+        supabase_uri = supabase_uri.replace('postgres://', 'postgresql://', 1)
+
+    if supabase_uri and ('postgresql' in supabase_uri or 'postgres' in supabase_uri):
+        print("🔌 Test de connexion à Supabase...")
+        if test_db_connection(supabase_uri):
+            print("✅ Supabase disponible → connexion établie")
+            return supabase_uri
+        else:
+            print("❌ Supabase INDISPONIBLE → bascule sur SQLite local")
+            return 'sqlite:///bulletin_fallback.db'
+
+    # Pas de DATABASE_URL → SQLite direct
+    sqlite_uri = os.environ.get('SQLITE_URL', 'sqlite:///bulletin.db')
+    print(f"⚠️  Pas de DATABASE_URL → SQLite : {sqlite_uri}")
+    return sqlite_uri
 
 
 def create_app():
     app = Flask(__name__)
 
-    # ── Configuration ──────────────────────────────────
+    # ── Configuration de base ──────────────────────────
     app.config.from_object(Config)
 
-    # ── Log pour confirmer la base utilisée ───────────
-    db_uri = app.config.get('SQLALCHEMY_DATABASE_URI', '')
-    if 'postgresql' in db_uri or 'supabase' in db_uri:
+    # ── Déterminer la base de données à utiliser ───────
+    db_uri = get_db_uri()
+    app.config['SQLALCHEMY_DATABASE_URI'] = db_uri
+
+    # ── Log de confirmation ────────────────────────────
+    if 'postgresql' in db_uri:
         print("✅ Base de données : Supabase (PostgreSQL)")
     else:
-        print("⚠️  Base de données : SQLite local (développement)")
+        print(f"⚠️  Base de données : SQLite local → {db_uri}")
 
     # ── Extensions ─────────────────────────────────────
     db.init_app(app)
@@ -52,14 +113,20 @@ def create_app():
     # ── Blueprints ─────────────────────────────────────
     register_routes(app)
 
-    # ── Timeout de session global (couvre tous les blueprints) ─
+    # ── Indicateur base active dans templates ──────────
+    @app.context_processor
+    def inject_conf_vars():
+        is_fallback = 'sqlite' in app.config.get('SQLALCHEMY_DATABASE_URI', '')
+        return {
+            't': t,
+            'current_lang': get_current_language(),
+            'available_languages': get_available_languages(),
+            'db_fallback': is_fallback,   # ← dispo dans tous les templates
+        }
+
+    # ── Timeout de session global ──────────────────────
     @app.before_request
     def check_session_timeout():
-        """
-        Vérifie l'inactivité avant chaque requête.
-        Si la session est inactive depuis plus de 2h → déconnexion automatique.
-        """
-        # Ignorer les routes publiques et les fichiers statiques
         if request.endpoint in PUBLIC_ENDPOINTS or request.endpoint is None:
             return
 
@@ -68,24 +135,14 @@ def create_app():
             if datetime.utcnow() - last > timedelta(minutes=SESSION_TIMEOUT_MINUTES):
                 user_type = session.get('user_type', 'ecole')
                 session.clear()
-                flash("⏰ Votre session a expiré après 2h d'inactivité. Veuillez vous reconnecter.", "warning")
+                flash("⏰ Votre session a expiré. Veuillez vous reconnecter.", "warning")
                 if user_type == 'admin':
                     return redirect(url_for('auth.admin_login'))
                 return redirect(url_for('auth.login'))
 
-        # Rafraîchir le timestamp à chaque action
         if session.get('user_type') in ('admin', 'ecole'):
             session['last_activity'] = datetime.utcnow().isoformat()
             session.modified = True
-
-    # ── Contexte global templates ──────────────────────
-    @app.context_processor
-    def inject_conf_vars():
-        return {
-            't': t,
-            'current_lang': get_current_language(),
-            'available_languages': get_available_languages()
-        }
 
     # ── Créer les tables si elles n'existent pas ───────
     with app.app_context():
@@ -100,15 +157,15 @@ def create_app():
 
 def register_routes(app):
     try:
-        from routes.auth     import auth_bp
-        from routes.main     import main_bp
-        from routes.classe   import classe_bp
-        from routes.eleve    import eleve_bp
-        from routes.matiere  import matiere_bp
-        from routes.notes    import notes_bp
-        from routes.pdf      import pdf_bp, pdf_ar_bp
-        from routes.language import language_bp
-        from routes.search   import search_bp
+        from routes.auth      import auth_bp
+        from routes.main      import main_bp
+        from routes.classe    import classe_bp
+        from routes.eleve     import eleve_bp
+        from routes.matiere   import matiere_bp
+        from routes.notes     import notes_bp
+        from routes.pdf       import pdf_bp, pdf_ar_bp
+        from routes.language  import language_bp
+        from routes.search    import search_bp
         from routes.paiements import paiements_bp
 
         app.register_blueprint(search_bp)
