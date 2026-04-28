@@ -6,6 +6,8 @@ from i18n import init_babel, get_current_language, get_available_languages
 from routes.analytics import analytics_bp
 from translations_manual import t
 from datetime import datetime, timedelta
+from routes.absences import absences_bp
+
 
 import os
 
@@ -167,6 +169,7 @@ def register_routes(app):
         from routes.language  import language_bp
         from routes.search    import search_bp
         from routes.paiements import paiements_bp
+        from routes.absences  import absences_bp
 
         app.register_blueprint(search_bp)
         app.register_blueprint(auth_bp)
@@ -180,6 +183,7 @@ def register_routes(app):
         app.register_blueprint(language_bp)
         app.register_blueprint(paiements_bp)
         app.register_blueprint(analytics_bp)
+        app.register_blueprint(absences_bp)
         print("✅ Tous les blueprints enregistrés")
 
     except ImportError as e:
