@@ -217,6 +217,11 @@
             .actions-grid { grid-template-columns:1fr 1fr; }
             .stats-grid   { grid-template-columns:1fr; }
         }
+
+        .action-icon.abs  { background: rgba(220,38,38,0.08); color: #991b1b; }
+        .action-icon.card { background: rgba(99,102,241,0.1);  color: #4f46e5; }
+
+
     </style>
 </head>
 <body>
@@ -370,6 +375,13 @@
             <div class="action-label">Cartes scolaires</div>
             <div class="action-sub">Générer et imprimer</div>
         </a>
+
+        <a href="{{ url_for('absences.feuille_absences', classe_id=classe.id) }}" class="action-card" style="animation-delay:0.35s">
+                <div class="action-icon abs"><i class="bi bi-clipboard2-check-fill"></i></div>
+                <div class="action-label">Absences</div>
+                <div class="action-sub">Feuille d'appel</div>
+        </a>
+
 
         
     </div>

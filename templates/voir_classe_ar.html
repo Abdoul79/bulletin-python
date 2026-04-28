@@ -177,6 +177,7 @@
         }
         .icon-carte { background: rgba(99,102,241,0.12); color: #4f46e5; }
         .action-card.cartes:hover { border-color: #4f46e5; }
+        .action-icon.abs { background: rgba(220,38,38,0.08); color: #991b1b; }
     </style>
 </head>
 <body>
@@ -300,6 +301,12 @@
         <a href="{{ url_for('analytics.cartes_classe', classe_id=classe.id) }}" class="action-card cartes">
             <div class="action-icon-wrap icon-carte"><i class="bi bi-person-badge-fill"></i></div>
             <span class="action-label">البطاقات المدرسية</span>
+        </a>
+
+        {# ── ABSENCES ── #}
+        <a href="{{ url_for('absences.feuille_absences', classe_id=classe.id) }}" class="action-card" style="animation-delay:0.35s">
+                <div class="action-icon abs"><i class="bi bi-clipboard2-check-fill"></i></div>
+                <span class="action-label">الغيابات</span>
         </a>
 
     </div>
