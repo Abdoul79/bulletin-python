@@ -43,6 +43,41 @@ class Classe(db.Model):
     eleves   = db.relationship('Eleve',   backref='classe', lazy=True, cascade='all, delete-orphan')
     matieres = db.relationship('Matiere', backref='classe', lazy=True, cascade='all, delete-orphan')
 
+#model absence 
+# ═══════════════════════════════════════════════════════
+#  AJOUTER DANS models.py — après la classe Eleve
+# ═══════════════════════════════════════════════════════
+
+class Absence(db.Model):
+    """Enregistrement des absences par demi-journée"""
+    __tablename__ = 'absence'
+
+    id           = db.Column(db.Integer, primary_key=True)
+    eleve_id     = db.Column(db.Integer, db.ForeignKey('eleve.id'), nullable=False)
+    classe_id    = db.Column(db.Integer, db.ForeignKey('classe.id'), nullable=False)
+    date_absence = db.Column(db.Date, nullable=False)
+    matin        = db.Column(db.Boolean, default=False)   # avant midi
+    apres_midi   = db.Column(db.Boolean, default=False)   # après midi
+    justifiee    = db.Column(db.Boolean, default=False)   # absence justifiée
+    motif        = db.Column(db.String(200), nullable=True)
+
+    # Relations
+    eleve  = db.relationship('Eleve',  backref=db.backref('absences',  lazy=True))
+    classe = db.relationship('Classe', backref=db.backref('absences_cl', lazy=True))
+
+    @property
+    def journee_entiere(self):
+        return self.matin and self.apres_midi
+
+    @property
+    def nb_demi_journees(self):
+        return int(self.matin) + int(self.apres_midi)
+
+    def __repr__(self):
+        return f'<Absence eleve={self.eleve_id} date={self.date_absence}>'
+
+#fin model absence
+
 
 class Matiere(db.Model):
     """⚠️ Classe manquante — cause de toutes les erreurs"""
