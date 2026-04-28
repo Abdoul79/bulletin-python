@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الغيابات — {{ classe.nom }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root{--ink:#0d1117;--cream:#f5f0e8;--gold:#c9a84c;--mist:#e8edf2;--muted:#6b7685;--green:#228B22;--orange:#FF8C00;--red:#dc2626;--border:#e8edf2;}
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{font-family:'Cairo',sans-serif;background:var(--cream);min-height:100vh;color:var(--ink);direction:rtl;}
+        body::before{content:'';position:fixed;inset:0;z-index:0;background:radial-gradient(circle at 10% 10%,rgba(201,168,76,0.1),transparent 55%),radial-gradient(circle at 95% 90%,rgba(196,98,45,0.07),transparent 50%);pointer-events:none;}
+        body::after{content:'';position:fixed;inset:0;z-index:0;background-image:radial-gradient(circle,#c9a84c18 1px,transparent 1px);background-size:24px 24px;pointer-events:none;}
+
+        .navbar{position:sticky;top:0;z-index:100;background:rgba(245,240,232,0.95);backdrop-filter:blur(12px);border-bottom:1px solid rgba(201,168,76,0.15);padding:0 36px;height:62px;display:flex;align-items:center;justify-content:space-between;}
+        .brand{display:flex;align-items:center;gap:10px;text-decoration:none;flex-direction:row-reverse;}
+        .brand-icon{width:34px;height:34px;background:var(--ink);border-radius:9px;display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:1rem;}
+        .brand-name{font-size:1rem;font-weight:800;color:var(--ink);}
+        .nav-links{display:flex;gap:8px;}
+        .btn-nav{display:flex;align-items:center;gap:6px;padding:8px 16px;border-radius:50px;background:transparent;border:1.5px solid var(--border);color:var(--muted);font-size:13px;font-weight:600;text-decoration:none;transition:all 0.2s;font-family:'Cairo',sans-serif;}
+        .btn-nav:hover{border-color:var(--ink);color:var(--ink);}
+
+        .main{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:28px 24px;}
+
+        /* Hero */
+        .hero{background:var(--ink);border-radius:20px;padding:22px 28px;margin-bottom:22px;position:relative;overflow:hidden;}
+        .hero::before{content:'';position:absolute;top:-50px;left:-50px;width:220px;height:220px;background:radial-gradient(circle,rgba(201,168,76,0.1),transparent 70%);border-radius:50%;}
+        .hero-label{display:inline-flex;align-items:center;gap:6px;background:rgba(201,168,76,0.12);border:1px solid rgba(201,168,76,0.2);color:var(--gold);padding:4px 12px;border-radius:50px;font-size:11px;font-weight:700;margin-bottom:8px;}
+        .hero-title{font-size:1.3rem;font-weight:800;color:#e8edf2;margin-bottom:2px;}
+        .hero-sub{font-size:12px;color:#4a5568;}
+
+        /* Navigation semaine */
+        .date-nav{display:flex;align-items:center;gap:10px;margin-bottom:20px;flex-wrap:wrap;}
+        .date-nav-title{font-size:13px;font-weight:800;color:var(--ink);}
+        .week-days{display:flex;gap:6px;}
+        .day-btn{padding:7px 12px;border-radius:10px;border:1.5px solid var(--border);background:white;font-size:11px;font-weight:700;color:var(--muted);text-decoration:none;transition:all 0.2s;text-align:center;font-family:'Cairo',sans-serif;}
+        .day-btn:hover{border-color:var(--gold);color:var(--gold);}
+        .day-btn.today{border-color:var(--orange);color:var(--orange);}
+        .day-btn.selected{background:var(--ink);color:var(--gold);border-color:var(--ink);}
+        .day-btn .day-name{display:block;font-size:9px;font-weight:600;opacity:0.7;}
+        .day-btn .day-num{display:block;font-size:13px;font-weight:800;}
+        .date-input-wrap{display:flex;align-items:center;gap:8px;margin-right:auto;}
+        .date-input{padding:8px 12px;border:1.5px solid var(--border);border-radius:10px;font-size:12px;color:var(--ink);background:white;direction:ltr;}
+        .date-input:focus{outline:none;border-color:var(--gold);}
+
+        /* Tableau */
+        .table-card{background:white;border:1.5px solid var(--border);border-radius:18px;overflow:hidden;margin-bottom:20px;}
+        .table-head-bar{background:var(--ink);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;}
+        .table-head-title{font-size:13px;font-weight:800;color:#e8edf2;display:flex;align-items:center;gap:8px;}
+        .date-badge{background:rgba(201,168,76,0.15);color:var(--gold);padding:4px 12px;border-radius:50px;font-size:11px;font-weight:700;}
+
+        .abs-table{width:100%;border-collapse:collapse;}
+        .abs-table th{padding:10px 14px;font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;background:#f8f9fa;border-bottom:1px solid var(--border);text-align:center;}
+        .abs-table th.th-name{text-align:right;}
+        .abs-table td{padding:0;border-bottom:1px solid var(--mist);vertical-align:middle;}
+        .abs-table tbody tr:last-child td{border-bottom:none;}
+        .abs-table tbody tr:hover td{background:rgba(201,168,76,0.02);}
+
+        /* Élève cell */
+        .eleve-cell{display:flex;align-items:center;gap:10px;padding:12px 14px;flex-direction:row-reverse;}
+        .eleve-av{width:34px;height:34px;border-radius:9px;background:var(--ink);display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:11px;font-weight:800;flex-shrink:0;}
+        .eleve-nm{font-size:12px;font-weight:700;color:var(--ink);text-align:right;}
+        .eleve-mat{font-size:10px;color:var(--muted);text-align:right;}
+
+        /* Checkbox demi-journée */
+        .dj-cell{text-align:center;padding:8px 10px;min-width:90px;}
+        .dj-label{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;padding:8px 6px;border-radius:10px;border:1.5px solid var(--border);transition:all 0.2s;user-select:none;}
+        .dj-label:hover{border-color:var(--orange);background:rgba(255,140,0,0.04);}
+        .dj-label.checked-matin{background:rgba(255,140,0,0.1);border-color:var(--orange);}
+        .dj-label.checked-aprem{background:rgba(220,38,38,0.08);border-color:var(--red);}
+        .dj-label input[type=checkbox]{display:none;}
+        .dj-icon{font-size:1.1rem;}
+        .dj-txt{font-size:9px;font-weight:700;color:var(--muted);}
+        .dj-label.checked-matin .dj-txt{color:var(--orange);}
+        .dj-label.checked-aprem .dj-txt{color:var(--red);}
+
+        .journee-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:50px;font-size:10px;font-weight:800;background:rgba(220,38,38,0.1);color:var(--red);border:1px solid rgba(220,38,38,0.2);}
+        .journee-badge.hide{visibility:hidden;}
+
+        .stats-cell{text-align:center;padding:8px 10px;min-width:80px;}
+        .stat-dj{font-size:13px;font-weight:800;color:var(--ink);}
+        .stat-dj.warning{color:var(--orange);}
+        .stat-dj.danger{color:var(--red);}
+        .stat-sub{font-size:9px;color:var(--muted);margin-top:1px;}
+
+        .just-cell{padding:8px 10px;min-width:130px;}
+        .just-label{display:flex;align-items:center;gap:5px;cursor:pointer;font-size:12px;font-weight:600;color:var(--muted);flex-direction:row-reverse;}
+        .just-label input{accent-color:var(--green);}
+        .just-label.checked{color:var(--green);}
+        .motif-input{width:100%;margin-top:4px;padding:5px 8px;border:1.5px solid var(--border);border-radius:7px;font-size:11px;font-family:'Cairo',sans-serif;text-align:right;display:none;}
+        .motif-input.show{display:block;}
+
+        .recap-bar{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;background:#f8f9fa;border-top:1px solid var(--border);}
+        .recap-item{text-align:center;}
+        .recap-num{font-size:1.2rem;font-weight:800;color:var(--ink);}
+        .recap-num.orange{color:var(--orange);}
+        .recap-num.red{color:var(--red);}
+        .recap-lbl{font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;}
+
+        .btn-save{padding:12px 28px;background:var(--ink);color:var(--gold);border:none;border-radius:12px;font-size:13px;font-weight:800;cursor:pointer;font-family:'Cairo',sans-serif;transition:all 0.2s;display:inline-flex;align-items:center;gap:8px;}
+        .btn-save:hover{background:#1a2332;transform:translateY(-1px);}
+        .btn-bilan{display:inline-flex;align-items:center;gap:6px;padding:10px 20px;border:1.5px solid var(--border);border-radius:12px;font-size:12px;font-weight:700;color:var(--muted);text-decoration:none;transition:all 0.2s;font-family:'Cairo',sans-serif;}
+        .btn-bilan:hover{border-color:var(--gold);color:var(--gold);}
+
+        .flash{padding:12px 16px;border-radius:12px;margin-bottom:16px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px;}
+        .flash.success{background:rgba(34,139,34,0.1);border:1px solid rgba(34,139,34,0.2);color:#1a5c1a;}
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <a href="{{ url_for('main.dashboard_ar') }}" class="brand">
+        <div class="brand-icon">🎓</div>
+        <span class="brand-name">EduBulletin</span>
+    </a>
+    <div class="nav-links">
+        <a href="{{ url_for('absences.bilan_absences', classe_id=classe.id) }}" class="btn-nav">
+            <i class="bi bi-bar-chart"></i> بيان الغيابات
+        </a>
+        <a href="{{ url_for('main.voir_classe_ar', classe_id=classe.id) }}" class="btn-nav">
+            <i class="bi bi-arrow-right"></i> العودة للقسم
+        </a>
+    </div>
+</nav>
+
+<div class="main">
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for cat, msg in messages %}
+    <div class="flash {{ cat }}"><i class="bi bi-check-circle"></i> {{ msg }}</div>
+    {% endfor %}
+    {% endwith %}
+
+    <div class="hero">
+        <div class="hero-label">📋 كشف الغيابات</div>
+        <div class="hero-title">{{ classe.nom }} — الغيابات</div>
+        <div class="hero-sub">ضع علامة ☐ صباحاً / ☐ مساءً — الاثنان معاً = غياب يوم كامل</div>
+    </div>
+
+    <!-- Navigation semaine -->
+    <div class="date-nav">
+        <div>
+            <div class="date-nav-title" style="margin-bottom:8px;">أيام الأسبوع</div>
+            <div class="week-days">
+                {% set jours = ['الإثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'] %}
+                {% for d in semaine %}
+                <a href="{{ url_for('absences.feuille_absences', classe_id=classe.id, date=d.isoformat()) }}"
+                   class="day-btn {% if d == date_sel %}selected{% elif d == aujourd_hui %}today{% endif %}">
+                    <span class="day-name">{{ jours[loop.index0] }}</span>
+                    <span class="day-num">{{ d.day }}</span>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="date-input-wrap">
+            <form method="GET">
+                <input type="date" name="date" class="date-input" value="{{ date_sel.isoformat() }}" onchange="this.form.submit()">
+            </form>
+        </div>
+    </div>
+
+    <!-- Tableau -->
+    <form method="POST" id="absForm">
+        <input type="hidden" name="date" value="{{ date_sel.isoformat() }}">
+
+        <div class="table-card">
+            <div class="table-head-bar">
+                <div class="table-head-title">
+                    <i class="bi bi-people" style="color:var(--gold)"></i>
+                    كشف الحضور والغياب
+                </div>
+                <span class="date-badge">
+                    {{ date_sel.strftime('%d/%m/%Y') }}
+                </span>
+            </div>
+
+            <table class="abs-table">
+                <thead>
+                    <tr>
+                        <th class="th-name" style="width:28%;">التلميذ</th>
+                        <th style="width:14%;">☀️ قبل الزوال</th>
+                        <th style="width:14%;">🌙 بعد الزوال</th>
+                        <th style="width:12%;">اليوم</th>
+                        <th style="width:12%;">الشهر (ن.ج)</th>
+                        <th style="width:20%;">التبرير</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for eleve in eleves %}
+                {% set ab = absences_jour.get(eleve.id) %}
+                {% set is_matin = ab.matin if ab else false %}
+                {% set is_aprem = ab.apres_midi if ab else false %}
+                {% set is_just  = ab.justifiee if ab else false %}
+                {% set motif_v  = ab.motif if ab else '' %}
+                {% set stats    = stats_mois.get(eleve.id, {}) %}
+                <tr id="row-{{ eleve.id }}">
+                    <td>
+                        <div class="eleve-cell">
+                            <div class="eleve-av">{{ eleve.prenom[0] }}{{ eleve.nom[0] }}</div>
+                            <div>
+                                <div class="eleve-nm">{{ eleve.prenom }} {{ eleve.nom }}</div>
+                                <div class="eleve-mat">{{ eleve.matricule or '—' }}</div>
+                            </div>
+                        </div>
+                    </td>
+
+                    <!-- قبل الزوال -->
+                    <td class="dj-cell">
+                        <label class="dj-label {% if is_matin %}checked-matin{% endif %}"
+                               id="lbl-matin-{{ eleve.id }}"
+                               onclick="toggleDJ({{ eleve.id }}, 'matin')">
+                            <input type="checkbox" name="matin_{{ eleve.id }}"
+                                   id="cb-matin-{{ eleve.id }}"
+                                   {% if is_matin %}checked{% endif %}>
+                            <span class="dj-icon">🌅</span>
+                            <span class="dj-txt">قبل الزوال</span>
+                        </label>
+                    </td>
+
+                    <!-- بعد الزوال -->
+                    <td class="dj-cell">
+                        <label class="dj-label {% if is_aprem %}checked-aprem{% endif %}"
+                               id="lbl-aprem-{{ eleve.id }}"
+                               onclick="toggleDJ({{ eleve.id }}, 'aprem')">
+                            <input type="checkbox" name="apres_midi_{{ eleve.id }}"
+                                   id="cb-aprem-{{ eleve.id }}"
+                                   {% if is_aprem %}checked{% endif %}>
+                            <span class="dj-icon">🌆</span>
+                            <span class="dj-txt">بعد الزوال</span>
+                        </label>
+                    </td>
+
+                    <!-- يوم كامل -->
+                    <td style="text-align:center;padding:8px;">
+                        <span class="journee-badge {% if not (is_matin and is_aprem) %}hide{% endif %}"
+                              id="badge-{{ eleve.id }}">
+                            🔴 يوم كامل
+                        </span>
+                    </td>
+
+                    <!-- إحصاء الشهر -->
+                    <td class="stats-cell">
+                        {% set dj = stats.get('total_demi', 0) %}
+                        <div class="stat-dj {% if dj >= 6 %}danger{% elif dj >= 3 %}warning{% endif %}">{{ dj }}</div>
+                        <div class="stat-sub">{{ "%.1f"|format(dj/2) }} ي.</div>
+                    </td>
+
+                    <!-- التبرير -->
+                    <td class="just-cell">
+                        {% if is_matin or is_aprem %}
+                        <label class="just-label {% if is_just %}checked{% endif %}"
+                               id="lbl-just-{{ eleve.id }}"
+                               onclick="toggleJust({{ eleve.id }})">
+                            <input type="checkbox" name="justifie_{{ eleve.id }}"
+                                   id="cb-just-{{ eleve.id }}"
+                                   {% if is_just %}checked{% endif %}>
+                            <i class="bi bi-check-circle{% if is_just %}-fill{% endif %}"></i>
+                            مبرر
+                        </label>
+                        <input type="text" name="motif_{{ eleve.id }}"
+                               id="motif-{{ eleve.id }}"
+                               class="motif-input {% if is_just %}show{% endif %}"
+                               value="{{ motif_v }}" placeholder="السبب...">
+                        {% else %}
+                        <label class="just-label" style="opacity:0.3;pointer-events:none;">
+                            <input type="checkbox" name="justifie_{{ eleve.id }}" id="cb-just-{{ eleve.id }}" disabled>
+                            <i class="bi bi-circle"></i>
+                            مبرر
+                        </label>
+                        <input type="text" name="motif_{{ eleve.id }}" id="motif-{{ eleve.id }}"
+                               class="motif-input" placeholder="السبب..." disabled>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+
+            <!-- شريط الملخص والحفظ -->
+            <div class="recap-bar">
+                <div style="display:flex;gap:10px;align-items:center;">
+                    <button type="submit" class="btn-save">
+                        <i class="bi bi-save"></i> حفظ الغيابات
+                    </button>
+                    <a href="{{ url_for('absences.bilan_absences', classe_id=classe.id) }}" class="btn-bilan">
+                        <i class="bi bi-graph-up"></i> بيان الغيابات
+                    </a>
+                </div>
+                <div class="recap-item">
+                    <div class="recap-num" id="recap-presents">{{ eleves|length }}</div>
+                    <div class="recap-lbl">حاضرون</div>
+                </div>
+                <div class="recap-item">
+                    <div class="recap-num red" id="recap-journees">0</div>
+                    <div class="recap-lbl">يوم كامل</div>
+                </div>
+                <div class="recap-item">
+                    <div class="recap-num orange" id="recap-absents">0</div>
+                    <div class="recap-lbl">غائبون</div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+</div>
+
+<script>
+function toggleDJ(eleveId, demi) {
+    const cbMatin = document.getElementById('cb-matin-' + eleveId);
+    const cbAprem = document.getElementById('cb-aprem-' + eleveId);
+    const lblMatin = document.getElementById('lbl-matin-' + eleveId);
+    const lblAprem = document.getElementById('lbl-aprem-' + eleveId);
+    const badge    = document.getElementById('badge-' + eleveId);
+    const lblJust  = document.getElementById('lbl-just-' + eleveId);
+    const cbJust   = document.getElementById('cb-just-' + eleveId);
+    const motif    = document.getElementById('motif-' + eleveId);
+
+    if (demi === 'matin') {
+        cbMatin.checked = !cbMatin.checked;
+        lblMatin.className = 'dj-label' + (cbMatin.checked ? ' checked-matin' : '');
+    } else {
+        cbAprem.checked = !cbAprem.checked;
+        lblAprem.className = 'dj-label' + (cbAprem.checked ? ' checked-aprem' : '');
+    }
+
+    const journee = cbMatin.checked && cbAprem.checked;
+    badge.className = 'journee-badge' + (journee ? '' : ' hide');
+
+    const absent = cbMatin.checked || cbAprem.checked;
+    if (absent) {
+        lblJust.style.opacity = '1';
+        lblJust.style.pointerEvents = 'auto';
+        cbJust.disabled = false;
+        motif.disabled = false;
+    } else {
+        lblJust.style.opacity = '0.3';
+        lblJust.style.pointerEvents = 'none';
+        cbJust.checked = false;
+        cbJust.disabled = true;
+        motif.disabled = true;
+        motif.classList.remove('show');
+        lblJust.className = 'just-label';
+    }
+    updateRecap();
+}
+
+function toggleJust(eleveId) {
+    const cb    = document.getElementById('cb-just-' + eleveId);
+    const lbl   = document.getElementById('lbl-just-' + eleveId);
+    const motif = document.getElementById('motif-' + eleveId);
+    cb.checked = !cb.checked;
+    lbl.className = 'just-label' + (cb.checked ? ' checked' : '');
+    motif.className = 'motif-input' + (cb.checked ? ' show' : '');
+}
+
+function updateRecap() {
+    let absents = 0, journees = 0;
+    document.querySelectorAll('[id^="cb-matin-"]').forEach(cb => {
+        const id = cb.id.replace('cb-matin-', '');
+        const m = cb.checked;
+        const a = document.getElementById('cb-aprem-' + id)?.checked;
+        if (m || a) absents++;
+        if (m && a) journees++;
+    });
+    const total = {{ eleves|length }};
+    document.getElementById('recap-absents').textContent  = absents;
+    document.getElementById('recap-journees').textContent = journees;
+    document.getElementById('recap-presents').textContent = total - absents;
+}
+updateRecap();
+
+</script>
+</body>
+</html>
