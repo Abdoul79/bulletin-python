@@ -377,7 +377,8 @@ def preview_bulletin_ar(eleve_id):
     donnees['appreciation'] = _generer_appreciation_ar(donnees['moyenne'])
     donnees['weasyprint_available'] = WEASYPRINT_AVAILABLE
 
-    return render_template('bulletin_preview_ar.html', **donnees)
+    qr_info = obtenir_ou_creer_verif(eleve.id, classe.id, classe.annee_scolaire)
+    return render_template('bulletin_preview_ar.html', **donnees, qr_info=qr_info)
 
 
 @pdf_ar_bp.route('/pdf/<int:eleve_id>')
@@ -405,7 +406,8 @@ def generer_bulletin_pdf_ar(eleve_id):
         donnees = _preparer_donnees_bulletin(eleve)
         donnees['appreciation'] = _generer_appreciation_ar(donnees['moyenne'])
 
-        html = render_template('bulletin_pdf_ar.html', **donnees)
+        qr_info = obtenir_ou_creer_verif(eleve.id, classe.id, classe.annee_scolaire)
+        html = render_template('bulletin_pdf_ar.html', **donnees, qr_info=qr_info)
         pdf = weasyprint.HTML(string=html, base_url=request.url_root).write_pdf()
         
         response = make_response(pdf)
