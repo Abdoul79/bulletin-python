@@ -155,7 +155,7 @@
             </div>
 
             <!-- Photo élève — collée au bord droit -->
-            <div style="position:absolute;right:0mm;top:0;bottom:0;width:75px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:white;padding:6px 8px 6px 6px;">
+            <div style="position:absolute;right:-14mm;top:0;bottom:0;width:75px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:white;padding:6px 8px 6px 6px;">
                 {% if eleve.photo_url %}
                 <img src="{{ eleve.photo_url }}" class="eleve-photo" alt="{{ eleve.prenom }}">
                 {% else %}
@@ -282,19 +282,51 @@
             </div>
         </div>
 
-        <!-- Signatures -->
-        <table class="sig-t"><tr>
-            <td>
-                <div class="sig-lbl">LE DIRECTEUR</div>
-                <div class="sig-name">{{ ecole.directeur or 'Directeur' }}</div>
-                <div class="sig-line"></div>
-            </td>
-            <td>
-                <div class="sig-lbl">LES PARENTS</div>
-                <div class="sig-name">Signature des parents ou tuteur</div>
-                <div class="sig-line"></div>
-            </td>
-        </tr></table>
+        <!-- Signatures + QR code -->
+        <table style="width:100%;border-collapse:collapse;margin-top:14px;">
+            <tr>
+                <!-- Signatures -->
+                <td style="vertical-align:bottom;padding-right:14px;">
+                    <table class="sig-t" style="margin-top:0;"><tr>
+                        <td>
+                            <div class="sig-lbl">LE DIRECTEUR</div>
+                            <div class="sig-name">{{ ecole.directeur or 'Directeur' }}</div>
+                            <div class="sig-line"></div>
+                        </td>
+                        <td>
+                            <div class="sig-lbl">LES PARENTS</div>
+                            <div class="sig-name">Signature des parents ou tuteur</div>
+                            <div class="sig-line"></div>
+                        </td>
+                    </tr></table>
+                </td>
+
+                <!-- QR code vérification -->
+                {% if qr_info %}
+                <td style="vertical-align:bottom;text-align:center;width:100px;padding-left:8px;border-left:1px dashed #ddd;">
+                    {% if qr_info.qr_base64 %}
+                    <img src="{{ qr_info.qr_base64 }}" alt="QR Code"
+                         style="width:72px;height:72px;display:block;margin:0 auto 3px;">
+                    {% else %}
+                    <!-- Fallback si qrcode non installé -->
+                    <div style="width:72px;height:72px;background:#f0ede7;border:1px solid #ddd;border-radius:4px;display:flex;align-items:center;justify-content:center;margin:0 auto 3px;font-size:18px;">📱</div>
+                    {% endif %}
+                    <div style="font-size:6px;color:#999;font-weight:700;text-transform:uppercase;letter-spacing:0.3px;margin-bottom:2px;">Vérifier l'authenticité</div>
+                    <div style="font-size:5.5px;color:#bbb;font-family:monospace;word-break:break-all;">{{ qr_info.code[:16] }}...</div>
+                </td>
+                {% endif %}
+            </tr>
+        </table>
+
+        <!-- Bande de vérification bas de page -->
+        {% if qr_info %}
+        <div style="margin-top:10px;padding:5px 10px;background:#f8f9fa;border-radius:4px;border:1px solid #eee;display:flex;align-items:center;justify-content:space-between;">
+            <div style="font-size:7px;color:#999;">
+                🔐 <strong>Document officiel</strong> — Scannez le QR code pour vérifier l'authenticité de ce bulletin sur EduBulletin
+            </div>
+            <div style="font-size:6px;color:#bbb;font-family:monospace;">{{ qr_info.code[:24] }}</div>
+        </div>
+        {% endif %}
 
     </div><!-- end page-inner -->
 </div><!-- end page -->

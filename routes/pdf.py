@@ -5,6 +5,7 @@ import zipfile
 import io
 from datetime import datetime
 from urllib.parse import quote
+from routes.verification import obtenir_ou_creer_verif
 
 # Import WeasyPrint de façon sécurisée pour éviter les crashes
 WEASYPRINT_AVAILABLE = False
@@ -220,7 +221,8 @@ def preview_bulletin(eleve_id):
     donnees = _preparer_donnees_bulletin(eleve)
     donnees['appreciation'] = _generer_appreciation(donnees['moyenne'])
     donnees['weasyprint_available'] = WEASYPRINT_AVAILABLE
-
+     
+    
     return render_template('bulletin_preview.html', **donnees)
 
 

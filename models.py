@@ -2,8 +2,7 @@
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from datetime import datetime
-
-
+import uuid as uuid_lib
 import uuid
 from datetime import datetime
 
@@ -262,3 +261,47 @@ class Config(db.Model):
             row = Config(cle=cle, valeur=valeur)
             db.session.add(row)
         db.session.commit()
+
+
+# ═══════════════════════════════════════════════════════
+#  AJOUTER DANS models.py
+# ═══════════════════════════════════════════════════════
+
+
+class BulletinVerification(db.Model):
+    """Code unique de vérification d'un bulletin"""
+    __tablename__ = 'bulletin_verification'
+
+    id             = db.Column(db.Integer, primary_key=True)
+    code           = db.Column(db.String(64), unique=True, nullable=False, index=True)
+    eleve_id       = db.Column(db.Integer, db.ForeignKey('eleve.id'), nullable=False)
+    classe_id      = db.Column(db.Integer, db.ForeignKey('classe.id'), nullable=False)
+    annee_scolaire = db.Column(db.String(20), nullable=False)
+    date_creation  = db.Column(db.DateTime, default=datetime.utcnow)
+    nb_scans       = db.Column(db.Integer, default=0)
+    dernier_scan   = db.Column(db.DateTime, nullable=True)
+
+    eleve  = db.relationship('Eleve',  backref=db.backref('verifications', lazy=True))
+    classe = db.relationship('Classe', backref=db.backref('verifications', lazy=True))
+
+    @staticmethod
+    def generer_ou_obtenir(eleve_id, classe_id, annee_scolaire):
+        """Retourne le code existant ou en crée un nouveau"""
+        verif = BulletinVerification.query.filter_by(
+            eleve_id=eleve_id,
+            classe_id=classe_id,
+            annee_scolaire=annee_scolaire
+        ).first()
+        if not verif:
+            verif = BulletinVerification(
+                code=uuid_lib.uuid4().hex,
+                eleve_id=eleve_id,
+                classe_id=classe_id,
+                annee_scolaire=annee_scolaire
+            )
+            db.session.add(verif)
+            db.session.commit()
+        return verif
+
+    def __repr__(self):
+        return f'<BulletinVerification {self.code[:8]}...>'

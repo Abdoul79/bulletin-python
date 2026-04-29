@@ -8,6 +8,9 @@ from translations_manual import t
 from datetime import datetime, timedelta
 from routes.absences import absences_bp
 
+from routes.verification import verification_bp
+
+
 
 import os
 
@@ -170,6 +173,7 @@ def register_routes(app):
         from routes.search    import search_bp
         from routes.paiements import paiements_bp
         from routes.absences  import absences_bp
+        
 
         app.register_blueprint(search_bp)
         app.register_blueprint(auth_bp)
@@ -184,6 +188,7 @@ def register_routes(app):
         app.register_blueprint(paiements_bp)
         app.register_blueprint(analytics_bp)
         app.register_blueprint(absences_bp)
+        app.register_blueprint(verification_bp)
         print("✅ Tous les blueprints enregistrés")
 
     except ImportError as e:

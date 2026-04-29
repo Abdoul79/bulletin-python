@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% if valide %}Bulletin — {{ eleve.prenom }} {{ eleve.nom }}{% else %}Bulletin invalide{% endif %} — EduBulletin</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=DM+Serif+Display&display=swap" rel="stylesheet">
+    <style>
+        :root{--ink:#0d1117;--cream:#f5f0e8;--gold:#c9a84c;--gold-l:#e8d5a3;--mist:#e8edf2;--muted:#6b7685;--green:#228B22;--orange:#FF8C00;--red:#dc2626;--border:#e8edf2;}
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{font-family:'DM Sans',sans-serif;background:var(--cream);min-height:100vh;color:var(--ink);}
+        body::before{content:'';position:fixed;inset:0;z-index:0;
+            background:radial-gradient(circle at 85% 15%,rgba(201,168,76,0.1),transparent 55%),
+                        radial-gradient(circle at 5% 85%,rgba(196,98,45,0.07),transparent 50%);
+            pointer-events:none;}
+        body::after{content:'';position:fixed;inset:0;z-index:0;
+            background-image:radial-gradient(circle,#c9a84c18 1px,transparent 1px);
+            background-size:24px 24px;pointer-events:none;}
+
+        /* ── Navbar ── */
+        .navbar{background:var(--ink);padding:0 28px;height:56px;display:flex;align-items:center;justify-content:space-between;}
+        .brand{display:flex;align-items:center;gap:9px;text-decoration:none;}
+        .brand-icon{width:30px;height:30px;background:var(--gold);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:0.9rem;}
+        .brand-name{font-size:0.95rem;font-weight:800;color:#e8edf2;}
+        .verify-badge{display:flex;align-items:center;gap:6px;padding:5px 14px;border-radius:50px;font-size:11px;font-weight:700;}
+        .verify-badge.ok{background:rgba(34,139,34,0.15);color:#4ade80;border:1px solid rgba(34,139,34,0.3);}
+        .verify-badge.ko{background:rgba(220,38,38,0.15);color:#f87171;border:1px solid rgba(220,38,38,0.3);}
+
+        /* ── Contenu ── */
+        .page{position:relative;z-index:1;max-width:780px;margin:0 auto;padding:28px 20px;}
+
+        /* ── Bannière statut ── */
+        .status-banner{border-radius:18px;padding:20px 24px;margin-bottom:24px;display:flex;align-items:flex-start;gap:16px;}
+        .status-banner.valid{background:rgba(34,139,34,0.07);border:1.5px solid rgba(34,139,34,0.2);}
+        .status-banner.invalid{background:rgba(220,38,38,0.06);border:1.5px solid rgba(220,38,38,0.2);}
+        .status-icon{font-size:2rem;flex-shrink:0;}
+        .status-title{font-size:1.1rem;font-weight:800;color:var(--ink);margin-bottom:3px;}
+        .status-title.valid{color:var(--green);}
+        .status-title.invalid{color:var(--red);}
+        .status-sub{font-size:12px;color:var(--muted);line-height:1.6;}
+        .status-meta{display:flex;gap:12px;flex-wrap:wrap;margin-top:8px;}
+        .meta-chip{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:50px;font-size:10px;font-weight:700;background:white;border:1px solid var(--border);color:var(--muted);}
+
+        /* ── Header bulletin ── */
+        .bul-header{background:var(--ink);border-radius:18px;padding:20px 24px;margin-bottom:20px;position:relative;overflow:hidden;}
+        .bul-header::before{content:'';position:absolute;top:-40px;right:-40px;width:180px;height:180px;background:radial-gradient(circle,rgba(201,168,76,0.1),transparent 70%);border-radius:50%;}
+        .bh-top{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:16px;}
+        .bh-eco{font-size:1.1rem;font-weight:800;color:var(--gold);margin-bottom:3px;}
+        .bh-titre{font-size:0.75rem;font-weight:700;color:#4a5568;text-transform:uppercase;letter-spacing:0.5px;}
+        .bh-annee{font-size:0.75rem;color:#4a5568;margin-top:2px;}
+
+        /* Drapeau CI */
+        .flag-ci{display:flex;height:30px;width:48px;border-radius:4px;overflow:hidden;border:1px solid rgba(255,255,255,0.15);}
+        .flag-ci .fo{flex:1;background:#FF8C00;}
+        .flag-ci .fw{flex:1;background:#fff;}
+        .flag-ci .fg{flex:1;background:#228B22;}
+
+        /* Infos élève */
+        .eleve-row{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.08);}
+        .eleve-field{background:rgba(255,255,255,0.05);border-radius:10px;padding:10px 14px;}
+        .ef-lbl{font-size:9px;font-weight:700;color:#4a5568;text-transform:uppercase;letter-spacing:0.4px;margin-bottom:3px;}
+        .ef-val{font-size:13px;font-weight:700;color:#e8edf2;}
+        .ef-val.gold{color:var(--gold);}
+
+        /* Résultat */
+        .result-box{background:white;border:1.5px solid var(--border);border-radius:16px;padding:18px;margin-bottom:18px;display:flex;align-items:center;gap:20px;}
+        .result-moy{text-align:center;min-width:90px;}
+        .result-moy-num{font-size:2.2rem;font-weight:800;color:var(--green);font-family:'DM Serif Display',serif;line-height:1;}
+        .result-moy-lbl{font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;margin-top:4px;}
+        .result-mention{font-size:1rem;font-weight:800;color:var(--orange);margin-bottom:4px;}
+        .result-rang{font-size:12px;color:var(--muted);}
+        .result-sep{width:1px;background:var(--border);align-self:stretch;}
+
+        /* Table notes */
+        .sec{margin-bottom:16px;border:1.5px solid var(--border);border-radius:14px;overflow:hidden;}
+        .sec-t{background:var(--ink);padding:9px 14px;font-size:11px;font-weight:700;color:var(--gold);letter-spacing:0.3px;}
+        .notes-v{width:100%;border-collapse:collapse;font-size:11px;}
+        .notes-v th{padding:8px 10px;font-size:9px;font-weight:800;color:var(--muted);text-transform:uppercase;background:#f8f9fa;border-bottom:1px solid var(--border);text-align:center;}
+        .notes-v th.h-mat{text-align:left;padding-left:14px;}
+        .notes-v td{padding:7px 10px;border-bottom:1px solid var(--mist);text-align:center;vertical-align:middle;}
+        .notes-v td.mat{text-align:left;padding-left:14px;font-weight:600;color:var(--ink);}
+        .notes-v tr:last-child td{border-bottom:none;}
+        .notes-v tr:hover td{background:#fafaf8;}
+        .nv{font-weight:800;font-size:12px;}
+        .nv.t1{color:#1565C0;} .nv.t2{color:#2E7D32;} .nv.t3{color:#6A1B9A;} .nv.moy{color:var(--orange);}
+        .appr{font-size:8px;color:var(--muted);display:block;margin-top:1px;}
+        .notes-v tr.row-moy td{background:#f0f0f0;font-weight:700;font-size:11px;border-top:2px solid #ccc;}
+        .notes-v tr.row-moy td.mat{color:#444;font-style:italic;}
+
+        /* Observations */
+        .obs-box{background:white;border:1.5px solid var(--border);border-radius:14px;padding:16px;margin-bottom:16px;}
+        .obs-title{font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:0.4px;margin-bottom:8px;}
+        .obs-text{font-size:12px;color:var(--ink);line-height:1.7;}
+
+        /* Sceau de vérification */
+        .seal{background:white;border:1.5px solid rgba(34,139,34,0.25);border-radius:14px;padding:16px;margin-bottom:16px;display:flex;align-items:center;gap:14px;}
+        .seal-icon{width:48px;height:48px;background:rgba(34,139,34,0.1);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0;}
+        .seal-title{font-size:13px;font-weight:800;color:var(--green);margin-bottom:3px;}
+        .seal-sub{font-size:11px;color:var(--muted);line-height:1.5;}
+        .seal-code{font-size:10px;font-family:monospace;background:var(--mist);padding:3px 8px;border-radius:6px;color:var(--ink);margin-top:5px;display:inline-block;}
+
+        /* Pied de page */
+        .footer{text-align:center;padding:20px;color:var(--muted);font-size:11px;border-top:1px solid var(--border);margin-top:10px;}
+        .footer a{color:var(--gold);text-decoration:none;font-weight:700;}
+
+        /* Invalid state */
+        .invalid-page{text-align:center;padding:60px 24px;}
+        .invalid-icon{font-size:4rem;margin-bottom:16px;}
+        .invalid-title{font-size:1.5rem;font-weight:800;color:var(--red);margin-bottom:8px;}
+        .invalid-sub{font-size:13px;color:var(--muted);max-width:400px;margin:0 auto;}
+
+        @media(max-width:600px){
+            .bh-top{flex-direction:column;}
+            .eleve-row{grid-template-columns:1fr;}
+            .result-box{flex-direction:column;text-align:center;}
+            .result-sep{display:none;}
+        }
+    </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar">
+    <a href="/" class="brand">
+        <div class="brand-icon">🎓</div>
+        <span class="brand-name">EduBulletin</span>
+    </a>
+    {% if valide %}
+    <span class="verify-badge ok">✅ Bulletin authentique</span>
+    {% else %}
+    <span class="verify-badge ko">❌ Bulletin invalide</span>
+    {% endif %}
+</nav>
+
+<div class="page">
+
+{% if not valide %}
+<!-- ══ BULLETIN INVALIDE ══ -->
+<div class="invalid-page">
+    <div class="invalid-icon">🔍</div>
+    <div class="invalid-title">Bulletin introuvable</div>
+    <div class="invalid-sub">{{ erreur }}</div>
+    <div style="margin-top:24px;font-size:12px;color:var(--muted);">
+        Ce QR code ne correspond à aucun bulletin dans notre base de données.<br>
+        Il est possible que ce document soit un faux.
+    </div>
+</div>
+
+{% else %}
+<!-- ══ BULLETIN VALIDE ══ -->
+
+<!-- Bannière de validité -->
+<div class="status-banner valid">
+    <div class="status-icon">🛡️</div>
+    <div>
+        <div class="status-title valid">Document officiel authentifié</div>
+        <div class="status-sub">
+            Ce bulletin a été émis par <strong>{{ ecole.nom }}</strong> et est enregistré dans notre base de données sécurisée.
+            Son authenticité est garantie par EduBulletin.
+        </div>
+        <div class="status-meta">
+            <span class="meta-chip">📅 Scanné {{ verif.dernier_scan.strftime('%d/%m/%Y à %H:%M') }}</span>
+            <span class="meta-chip">🔍 {{ verif.nb_scans }} scan(s)</span>
+            <span class="meta-chip">📄 Créé le {{ verif.date_creation.strftime('%d/%m/%Y') }}</span>
+        </div>
+    </div>
+</div>
+
+<!-- Header bulletin -->
+<div class="bul-header">
+    <div class="bh-top">
+        <div>
+            <div class="bh-eco">{{ ecole.nom }}</div>
+            <div class="bh-titre">Bulletin Scolaire Annuel — Officiel</div>
+            <div class="bh-annee">Année scolaire {{ classe.annee_scolaire }}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;">
+            <div class="flag-ci"><div class="fo"></div><div class="fw"></div><div class="fg"></div></div>
+            <div style="font-size:9px;color:#4a5568;text-align:right;">République de Côte d'Ivoire<br>Union — Discipline — Travail</div>
+        </div>
+    </div>
+    <div class="eleve-row">
+        <div class="eleve-field">
+            <div class="ef-lbl">Nom et prénoms</div>
+            <div class="ef-val">{{ eleve.nom }} {{ eleve.prenom }}</div>
+        </div>
+        <div class="eleve-field">
+            <div class="ef-lbl">Classe</div>
+            <div class="ef-val">{{ classe.nom }}</div>
+        </div>
+        <div class="eleve-field">
+            <div class="ef-lbl">Date de naissance</div>
+            <div class="ef-val">{{ eleve.date_naissance.strftime('%d/%m/%Y') if eleve.date_naissance else '—' }}</div>
+        </div>
+        <div class="eleve-field">
+            <div class="ef-lbl">Matricule</div>
+            <div class="ef-val gold">{{ eleve.matricule or '—' }}</div>
+        </div>
+    </div>
+</div>
+
+<!-- Résultat général -->
+<div class="result-box">
+    <div class="result-moy">
+        <div class="result-moy-num">{{ "%.2f"|format(moyenne) }}</div>
+        <div style="font-size:11px;font-weight:700;color:var(--muted);margin-top:2px;">/20</div>
+        <div class="result-moy-lbl">Moyenne annuelle</div>
+    </div>
+    <div class="result-sep"></div>
+    <div>
+        <div class="result-mention">
+            {% if moyenne >= 16 %}TRÈS BIEN
+            {% elif moyenne >= 14 %}BIEN
+            {% elif moyenne >= 12 %}ASSEZ BIEN
+            {% elif moyenne >= 10 %}PASSABLE
+            {% else %}INSUFFISANT{% endif %}
+        </div>
+        <div class="result-rang">🏆 Classement : {{ rang }} / {{ total_eleves }}</div>
+        <div style="display:flex;gap:10px;margin-top:8px;flex-wrap:wrap;">
+            <span style="font-size:11px;font-weight:700;color:#1565C0;">T1 : {{ "%.2f"|format(moyennes['T1']) }}</span>
+            <span style="font-size:11px;font-weight:700;color:#2E7D32;">T2 : {{ "%.2f"|format(moyennes['T2']) }}</span>
+            <span style="font-size:11px;font-weight:700;color:#6A1B9A;">T3 : {{ "%.2f"|format(moyennes['T3']) }}</span>
+        </div>
+    </div>
+</div>
+
+<!-- Table des notes — 3 trimestres verticaux -->
+<div class="sec">
+    <div class="sec-t">📊 Notes par matière — Les 3 trimestres</div>
+    <table class="notes-v">
+        <thead>
+            <tr>
+                <th class="h-mat">Matière</th>
+                <th style="color:#1565C0;">T1</th>
+                <th style="color:#2E7D32;">T2</th>
+                <th style="color:#6A1B9A;">T3</th>
+                <th style="color:var(--orange);">Moy. Ann.</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% set matieres_all = [] %}
+        {% for item in matieres_notes_t1 %}{% if item.matiere not in matieres_all %}{% set _ = matieres_all.append(item.matiere) %}{% endif %}{% endfor %}
+        {% for item in matieres_notes_t2 %}{% if item.matiere not in matieres_all %}{% set _ = matieres_all.append(item.matiere) %}{% endif %}{% endfor %}
+        {% for item in matieres_notes_t3 %}{% if item.matiere not in matieres_all %}{% set _ = matieres_all.append(item.matiere) %}{% endif %}{% endfor %}
+
+        {% for mat in matieres_all %}
+            {% set n1 = namespace(v=none) %}
+            {% set n2 = namespace(v=none) %}
+            {% set n3 = namespace(v=none) %}
+            {% for item in matieres_notes_t1 %}{% if item.matiere == mat %}{% set n1.v = item.note %}{% endif %}{% endfor %}
+            {% for item in matieres_notes_t2 %}{% if item.matiere == mat %}{% set n2.v = item.note %}{% endif %}{% endfor %}
+            {% for item in matieres_notes_t3 %}{% if item.matiere == mat %}{% set n3.v = item.note %}{% endif %}{% endfor %}
+            {% set notes_mat = [] %}
+            {% if n1.v is not none %}{% set _ = notes_mat.append(n1.v) %}{% endif %}
+            {% if n2.v is not none %}{% set _ = notes_mat.append(n2.v) %}{% endif %}
+            {% if n3.v is not none %}{% set _ = notes_mat.append(n3.v) %}{% endif %}
+            {% set moy_mat = (notes_mat|sum / notes_mat|length) if notes_mat|length > 0 else none %}
+            <tr>
+                <td class="mat">{{ mat }}</td>
+                <td>{% if n1.v is not none %}<span class="nv t1">{{ "%.2f"|format(n1.v) }}</span><span class="appr">{% if n1.v>=16 %}TB{% elif n1.v>=14 %}B{% elif n1.v>=12 %}AB{% elif n1.v>=10 %}P{% else %}I{% endif %}</span>{% else %}<span style="color:#ccc">–</span>{% endif %}</td>
+                <td>{% if n2.v is not none %}<span class="nv t2">{{ "%.2f"|format(n2.v) }}</span><span class="appr">{% if n2.v>=16 %}TB{% elif n2.v>=14 %}B{% elif n2.v>=12 %}AB{% elif n2.v>=10 %}P{% else %}I{% endif %}</span>{% else %}<span style="color:#ccc">–</span>{% endif %}</td>
+                <td>{% if n3.v is not none %}<span class="nv t3">{{ "%.2f"|format(n3.v) }}</span><span class="appr">{% if n3.v>=16 %}TB{% elif n3.v>=14 %}B{% elif n3.v>=12 %}AB{% elif n3.v>=10 %}P{% else %}I{% endif %}</span>{% else %}<span style="color:#ccc">–</span>{% endif %}</td>
+                <td>{% if moy_mat is not none %}<span class="nv moy">{{ "%.2f"|format(moy_mat) }}</span>{% else %}<span style="color:#ccc">–</span>{% endif %}</td>
+            </tr>
+        {% endfor %}
+        <tr class="row-moy">
+            <td class="mat">📊 Moyenne de classe</td>
+            <td><span class="nv t1">{{ "%.2f"|format(moyennes['T1']) }}</span></td>
+            <td><span class="nv t2">{{ "%.2f"|format(moyennes['T2']) }}</span></td>
+            <td><span class="nv t3">{{ "%.2f"|format(moyennes['T3']) }}</span></td>
+            <td><span class="nv moy">{{ "%.2f"|format(moyenne) }}</span></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- Observations -->
+<div class="obs-box">
+    <div class="obs-title">Observations générales</div>
+    <div class="obs-text">
+        {% if moyenne >= 16 %}<strong>EXCELLENTS RÉSULTATS !</strong> L'élève fait preuve d'un très bon niveau dans l'ensemble des matières. Excellente maîtrise des compétences attendues. Félicitations !
+        {% elif moyenne >= 14 %}<strong>BONS RÉSULTATS.</strong> L'élève montre de bonnes capacités et une bonne compréhension des notions enseignées.
+        {% elif moyenne >= 12 %}<strong>RÉSULTATS SATISFAISANTS.</strong> L'élève travaille correctement et assimile les connaissances de base. Il faut maintenir les efforts.
+        {% elif moyenne >= 10 %}<strong>RÉSULTATS PASSABLES.</strong> L'élève doit fournir plus d'efforts.
+        {% else %}<strong>RÉSULTATS INSUFFISANTS.</strong> Un accompagnement particulier est nécessaire.
+        {% endif %}
+    </div>
+</div>
+
+<!-- Sceau de vérification -->
+<div class="seal">
+    <div class="seal-icon">✅</div>
+    <div>
+        <div class="seal-title">Document certifié par EduBulletin</div>
+        <div class="seal-sub">
+            Ce bulletin est authentique et provient directement de la base de données de
+            <strong>{{ ecole.nom }}</strong>. Aucune modification n'a été effectuée.
+        </div>
+        <div class="seal-code">Code : {{ verif.code[:16] }}...</div>
+    </div>
+</div>
+
+{% endif %}
+
+<!-- Footer -->
+<div class="footer">
+    Vérification assurée par <a href="/">EduBulletin</a> — Système de gestion scolaire 🇨🇮
+</div>
+
+</div><!-- end page -->
+</body>
+</html>
