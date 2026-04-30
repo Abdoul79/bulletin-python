@@ -27,9 +27,6 @@
         .topbar td { height:8px;padding:0;border:none; }
         .tb-g{background:#228B22;width:33.3%;} .tb-w{background:#FFF;width:33.3%;} .tb-o{background:#FF8C00;width:33.4%;}
 
-        /* ── Header: صورة التلميذ يسار | اسم المدرسة وسط | دراب يمين ── */
-        /* في RTL: يمين = بداية، يسار = نهاية */
-
         /* دراب CI */
         .flag-country{font-size:9px;font-weight:700;color:#228B22;margin-bottom:5px;text-align:center;}
         .flag-css{border-collapse:collapse;margin:0 auto 5px;border:2px solid #bbb;}
@@ -80,6 +77,7 @@
         .notes-v tr.row-moy td.mat{background:#e0e0e0!important;color:#333;font-style:italic;}
 
         .obs{font-size:10.5px;line-height:1.7;text-align:justify;}
+
         .sig-t{width:100%;border-collapse:collapse;margin-top:16px;}
         .sig-t td{border:none;text-align:center;padding:0 20px;vertical-align:top;}
         .sig-lbl{font-weight:700;font-size:11px;margin-bottom:4px;}
@@ -117,19 +115,12 @@
     <div class="page-inner">
 
         <!-- ══ HEADER RTL : صورة التلميذ يسار | المدرسة وسط | الدراب يمين ══ -->
-        <!--
-            في RTL:
-            - يمين الصفحة = بداية = الدراب (جمهورية كوت ديفوار)
-            - وسط = اسم المدرسة
-            - يسار الصفحة = نهاية = صورة التلميذ (بورد gauche en CSS)
-        -->
         <div style="position:relative; border-bottom:3px solid #FF8C00; padding-bottom:10px; margin-bottom:12px; min-height:90px;">
 
             <!-- الدراب — ملاصق للحافة اليمنى (بداية RTL) -->
             <div style="position:absolute; right:0; top:50%; transform:translateY(-50%); text-align:center; width:110px;">
                 <div class="flag-country">جمهورية<br>كوت ديفوار</div>
                 <table class="flag-css"><tr>
-                    <!-- RTL: أخضر | أبيض | برتقالي -->
                     <td class="f-g"></td>
                     <td class="f-w"></td>
                     <td class="f-o"></td>
@@ -145,7 +136,7 @@
                 <div class="bh-year">السنة الدراسية: {{ classe.annee_scolaire }}</div>
             </div>
 
-            <!-- صورة التلميذ — ملاصقة للحافة اليسرى (نهاية RTL) — تخترق الهامش -->
+            <!-- صورة التلميذ — ملاصقة للحافة اليسرى (نهاية RTL) -->
             <div style="position:absolute;left:0;top:50%;transform:translateY(-50%);text-align:center;width:100px;">
                 {% if eleve.photo_url %}
                 <img src="{{ eleve.photo_url }}" class="eleve-photo" alt="{{ eleve.prenom }}">
@@ -270,19 +261,51 @@
             </div>
         </div>
 
-        <!-- التوقيعات -->
-        <table class="sig-t"><tr>
-            <td>
-                <div class="sig-lbl">المدير</div>
-                <div class="sig-name">{{ ecole.directeur or 'المدير' }}</div>
-                <div class="sig-line"></div>
-            </td>
-            <td>
-                <div class="sig-lbl">توقيع الأولياء</div>
-                <div class="sig-name">الوالدان أو الوصي القانوني</div>
-                <div class="sig-line"></div>
-            </td>
-        </tr></table>
+        <!-- التوقيعات + رمز QR -->
+        <table style="width:100%;border-collapse:collapse;margin-top:14px;">
+            <tr>
+                <!-- رمز QR — يسار الصفحة (نهاية RTL) -->
+                {% if qr_info %}
+                <td style="vertical-align:bottom;text-align:center;width:100px;padding-right:8px;border-right:1px dashed #ddd;">
+                    {% if qr_info.qr_base64 %}
+                    <img src="{{ qr_info.qr_base64 }}" alt="رمز QR"
+                         style="width:72px;height:72px;display:block;margin:0 auto 3px;">
+                    {% else %}
+                    <!-- احتياطي إذا لم يكن qrcode مثبتاً -->
+                    <div style="width:72px;height:72px;background:#f0ede7;border:1px solid #ddd;border-radius:4px;display:flex;align-items:center;justify-content:center;margin:0 auto 3px;font-size:18px;">📱</div>
+                    {% endif %}
+                    <div style="font-size:6px;color:#999;font-weight:700;text-align:center;margin-bottom:2px;">التحقق من الأصالة</div>
+                    <div style="font-size:5.5px;color:#bbb;font-family:monospace;word-break:break-all;text-align:center;">{{ qr_info.code[:16] }}...</div>
+                </td>
+                {% endif %}
+
+                <!-- التوقيعات -->
+                <td style="vertical-align:bottom;padding-right:14px;">
+                    <table class="sig-t" style="margin-top:0;"><tr>
+                        <td>
+                            <div class="sig-lbl">المدير</div>
+                            <div class="sig-name">{{ ecole.directeur or 'المدير' }}</div>
+                            <div class="sig-line"></div>
+                        </td>
+                        <td>
+                            <div class="sig-lbl">توقيع الأولياء</div>
+                            <div class="sig-name">الوالدان أو الوصي القانوني</div>
+                            <div class="sig-line"></div>
+                        </td>
+                    </tr></table>
+                </td>
+            </tr>
+        </table>
+
+        <!-- شريط التحقق — أسفل الصفحة -->
+        {% if qr_info %}
+        <div style="margin-top:10px;padding:5px 10px;background:#f8f9fa;border-radius:4px;border:1px solid #eee;display:flex;align-items:center;justify-content:space-between;">
+            <div style="font-size:6px;color:#bbb;font-family:monospace;">{{ qr_info.code[:24] }}</div>
+            <div style="font-size:7px;color:#999;text-align:right;">
+                🔐 <strong>وثيقة رسمية</strong> — امسح رمز QR للتحقق من أصالة هذه النشرة على EduBulletin
+            </div>
+        </div>
+        {% endif %}
 
     </div><!-- end page-inner -->
 </div><!-- end page -->
