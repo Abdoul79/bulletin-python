@@ -91,11 +91,19 @@ def add_eleve(classe_id):
     def supprimer_eleve_complet(eleve):
         """Supprime un élève et toutes ses données liées dans le bon ordre :
            Paiements → Scolarités → Notes → Élève"""
-        from models import Scolarite, Paiement
+        from models import Scolarite, Paiement, Absence, BulletinVerification
         # 1. Paiements et scolarités
         for scolarite in Scolarite.query.filter_by(eleve_id=eleve.id).all():
             Paiement.query.filter_by(scolarite_id=scolarite.id).delete(synchronize_session=False)
             db.session.delete(scolarite)
+
+
+            # 2. Absences  ← NOUVEAU
+            Absence.query.filter_by(eleve_id=eleve.id).delete(synchronize_session=False)
+
+            # 3. Vérifications QR  ← NOUVEAU
+            BulletinVerification.query.filter_by(eleve_id=eleve.id).delete(synchronize_session=False)
+
         # 2. Notes
         Note.query.filter_by(eleve_id=eleve.id).delete(synchronize_session=False)
         # 3. Élève
