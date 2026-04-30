@@ -144,8 +144,8 @@ def verifier_bulletin(code):
     eleves_classe = Eleve.query.filter_by(classe_id=classe.id).all()
     moyennes_classe = []
     for e in eleves_classe:
-        notes_e = Note.query.filter_by(eleve_id=e.id).with_entities(Note.valeur).all()
-        vals_e = [n.valeur for n in notes_e if n.valeur is not None]
+        notes_e = Note.query.filter_by(eleve_id=e.id).with_entities(Note.note).all()
+        vals_e = [n.note for n in notes_e if n.note is not None]
         moy_e = round(sum(vals_e) / len(vals_e), 2) if vals_e else 0.0
         moyennes_classe.append((e.id, moy_e))
 
