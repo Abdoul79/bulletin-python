@@ -114,7 +114,7 @@ def verifier_bulletin(code):
             ).first()
             notes.append({
                 'matiere': mat.nom,
-                'note':    note.valeur if note else None,
+                'note':    note.note if note else None,
             })
         return notes
 
