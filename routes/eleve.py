@@ -87,6 +87,10 @@ def add_eleve(classe_id):
         flash("Accès non autorisé.", "error")
         return redirect(url_for('main.dashboard'))
 
+
+
+        
+
     # ── Helper : suppression complète d'un élève ─────────────────
     def supprimer_eleve_complet(eleve):
         """Supprime un élève et toutes ses données liées dans le bon ordre :
@@ -99,15 +103,21 @@ def add_eleve(classe_id):
 
 
             # 2. Absences  ← NOUVEAU
-            Absence.query.filter_by(eleve_id=eleve.id).delete(synchronize_session=False)
+        Absence.query.filter_by(eleve_id=eleve.id).delete(synchronize_session=False)
 
             # 3. Vérifications QR  ← NOUVEAU
-            BulletinVerification.query.filter_by(eleve_id=eleve.id).delete(synchronize_session=False)
+        BulletinVerification.query.filter_by(eleve_id=eleve.id).delete(synchronize_session=False)
 
         # 2. Notes
         Note.query.filter_by(eleve_id=eleve.id).delete(synchronize_session=False)
         # 3. Élève
         db.session.delete(eleve)
+
+
+
+
+
+
 
     if request.method == 'POST':
         action = request.form.get('action')
