@@ -4,6 +4,13 @@ from models import db, Ecole, Classe
 from utils import format_filename
 from datetime import datetime
 
+# ── IMPORTS À AJOUTER EN HAUT DE routes/auth.py ──────────────
+import secrets
+from datetime import datetime, timedelta
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail
+
+
 import os
 
 auth_bp = Blueprint('auth', __name__)
@@ -460,3 +467,194 @@ def logout():
         flash("Vous avez été déconnecté.", "info")
 
     return redirect(url_for('auth.index'))
+
+
+
+"""
+Ajouter dans routes/auth.py
+Système mot de passe oublié avec SendGrid
+"""
+
+# ── IMPORTS À AJOUTER EN HAUT DE routes/auth.py ──────────────
+
+# ── AJOUTER DANS models.py : table PasswordResetToken ────────
+
+
+# ════════════════════════════════════════════════════════════════
+#  HELPER — Envoi email SendGrid
+# ════════════════════════════════════════════════════════════════
+
+def envoyer_email_reset(destinataire_email, destinataire_nom, reset_url):
+    """Envoie l'email de réinitialisation via SendGrid"""
+    api_key = os.environ.get('SENDGRID_API_KEY')
+    from_email = os.environ.get('SENDGRID_FROM_EMAIL', 'noreply@edubulletin.app')
+
+    if not api_key:
+        print("⚠️ SENDGRID_API_KEY non configuré")
+        return False
+
+    message = Mail(
+        from_email=from_email,
+        to_emails=destinataire_email,
+        subject='🔐 Réinitialisation de votre mot de passe EduBulletin',
+        html_content=f"""
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"></head>
+<body style="font-family:'DM Sans',Arial,sans-serif;background:#f5f0e8;margin:0;padding:24px;">
+  <div style="max-width:520px;margin:0 auto;background:white;border-radius:18px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,0.08);">
+
+    <!-- Header -->
+    <div style="background:#0d1117;padding:24px 32px;text-align:center;">
+      <div style="display:inline-flex;align-items:center;gap:10px;">
+        <div style="width:36px;height:36px;background:#c9a84c;border-radius:9px;display:inline-flex;align-items:center;justify-content:center;font-size:18px;">🎓</div>
+        <span style="font-size:1.1rem;font-weight:800;color:#e8edf2;">EduBulletin</span>
+      </div>
+    </div>
+
+    <!-- Body -->
+    <div style="padding:32px;">
+      <h2 style="font-size:1.2rem;color:#0d1117;margin-bottom:8px;">Réinitialisation du mot de passe</h2>
+      <p style="color:#6b7685;font-size:13px;line-height:1.7;margin-bottom:24px;">
+        Bonjour <strong style="color:#0d1117;">{destinataire_nom}</strong>,<br>
+        Vous avez demandé à réinitialiser votre mot de passe EduBulletin.
+        Cliquez sur le bouton ci-dessous pour en créer un nouveau.
+      </p>
+
+      <!-- Bouton -->
+      <div style="text-align:center;margin-bottom:24px;">
+        <a href="{reset_url}"
+           style="display:inline-block;background:#0d1117;color:#c9a84c;padding:14px 32px;border-radius:12px;text-decoration:none;font-weight:800;font-size:14px;letter-spacing:0.3px;">
+          🔐 Réinitialiser mon mot de passe
+        </a>
+      </div>
+
+      <!-- Lien texte -->
+      <p style="color:#6b7685;font-size:11px;text-align:center;margin-bottom:16px;">
+        Ou copiez ce lien dans votre navigateur :<br>
+        <a href="{reset_url}" style="color:#c9a84c;word-break:break-all;">{reset_url}</a>
+      </p>
+
+      <!-- Avertissement -->
+      <div style="background:#fff8e7;border:1px solid rgba(201,168,76,0.3);border-radius:10px;padding:12px 16px;">
+        <p style="color:#7a5c10;font-size:11px;margin:0;line-height:1.6;">
+          ⏰ <strong>Ce lien expire dans 1 heure.</strong><br>
+          Si vous n'avez pas demandé cette réinitialisation, ignorez cet email.
+          Votre mot de passe ne sera pas modifié.
+        </p>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div style="background:#f8f9fa;border-top:1px solid #e8edf2;padding:16px 32px;text-align:center;">
+      <p style="color:#aab0ba;font-size:10px;margin:0;">
+        EduBulletin — Système de gestion scolaire 🇨🇮<br>
+        Cet email a été envoyé à {destinataire_email}
+      </p>
+    </div>
+
+  </div>
+</body>
+</html>
+        """
+    )
+
+    try:
+        sg = SendGridAPIClient(api_key)
+        response = sg.send(message)
+        print(f"✅ Email reset envoyé à {destinataire_email} — status {response.status_code}")
+        return True
+    except Exception as e:
+        print(f"❌ Erreur SendGrid : {e}")
+        return False
+
+
+# ════════════════════════════════════════════════════════════════
+#  ROUTE 1 — Formulaire "mot de passe oublié"
+# ════════════════════════════════════════════════════════════════
+
+@auth_bp.route('/mot-de-passe-oublie', methods=['GET', 'POST'])
+def mot_de_passe_oublie():
+    if request.method == 'POST':
+        from models import Ecole, PasswordResetToken
+
+        email = request.form.get('email', '').strip().lower()
+        if not email:
+            flash("Veuillez saisir votre adresse email.", "error")
+            return redirect(url_for('auth.mot_de_passe_oublie'))
+
+        ecole = Ecole.query.filter_by(email=email).first()
+
+        # Toujours afficher le même message (sécurité — ne pas révéler si l'email existe)
+        if ecole:
+            # Invalider les anciens tokens
+            from models import PasswordResetToken
+            PasswordResetToken.query.filter_by(ecole_id=ecole.id, used=False).update({'used': True})
+            db.session.flush()
+
+            # Créer un nouveau token
+            token = secrets.token_urlsafe(32)
+            reset_token = PasswordResetToken(
+                ecole_id=ecole.id,
+                token=token,
+                expires_at=datetime.utcnow() + timedelta(hours=1)
+            )
+            db.session.add(reset_token)
+            db.session.commit()
+
+            # Construire l'URL de reset
+            base_url = os.environ.get('APP_BASE_URL', request.host_url.rstrip('/'))
+            reset_url = f"{base_url}/reinitialiser-mot-de-passe/{token}"
+
+            # Envoyer l'email
+            envoyer_email_reset(ecole.email, ecole.nom, reset_url)
+
+        flash(
+            "Si cette adresse email est enregistrée, vous recevrez un lien de réinitialisation dans quelques minutes.",
+            "success"
+        )
+        return redirect(url_for('auth.mot_de_passe_oublie'))
+
+    return render_template('forgot_password.html')
+
+
+# ════════════════════════════════════════════════════════════════
+#  ROUTE 2 — Formulaire de nouveau mot de passe
+# ════════════════════════════════════════════════════════════════
+
+@auth_bp.route('/reinitialiser-mot-de-passe/<string:token>', methods=['GET', 'POST'])
+def reinitialiser_mot_de_passe(token):
+    from models import PasswordResetToken
+    from werkzeug.security import generate_password_hash
+
+    reset_token = PasswordResetToken.query.filter_by(token=token, used=False).first()
+
+    # Vérifier validité du token
+    if not reset_token or reset_token.expires_at < datetime.utcnow():
+        flash("Ce lien est invalide ou a expiré. Veuillez faire une nouvelle demande.", "error")
+        return redirect(url_for('auth.mot_de_passe_oublie'))
+
+    if request.method == 'POST':
+        password         = request.form.get('password', '')
+        password_confirm = request.form.get('password_confirm', '')
+
+        if len(password) < 6:
+            flash("Le mot de passe doit contenir au moins 6 caractères.", "error")
+            return redirect(url_for('auth.reinitialiser_mot_de_passe', token=token))
+
+        if password != password_confirm:
+            flash("Les mots de passe ne correspondent pas.", "error")
+            return redirect(url_for('auth.reinitialiser_mot_de_passe', token=token))
+
+        # Mettre à jour le mot de passe
+        ecole = reset_token.ecole
+        ecole.mot_de_passe = generate_password_hash(password)
+
+        # Invalider le token
+        reset_token.used = True
+        db.session.commit()
+
+        flash("Mot de passe mis à jour avec succès ! Vous pouvez vous connecter.", "success")
+        return redirect(url_for('auth.login'))
+
+    return render_template('reset_password.html', token=token)

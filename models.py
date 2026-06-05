@@ -115,6 +115,7 @@ class Eleve(db.Model):
     #scolarites = db.relationship('Scolarite', backref='eleve', cascade="all, delete-orphan")
     notes      = db.relationship('Note', backref='eleve', lazy=True, cascade='all, delete-orphan')
     scolarites = db.relationship('Scolarite', back_populates='eleve', cascade="all, delete-orphan")
+    #absences = db.relationship('Absence', backref='eleve', cascade="all, delete-orphan")
 
     def __repr__(self):
         return f'<Eleve {self.matricule} - {self.prenom} {self.nom}>'
@@ -305,3 +306,15 @@ class BulletinVerification(db.Model):
 
     def __repr__(self):
         return f'<BulletinVerification {self.code[:8]}...>'
+
+
+class PasswordResetToken(db.Model):
+    __tablename__ = 'password_reset_token'
+ 
+    id         = db.Column(db.Integer, primary_key=True)
+    ecole_id   = db.Column(db.Integer, db.ForeignKey('ecole.id'), nullable=False)
+    token      = db.Column(db.String(64), unique=True, nullable=False, index=True)
+    expires_at = db.Column(db.DateTime, nullable=False)
+    used       = db.Column(db.Boolean, default=False)
+ 
+    ecole = db.relationship('Ecole', backref=db.backref('reset_tokens', lazy=True))
