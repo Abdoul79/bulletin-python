@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Affectations — {{ prof.nom_complet }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=DM+Serif+Display&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root{--ink:#0d1117;--cream:#f5f0e8;--gold:#c9a84c;--gold-l:#e8d5a3;--mist:#e8edf2;--muted:#6b7685;--green:#228B22;--red:#dc2626;--border:#e8edf2;--orange:#FF8C00;}
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{font-family:'DM Sans',sans-serif;background:var(--cream);min-height:100vh;color:var(--ink);}
+        body::before{content:'';position:fixed;inset:0;z-index:0;background:radial-gradient(circle at 90% 10%,rgba(201,168,76,0.1),transparent 55%),radial-gradient(circle at 5% 90%,rgba(196,98,45,0.07),transparent 50%);pointer-events:none;}
+        body::after{content:'';position:fixed;inset:0;z-index:0;background-image:radial-gradient(circle,#c9a84c18 1px,transparent 1px);background-size:24px 24px;pointer-events:none;}
+
+        /* Navbar */
+        .navbar{position:sticky;top:0;z-index:100;background:rgba(245,240,232,0.95);backdrop-filter:blur(12px);border-bottom:1px solid rgba(201,168,76,0.15);padding:0 36px;height:62px;display:flex;align-items:center;justify-content:space-between;}
+        .brand{display:flex;align-items:center;gap:10px;text-decoration:none;}
+        .brand-icon{width:34px;height:34px;background:var(--ink);border-radius:9px;display:flex;align-items:center;justify-content:center;color:var(--gold);}
+        .brand-name{font-size:1rem;font-weight:800;color:var(--ink);}
+        .btn-nav{display:flex;align-items:center;gap:6px;padding:8px 16px;border-radius:50px;border:1.5px solid var(--border);background:transparent;color:var(--muted);font-size:12px;font-weight:600;text-decoration:none;transition:all 0.2s;}
+        .btn-nav:hover{border-color:var(--ink);color:var(--ink);}
+
+        .main{position:relative;z-index:1;max-width:960px;margin:0 auto;padding:28px 24px;}
+
+        /* Hero */
+        .hero{background:var(--ink);border-radius:20px;padding:22px 28px;margin-bottom:22px;position:relative;overflow:hidden;}
+        .hero::before{content:'';position:absolute;top:-50px;right:-50px;width:200px;height:200px;background:radial-gradient(circle,rgba(201,168,76,0.1),transparent 70%);border-radius:50%;}
+        .hero-label{display:inline-flex;align-items:center;gap:6px;background:rgba(201,168,76,0.12);border:1px solid rgba(201,168,76,0.2);color:var(--gold);padding:4px 12px;border-radius:50px;font-size:10px;font-weight:700;margin-bottom:8px;}
+        .hero-row{display:flex;align-items:center;gap:16px;}
+        .prof-avatar{width:52px;height:52px;border-radius:14px;background:rgba(201,168,76,0.15);display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:1.2rem;font-weight:800;flex-shrink:0;}
+        .hero-title{font-size:1.2rem;font-weight:800;color:#e8edf2;margin-bottom:2px;}
+        .hero-sub{font-size:11px;color:#4a5568;}
+
+        /* Flash */
+        .flash{padding:12px 16px;border-radius:12px;margin-bottom:16px;font-size:12px;font-weight:600;display:flex;align-items:center;gap:8px;}
+        .flash.success{background:rgba(34,139,34,0.1);border:1px solid rgba(34,139,34,0.2);color:#1a5c1a;}
+        .flash.error{background:rgba(220,38,38,0.08);border:1px solid rgba(220,38,38,0.2);color:var(--red);}
+        .flash.warning{background:rgba(255,140,0,0.1);border:1px solid rgba(255,140,0,0.2);color:#92400e;}
+
+        /* Layout 2 colonnes */
+        .two-col{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+
+        /* Card */
+        .card{background:white;border:1.5px solid var(--border);border-radius:18px;overflow:hidden;}
+        .card-header{background:var(--ink);padding:14px 20px;display:flex;align-items:center;gap:10px;}
+        .card-header-icon{width:28px;height:28px;background:rgba(201,168,76,0.15);border-radius:7px;display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:0.85rem;}
+        .card-title{font-size:13px;font-weight:800;color:var(--gold-l);}
+        .card-body{padding:20px;}
+
+        /* Formulaire ajout */
+        .field{margin-bottom:14px;}
+        .field label{display:block;font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.4px;margin-bottom:6px;}
+        .field select{width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;font-family:'DM Sans',sans-serif;color:var(--ink);background:var(--mist);transition:all 0.2s;cursor:pointer;}
+        .field select:focus{outline:none;border-color:var(--gold);background:white;box-shadow:0 0 0 3px rgba(201,168,76,0.1);}
+        .btn-add{width:100%;padding:11px;background:var(--ink);color:var(--gold);border:none;border-radius:10px;font-size:13px;font-weight:800;cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;align-items:center;justify-content:center;gap:7px;transition:all 0.2s;margin-top:4px;}
+        .btn-add:hover{background:#1a2332;}
+
+        /* Info box */
+        .info-box{background:rgba(201,168,76,0.07);border:1px solid rgba(201,168,76,0.2);border-radius:10px;padding:10px 14px;font-size:11px;color:#7a5c10;margin-bottom:14px;line-height:1.6;}
+
+        /* Liste affectations existantes */
+        .aff-list{display:flex;flex-direction:column;gap:8px;}
+        .aff-item{display:flex;align-items:center;gap:10px;padding:10px 14px;border:1.5px solid var(--border);border-radius:12px;background:#fafafa;transition:all 0.2s;}
+        .aff-item:hover{border-color:var(--gold);background:rgba(201,168,76,0.03);}
+        .aff-classe{font-size:11px;font-weight:700;color:var(--ink);display:block;}
+        .aff-matiere{font-size:10px;color:var(--muted);margin-top:1px;}
+        .aff-icons{display:flex;gap:6px;margin-right:auto;}
+        .aff-icon{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:11px;}
+        .aff-icon.classe{background:rgba(99,102,241,0.1);color:#4f46e5;}
+        .aff-icon.mat{background:rgba(34,139,34,0.1);color:var(--green);}
+        .btn-remove{width:26px;height:26px;border-radius:7px;border:1.5px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;transition:all 0.2s;flex-shrink:0;}
+        .btn-remove:hover{background:rgba(220,38,38,0.08);border-color:rgba(220,38,38,0.25);color:var(--red);}
+
+        .empty-aff{text-align:center;padding:32px 16px;color:var(--muted);}
+        .empty-aff .empty-icon{font-size:2rem;opacity:0.4;margin-bottom:8px;}
+        .empty-aff p{font-size:11px;}
+
+        /* Count badge */
+        .count-badge{background:rgba(201,168,76,0.15);color:var(--gold);padding:2px 9px;border-radius:50px;font-size:10px;font-weight:700;margin-right:auto;}
+
+        @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+        .fade-in{animation:fadeUp 0.4s ease both;}
+
+        @media(max-width:700px){.two-col{grid-template-columns:1fr;}}
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <a href="{{ url_for('main.dashboard') }}" class="brand">
+        <div class="brand-icon">🎓</div>
+        <span class="brand-name">EduBulletin</span>
+    </a>
+    <a href="{{ url_for('professeurs.gerer_professeurs') }}" class="btn-nav">
+        <i class="bi bi-arrow-left"></i> Tous les professeurs
+    </a>
+</nav>
+
+<div class="main">
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for cat, msg in messages %}
+    <div class="flash {{ cat }}"><i class="bi bi-info-circle"></i> {{ msg }}</div>
+    {% endfor %}
+    {% endwith %}
+
+    <!-- Hero -->
+    <div class="hero fade-in">
+        <div class="hero-label">🔗 Affectations</div>
+        <div class="hero-row">
+            <div class="prof-avatar">{{ prof.prenom[0] }}{{ prof.nom[0] }}</div>
+            <div>
+                <div class="hero-title">{{ prof.prenom }} {{ prof.nom }}</div>
+                <div class="hero-sub">{{ prof.email }} — {{ affectations|length }} affectation(s) au total</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="two-col">
+
+        <!-- ── Colonne gauche : Ajouter une affectation ── -->
+        <div class="card fade-in">
+            <div class="card-header">
+                <div class="card-header-icon"><i class="bi bi-plus-lg"></i></div>
+                <div class="card-title">Ajouter une affectation</div>
+            </div>
+            <div class="card-body">
+                <div class="info-box">
+                    <i class="bi bi-info-circle"></i>
+                    Sélectionnez d'abord une <strong>classe</strong>, puis la <strong>matière</strong>
+                    que ce professeur enseignera dans cette classe.
+                </div>
+                <form method="POST" id="addForm">
+                    <input type="hidden" name="action" value="add">
+                    <div class="field">
+                        <label>Classe *</label>
+                        <select name="classe_id" id="classeSelect" required onchange="chargerMatieres(this.value)">
+                            <option value="">— Choisir une classe —</option>
+                            {% for classe in classes %}
+                            <option value="{{ classe.id }}">{{ classe.nom }} ({{ classe.annee_scolaire }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label>Matière *</label>
+                        <select name="matiere_id" id="matiereSelect" required>
+                            <option value="">— Choisir d'abord une classe —</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn-add">
+                        <i class="bi bi-plus-lg"></i> Affecter cette matière
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- ── Colonne droite : Affectations existantes ── -->
+        <div class="card fade-in" style="animation-delay:0.1s">
+            <div class="card-header">
+                <div class="card-header-icon"><i class="bi bi-diagram-3"></i></div>
+                <div class="card-title">Affectations actuelles</div>
+                <span class="count-badge">{{ affectations|length }}</span>
+            </div>
+            <div class="card-body">
+                {% if affectations %}
+                <div class="aff-list">
+                    {% for aff in affectations %}
+                    <div class="aff-item">
+                        <div class="aff-icons">
+                            <div class="aff-icon classe" title="Classe">
+                                <i class="bi bi-building"></i>
+                            </div>
+                            <div class="aff-icon mat" title="Matière">
+                                <i class="bi bi-book"></i>
+                            </div>
+                        </div>
+                        <div style="flex:1;min-width:0;">
+                            <span class="aff-classe">{{ aff.classe.nom }}</span>
+                            <div class="aff-matiere">{{ aff.matiere.nom }}</div>
+                        </div>
+                        <form method="POST"
+                              onsubmit="return confirm('Supprimer cette affectation ?');"
+                              style="display:inline;">
+                            <input type="hidden" name="action" value="remove">
+                            <input type="hidden" name="aff_id" value="{{ aff.id }}">
+                            <button type="submit" class="btn-remove" title="Supprimer">
+                                <i class="bi bi-x-lg"></i>
+                            </button>
+                        </form>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="empty-aff">
+                    <div class="empty-icon">📋</div>
+                    <p>Aucune affectation pour l'instant.<br>Ajoutez-en une depuis le formulaire.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+// Données des matières par classe (injectées depuis le serveur)
+const matieresByClasse = {{ matieres_par_classe | tojson }};
+
+function chargerMatieres(classeId) {
+    const select = document.getElementById('matiereSelect');
+    select.innerHTML = '<option value="">— Choisir une matière —</option>';
+
+    if (!classeId) return;
+
+    const matieres = matieresByClasse[parseInt(classeId)] || [];
+    if (matieres.length === 0) {
+        select.innerHTML = '<option value="">Aucune matière dans cette classe</option>';
+        return;
+    }
+    matieres.forEach(m => {
+        const opt = document.createElement('option');
+        opt.value = m.id;
+        opt.textContent = m.nom;
+        select.appendChild(opt);
+    });
+}
+</script>
+</body>
+</html>

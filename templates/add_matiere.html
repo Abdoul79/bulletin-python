@@ -20,7 +20,6 @@
         .bg-decor::after  { content:''; position:absolute; bottom:-150px; left:-150px; width:500px; height:500px; background:radial-gradient(circle,rgba(196,98,45,0.07) 0%,transparent 70%); border-radius:50%; }
         .grid-dots { position:fixed; inset:0; z-index:0; background-image:radial-gradient(circle,#c9a84c18 1px,transparent 1px); background-size:32px 32px; }
 
-        /* Navbar */
         .navbar { position:sticky; top:0; z-index:100; background:rgba(245,240,232,0.92); backdrop-filter:blur(16px); border-bottom:1px solid rgba(201,168,76,0.2); padding:0 40px; height:64px; display:flex; align-items:center; justify-content:space-between; }
         .nav-brand { display:flex; align-items:center; gap:10px; font-family:'DM Serif Display',serif; font-size:1.3rem; color:var(--ink); text-decoration:none; }
         .nav-brand .brand-icon { width:36px; height:36px; background:var(--ink); border-radius:10px; display:flex; align-items:center; justify-content:center; color:var(--gold); font-size:1rem; }
@@ -28,10 +27,8 @@
         .btn-back { display:flex; align-items:center; gap:8px; padding:8px 18px; background:transparent; border:1.5px solid var(--border); border-radius:50px; font-size:0.85rem; font-weight:600; color:var(--text-muted); text-decoration:none; transition:all 0.2s; }
         .btn-back:hover { border-color:var(--ink); color:var(--ink); }
 
-        /* Content */
         .page-content { position:relative; z-index:1; padding:40px; max-width:1200px; margin:0 auto; }
 
-        /* Flash */
         .flash-msg { padding:14px 18px; border-radius:14px; font-size:0.88rem; margin-bottom:16px; display:flex; align-items:center; gap:10px; animation:slideDown 0.4s ease; }
         @keyframes slideDown { from{opacity:0;transform:translateY(-10px)} to{opacity:1;transform:translateY(0)} }
         .flash-success { background:rgba(39,174,96,0.08); border:1px solid rgba(39,174,96,0.2); color:var(--success-color); }
@@ -39,7 +36,6 @@
         .flash-warning { background:rgba(201,168,76,0.1); border:1px solid rgba(201,168,76,0.3); color:#7a5c10; }
         .flash-close   { margin-left:auto; background:none; border:none; cursor:pointer; color:inherit; opacity:0.6; }
 
-        /* Hero */
         .hero { background:var(--ink); border-radius:24px; padding:40px 48px; margin-bottom:32px; position:relative; overflow:hidden; animation:fadeUp 0.6s ease both; }
         .hero::before { content:''; position:absolute; top:-80px; right:-80px; width:300px; height:300px; background:radial-gradient(circle,rgba(201,168,76,0.1) 0%,transparent 70%); border-radius:50%; }
         .hero-label { display:inline-flex; align-items:center; gap:8px; background:rgba(201,168,76,0.12); border:1px solid rgba(201,168,76,0.25); color:var(--gold); padding:6px 14px; border-radius:50px; font-size:0.75rem; font-weight:600; letter-spacing:0.5px; text-transform:uppercase; margin-bottom:14px; }
@@ -47,53 +43,80 @@
         .hero h1 em { font-style:italic; color:var(--gold-light); }
         .hero-sub { color:#4a5568; font-size:0.9rem; }
 
-        /* Form card */
         .form-card { background:white; border:1px solid var(--border); border-radius:24px; padding:36px; margin-bottom:32px; animation:fadeUp 0.6s ease 0.1s both; }
         .form-card-header { display:flex; align-items:center; gap:12px; margin-bottom:28px; }
         .form-card-icon { width:42px; height:42px; background:var(--ink); border-radius:12px; display:flex; align-items:center; justify-content:center; color:var(--gold); font-size:1.1rem; }
         .form-card-title { font-family:'DM Serif Display',serif; font-size:1.3rem; color:var(--ink); }
         .form-card-sub { color:var(--text-muted); font-size:0.83rem; }
 
-        /* Fields */
-        .form-row { display:grid; gap:14px; grid-template-columns:2fr 1.5fr 1fr 1fr 1fr auto; align-items:end; }
+        .form-row { display:grid; gap:14px; grid-template-columns:2fr 1.8fr 1fr 1fr 1fr auto; align-items:end; }
         .field label { display:block; font-size:0.75rem; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px; }
-        .field input, .field select { width:100%; background:var(--mist); border:1.5px solid var(--border); border-radius:12px; padding:12px 14px; color:var(--ink); font-family:'DM Sans',sans-serif; font-size:0.92rem; outline:none; transition:all 0.2s; appearance:none; }
+        .field input, .field select {
+            width:100%; background:var(--mist); border:1.5px solid var(--border); border-radius:12px;
+            padding:12px 14px; color:var(--ink); font-family:'DM Sans',sans-serif; font-size:0.92rem;
+            outline:none; transition:all 0.2s; appearance:none;
+        }
         .field input:focus, .field select:focus { border-color:var(--gold); background:white; box-shadow:0 0 0 3px rgba(201,168,76,0.12); }
         .field input::placeholder { color:#c8d0da; }
         .btn-save { display:flex; align-items:center; justify-content:center; gap:8px; background:var(--ink); color:var(--cream); padding:12px 22px; border-radius:12px; border:2px solid var(--ink); font-family:'DM Sans',sans-serif; font-size:0.9rem; font-weight:700; cursor:pointer; transition:all 0.25s; white-space:nowrap; }
-        .btn-save:hover { background:transparent; color:var(--ink); transform:translateY(-2px); }
-
-        /* Form reset row */
+        .btn-save:hover { background:transparent; color:var(--ink); }
         .form-meta-row { display:flex; justify-content:flex-end; margin-top:12px; }
-        .btn-reset { display:flex; align-items:center; gap:7px; background:var(--mist); color:var(--text-muted); padding:9px 18px; border-radius:10px; border:none; font-family:'DM Sans',sans-serif; font-size:0.83rem; font-weight:600; cursor:pointer; transition:background 0.2s; }
+        .btn-reset { display:flex; align-items:center; gap:7px; background:var(--mist); color:var(--text-muted); padding:9px 18px; border-radius:10px; border:none; font-family:'DM Sans',sans-serif; font-size:0.83rem; font-weight:600; cursor:pointer; }
         .btn-reset:hover { background:var(--border); color:var(--ink); }
 
-        /* Schedule section */
+        /* ── Sélecteur professeur ── */
+        .prof-selector-wrap { position:relative; }
+        .prof-select {
+            width:100%; background:var(--mist); border:1.5px solid var(--border); border-radius:12px;
+            padding:12px 36px 12px 14px; color:var(--ink); font-family:'DM Sans',sans-serif; font-size:0.92rem;
+            outline:none; transition:all 0.2s; appearance:none; cursor:pointer;
+        }
+        .prof-select:focus { border-color:var(--gold); background:white; box-shadow:0 0 0 3px rgba(201,168,76,0.12); }
+        .prof-select-icon { position:absolute; right:12px; top:50%; transform:translateY(-50%); pointer-events:none; color:var(--gold); font-size:0.8rem; }
+        .prof-select option[value="__libre__"] { color:var(--text-muted); font-style:italic; }
+
+        /* Champ saisie libre (masqué par défaut) */
+        .prof-libre-wrap { margin-top:8px; display:none; }
+        .prof-libre-wrap.visible { display:block; }
+        .prof-libre-input {
+            width:100%; background:var(--mist); border:1.5px dashed rgba(201,168,76,0.4);
+            border-radius:12px; padding:11px 14px; color:var(--ink); font-family:'DM Sans',sans-serif;
+            font-size:0.9rem; outline:none; transition:all 0.2s;
+        }
+        .prof-libre-input:focus { border-color:var(--gold); background:white; }
+        .prof-libre-input::placeholder { color:#c8d0da; }
+
+        /* Badge "aucun prof" */
+        .no-prof-notice { background:rgba(201,168,76,0.08); border:1px solid rgba(201,168,76,0.2); border-radius:10px; padding:8px 12px; font-size:11px; color:#7a5c10; display:flex; align-items:center; gap:7px; margin-top:6px; }
+        .no-prof-notice a { color:var(--gold); font-weight:700; text-decoration:none; }
+        .no-prof-notice a:hover { text-decoration:underline; }
+
+        /* Emploi du temps */
         .schedule-section { animation:fadeUp 0.6s ease 0.2s both; }
         .schedule-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:24px; flex-wrap:wrap; gap:12px; }
         .schedule-title { font-family:'DM Serif Display',serif; font-size:1.6rem; color:var(--ink); }
-
         .btn-export { display:flex; align-items:center; gap:8px; background:rgba(39,174,96,0.07); border:1.5px solid rgba(39,174,96,0.25); color:var(--success-color); padding:10px 20px; border-radius:12px; font-family:'DM Sans',sans-serif; font-size:0.85rem; font-weight:600; cursor:pointer; transition:all 0.2s; }
         .btn-export:hover { background:rgba(39,174,96,0.14); }
 
-        /* Days grid */
         .days-grid { display:grid; grid-template-columns:repeat(3, 1fr); gap:20px; }
-
-        /* Day card */
         .day-card { background:white; border:1px solid var(--border); border-radius:20px; overflow:hidden; transition:all 0.3s ease; }
         .day-card:hover { border-color:var(--gold); box-shadow:0 8px 24px rgba(13,17,23,0.06); transform:translateY(-2px); }
         .day-header { background:var(--ink); padding:14px 20px; display:flex; align-items:center; justify-content:space-between; }
         .day-name { font-family:'DM Serif Display',serif; font-size:1rem; color:var(--gold-light); }
         .day-count { background:rgba(201,168,76,0.15); color:var(--gold); border-radius:50px; padding:2px 10px; font-size:0.72rem; font-weight:700; }
 
-        /* Matiere items */
         .matiere-list { padding:8px; }
-        .matiere-item { display:flex; align-items:flex-start; justify-content:space-between; padding:12px 12px; border-radius:12px; transition:background 0.15s; gap:12px; }
+        .matiere-item { display:flex; align-items:flex-start; justify-content:space-between; padding:12px; border-radius:12px; transition:background 0.15s; gap:12px; }
         .matiere-item:not(:last-child) { border-bottom:1px solid var(--mist); }
         .matiere-item:hover { background:rgba(201,168,76,0.04); }
         .matiere-info { flex:1; min-width:0; }
         .matiere-name { font-weight:700; color:var(--ink); font-size:0.9rem; margin-bottom:3px; }
-        .matiere-prof { font-size:0.78rem; color:var(--text-muted); }
+        .matiere-prof { font-size:0.78rem; color:var(--text-muted); display:flex; align-items:center; gap:4px; }
+
+        /* Badge prof enregistré vs libre */
+        .prof-badge-registered { background:rgba(99,102,241,0.1); color:#4f46e5; border-radius:6px; padding:1px 7px; font-size:0.68rem; font-weight:700; }
+        .prof-badge-libre { background:rgba(201,168,76,0.1); color:#7a5c10; border-radius:6px; padding:1px 7px; font-size:0.68rem; font-weight:700; }
+
         .matiere-right { display:flex; flex-direction:column; align-items:flex-end; gap:8px; flex-shrink:0; }
         .time-badge { background:var(--ink); color:var(--gold); border-radius:8px; padding:4px 10px; font-size:0.78rem; font-weight:700; }
         .dur-badge  { background:rgba(201,168,76,0.1); color:#7a5c10; border-radius:8px; padding:3px 8px; font-size:0.72rem; font-weight:600; }
@@ -102,10 +125,8 @@
         .icon-btn.edit:hover { background:var(--ink); border-color:var(--ink); color:var(--cream); }
         .icon-btn.del:hover  { background:rgba(196,98,45,0.1); border-color:rgba(196,98,45,0.3); color:var(--rust); }
 
-        /* Empty day */
         .day-empty { padding:24px; text-align:center; color:#c8d0da; font-size:0.82rem; font-style:italic; }
 
-        /* Modal */
         .modal-overlay { display:none; position:fixed; inset:0; z-index:500; background:rgba(13,17,23,0.5); backdrop-filter:blur(4px); align-items:center; justify-content:center; padding:24px; }
         .modal-overlay.open { display:flex; }
         .modal-box { background:white; border-radius:24px; padding:36px; width:100%; max-width:460px; box-shadow:0 32px 80px rgba(0,0,0,0.2); animation:popIn 0.3s cubic-bezier(0.22,1,0.36,1); }
@@ -119,7 +140,7 @@
         .btn-cancel  { flex:1; padding:13px; background:var(--mist); border:none; border-radius:12px; font-family:'DM Sans',sans-serif; font-size:0.9rem; font-weight:600; color:var(--text-muted); cursor:pointer; }
         .btn-cancel:hover { background:var(--border); }
         .btn-confirm { flex:2; padding:13px; background:var(--rust); border:none; border-radius:12px; font-family:'DM Sans',sans-serif; font-size:0.9rem; font-weight:600; color:white; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; transition:all 0.2s; }
-        .btn-confirm:hover { background:#a0522d; transform:translateY(-1px); }
+        .btn-confirm:hover { background:#a0522d; }
 
         @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
 
@@ -140,7 +161,6 @@
 <div class="bg-decor"></div>
 <div class="grid-dots"></div>
 
-<!-- Navbar -->
 <nav class="navbar">
     <a href="{{ url_for('main.dashboard') }}" class="nav-brand">
         <span class="brand-icon"><i class="bi bi-mortarboard-fill"></i></span>
@@ -158,7 +178,6 @@
 
 <div class="page-content">
 
-    <!-- Flash -->
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}{% for category, msg in messages %}
         <div class="flash-msg flash-{{ 'error' if category=='error' else 'success' if category=='success' else 'warning' }}">
@@ -169,7 +188,6 @@
         {% endfor %}{% endif %}
     {% endwith %}
 
-    <!-- Hero -->
     <div class="hero">
         <div class="hero-label"><i class="bi bi-book"></i> Gestion des matières</div>
         <h1>{{ classe.nom }}<br><em>Emploi du temps {{ classe.annee_scolaire }}</em></h1>
@@ -189,16 +207,54 @@
         <form method="POST" id="matiereForm">
             <input type="hidden" name="action" value="add">
             <input type="hidden" name="matiere_id" id="matiereId">
+            {# Champ caché qui reçoit le nom final du professeur #}
+            <input type="hidden" name="professeur" id="professeurFinal">
 
             <div class="form-row">
+                <!-- Nom matière -->
                 <div class="field">
                     <label>Nom de la matière</label>
                     <input type="text" name="nom" id="nom" placeholder="Ex: Mathématiques" required>
                 </div>
+
+                <!-- Sélecteur professeur -->
                 <div class="field">
                     <label>Professeur</label>
-                    <input type="text" name="professeur" id="professeur" placeholder="M. Dupont">
+                    {% if professeurs %}
+                    <div class="prof-selector-wrap">
+                        <select class="prof-select" id="profSelect" onchange="handleProfChange(this)">
+                            <option value="">— Choisir un professeur —</option>
+                            {% for prof in professeurs %}
+                            <option value="{{ prof.nom_complet }}"
+                                    data-id="{{ prof.id }}">
+                                {{ prof.prenom }} {{ prof.nom }}
+                            </option>
+                            {% endfor %}
+                            <option value="__libre__">✏️ Autre (saisie libre)</option>
+                        </select>
+                        <i class="bi bi-chevron-down prof-select-icon"></i>
+                    </div>
+                    <!-- Champ libre masqué -->
+                    <div class="prof-libre-wrap" id="profLibreWrap">
+                        <input type="text" class="prof-libre-input" id="profLibreInput"
+                               placeholder="Nom du professeur...">
+                    </div>
+                    {% else %}
+                    {# Aucun prof enregistré → saisie libre + lien vers la gestion #}
+                    <input type="text" id="profLibreInputDirect"
+                           class="prof-libre-input"
+                           placeholder="M. / Mme...">
+                    <div class="no-prof-notice">
+                        <i class="bi bi-info-circle" style="color:var(--gold);flex-shrink:0;"></i>
+                        <span>
+                            Aucun professeur enregistré.
+                            <a href="{{ url_for('professeurs.gerer_professeurs') }}">Ajouter des professeurs →</a>
+                        </span>
+                    </div>
+                    {% endif %}
                 </div>
+
+                <!-- Jour -->
                 <div class="field">
                     <label>Jour</label>
                     <select name="jour" id="jour" required>
@@ -211,10 +267,14 @@
                         <option value="Samedi">Samedi</option>
                     </select>
                 </div>
+
+                <!-- Heure -->
                 <div class="field">
                     <label>Heure</label>
                     <input type="time" name="heure" id="heure" required>
                 </div>
+
+                <!-- Durée -->
                 <div class="field">
                     <label>Durée (h)</label>
                     <select name="duree" id="duree">
@@ -225,7 +285,8 @@
                         <option value="3">3h</option>
                     </select>
                 </div>
-                <button type="submit" class="btn-save">
+
+                <button type="submit" class="btn-save" onclick="preparerSoumission()">
                     <i class="bi bi-check-lg"></i> Enregistrer
                 </button>
             </div>
@@ -259,11 +320,23 @@
                     {% if mj %}
                     <div class="matiere-list">
                         {% for m in mj %}
+
+                        {# Chercher si le professeur est enregistré #}
+                        {% set prof_enregistre = professeurs | selectattr('nom_complet', 'equalto', m.professeur) | list | first | default(None) %}
+
                         <div class="matiere-item">
                             <div class="matiere-info">
                                 <div class="matiere-name">{{ m.nom }}</div>
                                 {% if m.professeur %}
-                                <div class="matiere-prof"><i class="bi bi-person" style="color:var(--gold);font-size:0.7rem;"></i> {{ m.professeur }}</div>
+                                <div class="matiere-prof">
+                                    <i class="bi bi-person" style="color:var(--gold);font-size:0.7rem;"></i>
+                                    {{ m.professeur }}
+                                    {% if prof_enregistre %}
+                                    <span class="prof-badge-registered">👨‍🏫 Enregistré</span>
+                                    {% else %}
+                                    <span class="prof-badge-libre">Externe</span>
+                                    {% endif %}
+                                </div>
                                 {% endif %}
                             </div>
                             <div class="matiere-right">
@@ -329,36 +402,98 @@
 </div>
 
 <script>
+    // ── Modals ──
     function openModal(id) { document.getElementById(id).classList.add('open'); }
     function closeModal(id) { document.getElementById(id).classList.remove('open'); }
-    document.querySelectorAll('.modal-overlay').forEach(o => o.addEventListener('click', e => { if(e.target===o) o.classList.remove('open'); }));
-    document.addEventListener('keydown', e => { if(e.key==='Escape') document.querySelectorAll('.modal-overlay.open').forEach(m=>m.classList.remove('open')); });
+    document.querySelectorAll('.modal-overlay').forEach(o =>
+        o.addEventListener('click', e => { if(e.target===o) o.classList.remove('open'); }));
+    document.addEventListener('keydown', e => {
+        if(e.key==='Escape') document.querySelectorAll('.modal-overlay.open').forEach(m=>m.classList.remove('open')); });
 
-    // Reset
+    // ── Gestion sélecteur professeur ──────────────────────────────
+    function handleProfChange(select) {
+        const libreWrap = document.getElementById('profLibreWrap');
+        const libreInput = document.getElementById('profLibreInput');
+        if (select.value === '__libre__') {
+            libreWrap.classList.add('visible');
+            libreInput.focus();
+            libreInput.value = '';
+        } else {
+            libreWrap.classList.remove('visible');
+            libreInput.value = '';
+        }
+    }
+
+    // ── Préparer soumission : remplir le champ caché "professeur" ──
+    function preparerSoumission() {
+        const profSelect   = document.getElementById('profSelect');
+        const profLibre    = document.getElementById('profLibreInput');
+        const profFinal    = document.getElementById('professeurFinal');
+        const profDirect   = document.getElementById('profLibreInputDirect');
+
+        if (profSelect) {
+            if (profSelect.value === '__libre__') {
+                profFinal.value = profLibre ? profLibre.value.trim() : '';
+            } else {
+                profFinal.value = profSelect.value || '';
+            }
+        } else if (profDirect) {
+            // Aucun prof enregistré → saisie libre directe
+            profFinal.value = profDirect.value.trim();
+        }
+    }
+
+    // ── Reset formulaire ──
     document.getElementById('resetFormBtn').addEventListener('click', () => {
         document.getElementById('matiereForm').reset();
         document.getElementById('form-title').textContent = 'Ajouter une matière';
         document.querySelector('#matiereForm input[name="action"]').value = 'add';
         document.getElementById('matiereId').value = '';
+        document.getElementById('professeurFinal').value = '';
+        const libreWrap = document.getElementById('profLibreWrap');
+        if (libreWrap) libreWrap.classList.remove('visible');
     });
 
-    // Modifier
+    // ── Modifier matière ──
     document.querySelectorAll('.btn-modifier').forEach(btn => {
         btn.addEventListener('click', () => {
             document.getElementById('form-title').textContent = 'Modifier la matière';
             document.querySelector('#matiereForm input[name="action"]').value = 'edit';
             document.getElementById('matiereId').value = btn.dataset.id;
             document.getElementById('nom').value = btn.dataset.nom;
-            document.getElementById('professeur').value = btn.dataset.professeur;
             document.getElementById('jour').value = btn.dataset.jour;
             document.getElementById('heure').value = btn.dataset.heure;
             document.getElementById('duree').value = btn.dataset.duree;
+
+            // Pré-remplir le sélecteur prof
+            const profSelect = document.getElementById('profSelect');
+            const profNom = btn.dataset.professeur || '';
+            if (profSelect) {
+                // Chercher si le prof est dans la liste
+                let found = false;
+                for (let opt of profSelect.options) {
+                    if (opt.value === profNom) { profSelect.value = profNom; found = true; break; }
+                }
+                if (!found && profNom) {
+                    // Prof non trouvé → saisie libre
+                    profSelect.value = '__libre__';
+                    const libreWrap = document.getElementById('profLibreWrap');
+                    const libreInput = document.getElementById('profLibreInput');
+                    if (libreWrap) libreWrap.classList.add('visible');
+                    if (libreInput) libreInput.value = profNom;
+                }
+            } else {
+                const profDirect = document.getElementById('profLibreInputDirect');
+                if (profDirect) profDirect.value = profNom;
+            }
+            document.getElementById('professeurFinal').value = profNom;
+
             document.getElementById('nom').focus();
-            document.getElementById('matiereForm').scrollIntoView({behavior:'smooth'});
+            document.getElementById('matiereForm').scrollIntoView({ behavior:'smooth' });
         });
     });
 
-    // Supprimer
+    // ── Supprimer matière ──
     document.querySelectorAll('.btn-supprimer').forEach(btn => {
         btn.addEventListener('click', () => {
             document.getElementById('deleteNom').textContent = btn.dataset.nom;
@@ -367,38 +502,48 @@
         });
     });
 
-    // Export PDF (fenêtre d'impression)
+    // ── Export PDF ──
     document.getElementById('exportPdf').addEventListener('click', () => {
         const cn = "{{ classe.nom }}";
         const an = "{{ classe.annee_scolaire }}";
         const jours = ["Lundi","Mardi","Mercredi","Jeudi","Vendredi","Samedi"];
-        let content = `<h2 style="text-align:center;font-family:Georgia,serif;color:#0d1117;">Emploi du temps — ${cn}</h2><p style="text-align:center;color:#6b7685;margin-bottom:24px;">Année scolaire : ${an}</p>`;
+        let content = `<h2 style="text-align:center;font-family:Georgia,serif;color:#0d1117;">Emploi du temps — ${cn}</h2>
+                       <p style="text-align:center;color:#6b7685;margin-bottom:24px;">Année scolaire : ${an}</p>`;
         jours.forEach(jour => {
             const matieres = [];
             document.querySelectorAll('.day-card').forEach(card => {
                 if(card.querySelector('.day-name')?.textContent.trim() === jour) {
                     card.querySelectorAll('.matiere-item').forEach(item => {
                         const nom  = item.querySelector('.matiere-name')?.textContent.trim() || '';
-                        const prof = item.querySelector('.matiere-prof')?.textContent.trim() || '–';
+                        const prof = item.querySelector('.matiere-prof')?.textContent.trim().replace(/👨‍🏫.*|Externe/g,'').trim() || '–';
                         const time = item.querySelector('.time-badge')?.textContent.trim() || '–';
                         const dur  = item.querySelector('.dur-badge')?.textContent.trim() || '–';
-                        if(nom) matieres.push({nom,prof,time,dur});
+                        if(nom) matieres.push({nom, prof, time, dur});
                     });
                 }
             });
             if(matieres.length > 0) {
-                content += `<h4 style="margin-top:20px;margin-bottom:8px;font-family:Georgia,serif;color:#c9a84c;">${jour}</h4>`;
-                content += `<table border="1" cellpadding="8" width="100%" style="border-collapse:collapse;margin-bottom:16px;font-family:Arial,sans-serif;"><thead><tr style="background:#0d1117;color:white;"><th>Matière</th><th>Professeur</th><th>Heure</th><th>Durée</th></tr></thead><tbody>`;
-                matieres.forEach(m => { content += `<tr><td>${m.nom}</td><td>${m.prof}</td><td>${m.time}</td><td>${m.dur}</td></tr>`; });
+                content += `<h4 style="margin-top:20px;color:#c9a84c;font-family:Georgia,serif;">${jour}</h4>
+                            <table border="1" cellpadding="8" width="100%"
+                                   style="border-collapse:collapse;margin-bottom:16px;font-family:Arial,sans-serif;">
+                            <thead><tr style="background:#0d1117;color:white;">
+                                <th>Matière</th><th>Professeur</th><th>Heure</th><th>Durée</th>
+                            </tr></thead><tbody>`;
+                matieres.forEach(m => {
+                    content += `<tr><td>${m.nom}</td><td>${m.prof}</td><td>${m.time}</td><td>${m.dur}</td></tr>`;
+                });
                 content += `</tbody></table>`;
             }
         });
         const win = window.open('','','width=800,height=700');
-        win.document.write(`<!DOCTYPE html><html><head><title>Emploi du temps ${cn}</title><style>body{font-family:Arial,sans-serif;padding:20px;color:#333;}table{width:100%;}th,td{padding:10px;text-align:left;border:1px solid #ddd;}</style></head><body>${content}</body></html>`);
-        win.document.close();
-        win.focus();
-        win.print();
+        win.document.write(`<!DOCTYPE html><html><head><title>Emploi du temps ${cn}</title>
+            <style>body{font-family:Arial,sans-serif;padding:20px;color:#333;}
+            table{width:100%;}th,td{padding:10px;text-align:left;border:1px solid #ddd;}</style>
+            </head><body>${content}</body></html>`);
+        win.document.close(); win.focus(); win.print();
     });
 </script>
 </body>
 </html>
+
+

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tableau de bord — {{ prof.nom_complet }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=DM+Serif+Display&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root{--ink:#0d1117;--cream:#f5f0e8;--gold:#c9a84c;--gold-l:#e8d5a3;--mist:#e8edf2;--muted:#6b7685;--green:#228B22;--border:#e8edf2;}
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{font-family:'DM Sans',sans-serif;background:var(--cream);min-height:100vh;color:var(--ink);}
+        body::before{content:'';position:fixed;inset:0;z-index:0;background:radial-gradient(circle at 90% 10%,rgba(201,168,76,0.1),transparent 55%);pointer-events:none;}
+        body::after{content:'';position:fixed;inset:0;z-index:0;background-image:radial-gradient(circle,#c9a84c18 1px,transparent 1px);background-size:24px 24px;pointer-events:none;}
+
+        .navbar{position:sticky;top:0;z-index:100;background:rgba(245,240,232,0.95);backdrop-filter:blur(12px);border-bottom:1px solid rgba(201,168,76,0.15);padding:0 36px;height:62px;display:flex;align-items:center;justify-content:space-between;}
+        .brand{display:flex;align-items:center;gap:10px;text-decoration:none;}
+        .brand-icon{width:34px;height:34px;background:var(--ink);border-radius:9px;display:flex;align-items:center;justify-content:center;color:var(--gold);}
+        .brand-name{font-size:1rem;font-weight:800;color:var(--ink);}
+        .prof-badge{display:flex;align-items:center;gap:8px;padding:6px 14px;background:var(--ink);border-radius:50px;}
+        .prof-badge span{font-size:12px;font-weight:700;color:var(--gold-l);}
+        .btn-logout{display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:50px;border:1.5px solid var(--border);background:transparent;color:var(--muted);font-size:12px;font-weight:600;text-decoration:none;transition:all 0.2s;margin-right:8px;}
+
+        .main{position:relative;z-index:1;max-width:1000px;margin:0 auto;padding:28px 24px;}
+
+        .hero{background:var(--ink);border-radius:20px;padding:24px 28px;margin-bottom:24px;position:relative;overflow:hidden;}
+        .hero::before{content:'';position:absolute;top:-50px;right:-50px;width:220px;height:220px;background:radial-gradient(circle,rgba(201,168,76,0.1),transparent 70%);border-radius:50%;}
+        .hero-label{display:inline-flex;align-items:center;gap:6px;background:rgba(201,168,76,0.12);border:1px solid rgba(201,168,76,0.2);color:var(--gold);padding:4px 12px;border-radius:50px;font-size:10px;font-weight:700;margin-bottom:8px;}
+        .hero-title{font-size:1.3rem;font-weight:800;color:#e8edf2;margin-bottom:2px;}
+        .hero-sub{font-size:11px;color:#4a5568;}
+
+        .flash{padding:12px 16px;border-radius:12px;margin-bottom:16px;font-size:12px;font-weight:600;display:flex;align-items:center;gap:8px;}
+        .flash.success{background:rgba(34,139,34,0.1);border:1px solid rgba(34,139,34,0.2);color:#1a5c1a;}
+
+        .section-title{font-size:1rem;font-weight:800;color:var(--ink);margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+
+        .classes-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:18px;}
+
+        .classe-card{background:white;border:1.5px solid var(--border);border-radius:18px;overflow:hidden;transition:all 0.2s;}
+        .classe-card:hover{border-color:var(--gold);box-shadow:0 8px 24px rgba(0,0,0,0.06);transform:translateY(-3px);}
+        .classe-card-header{background:var(--ink);padding:14px 18px;display:flex;align-items:center;gap:10px;}
+        .classe-icon{width:32px;height:32px;background:rgba(201,168,76,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:0.9rem;}
+        .classe-name{font-size:13px;font-weight:800;color:#e8edf2;}
+        .classe-year{font-size:10px;color:#4a5568;margin-top:1px;}
+        .matieres-list{padding:14px;}
+        .matiere-item{display:flex;align-items:center;justify-content:space-between;padding:9px 12px;border-radius:10px;border:1.5px solid var(--border);margin-bottom:8px;transition:all 0.2s;}
+        .matiere-item:last-child{margin-bottom:0;}
+        .matiere-item:hover{border-color:var(--gold);background:rgba(201,168,76,0.04);}
+        .mat-name{font-size:12px;font-weight:700;color:var(--ink);}
+        .trim-btns{display:flex;gap:5px;}
+        .trim-btn{padding:4px 10px;border-radius:7px;font-size:10px;font-weight:700;text-decoration:none;transition:all 0.2s;border:1.5px solid var(--border);color:var(--muted);}
+        .trim-btn:hover{background:var(--ink);color:var(--gold);border-color:var(--ink);}
+
+        .empty-state{text-align:center;padding:60px 24px;color:var(--muted);}
+        .empty-icon{font-size:3rem;margin-bottom:12px;opacity:0.4;}
+
+        @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+        .fade-in{animation:fadeUp 0.4s ease both;}
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <a href="{{ url_for('professeurs.prof_dashboard') }}" class="brand">
+        <div class="brand-icon">🎓</div>
+        <span class="brand-name">EduBulletin</span>
+    </a>
+    <div style="display:flex;align-items:center;gap:8px;">
+        <a href="{{ url_for('professeurs.prof_logout') }}" class="btn-logout">
+            <i class="bi bi-box-arrow-right"></i> Déconnexion
+        </a>
+        <div class="prof-badge">
+            <i class="bi bi-person-badge" style="color:var(--gold);"></i>
+            <span>{{ prof.prenom }} {{ prof.nom }}</span>
+        </div>
+    </div>
+</nav>
+
+<div class="main">
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for cat, msg in messages %}
+    <div class="flash {{ cat }}"><i class="bi bi-check-circle"></i> {{ msg }}</div>
+    {% endfor %}
+    {% endwith %}
+
+    <div class="hero fade-in">
+        <div class="hero-label">👨‍🏫 Espace professeur</div>
+        <div class="hero-title">Bonjour, {{ prof.prenom }} !</div>
+        <div class="hero-sub">{{ ecole.nom }} — Sélectionnez une matière et un trimestre pour saisir les notes</div>
+    </div>
+
+    {% if classes_matieres %}
+    <div class="section-title">
+        <i class="bi bi-diagram-3" style="color:var(--gold)"></i>
+        Mes classes & matières
+    </div>
+    <div class="classes-grid">
+        {% for cm in classes_matieres %}
+        <div class="classe-card fade-in">
+            <div class="classe-card-header">
+                <div class="classe-icon"><i class="bi bi-building"></i></div>
+                <div>
+                    <div class="classe-name">{{ cm.classe.nom }}</div>
+                    <div class="classe-year">{{ cm.classe.annee_scolaire }}</div>
+                </div>
+            </div>
+            <div class="matieres-list">
+                {% for matiere in cm.matieres %}
+                <div class="matiere-item">
+                    <span class="mat-name">{{ matiere.nom }}</span>
+                    <div class="trim-btns">
+                        {% for t in ['T1', 'T2', 'T3'] %}
+                        <a href="{{ url_for('professeurs.prof_saisir_notes', classe_id=cm.classe.id, matiere_id=matiere.id, trimestre=t) }}"
+                           class="trim-btn">{{ t }}</a>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-icon">📋</div>
+        <div style="font-size:14px;font-weight:700;">Aucune affectation</div>
+        <div style="font-size:12px;margin-top:6px;">L'administrateur de votre école doit vous affecter à des classes et matières.</div>
+    </div>
+    {% endif %}
+
+</div>
+</body>
+</html>

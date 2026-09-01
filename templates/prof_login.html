@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion Professeur — EduBulletin</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=DM+Serif+Display&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root{--ink:#0d1117;--cream:#f5f0e8;--gold:#c9a84c;--mist:#e8edf2;--muted:#6b7685;--border:#e8edf2;--rust:#c4622d;--green:#228B22;}
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{font-family:'DM Sans',sans-serif;background:var(--cream);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;}
+        body::before{content:'';position:fixed;inset:0;z-index:0;background:radial-gradient(circle at 85% 15%,rgba(201,168,76,0.1),transparent 55%),radial-gradient(circle at 5% 85%,rgba(196,98,45,0.07),transparent 50%);pointer-events:none;}
+        body::after{content:'';position:fixed;inset:0;z-index:0;background-image:radial-gradient(circle,#c9a84c18 1px,transparent 1px);background-size:24px 24px;pointer-events:none;}
+
+        .wrapper{position:relative;z-index:1;width:100%;max-width:880px;display:grid;grid-template-columns:1fr 1fr;border-radius:24px;overflow:hidden;box-shadow:0 32px 80px rgba(13,17,23,0.18);}
+
+        .left{background:var(--ink);padding:48px 40px;display:flex;flex-direction:column;justify-content:center;position:relative;overflow:hidden;}
+        .left::before{content:'';position:absolute;top:-60px;right:-60px;width:240px;height:240px;background:radial-gradient(circle,rgba(201,168,76,0.1),transparent 70%);border-radius:50%;}
+        .brand{display:flex;align-items:center;gap:10px;margin-bottom:36px;}
+        .brand-icon{width:36px;height:36px;background:var(--gold);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;}
+        .brand-name{font-size:1rem;font-weight:800;color:#e8edf2;}
+        .left-title{font-size:1.5rem;font-weight:800;color:#e8edf2;line-height:1.3;margin-bottom:10px;}
+        .left-title em{font-style:italic;color:var(--gold);}
+        .left-sub{font-size:12px;color:#4a5568;line-height:1.7;margin-bottom:28px;}
+        .features{display:flex;flex-direction:column;gap:12px;}
+        .feat{display:flex;align-items:center;gap:10px;font-size:12px;color:#6b7685;}
+        .feat i{color:var(--gold);width:16px;}
+        .diff-link{margin-top:28px;padding-top:20px;border-top:1px solid rgba(255,255,255,0.07);font-size:11px;color:#4a5568;}
+        .diff-link a{color:var(--gold);text-decoration:none;font-weight:700;}
+
+        .right{background:white;padding:48px 40px;display:flex;flex-direction:column;justify-content:center;}
+        .right-title{font-size:1.3rem;font-weight:800;color:var(--ink);margin-bottom:4px;}
+        .right-sub{font-size:12px;color:var(--muted);margin-bottom:28px;}
+
+        .flash{padding:12px 16px;border-radius:12px;margin-bottom:20px;font-size:12px;font-weight:600;display:flex;align-items:center;gap:8px;}
+        .flash.error{background:rgba(196,98,45,0.08);border:1px solid rgba(196,98,45,0.2);color:var(--rust);}
+        .flash.success{background:rgba(34,139,34,0.08);border:1px solid rgba(34,139,34,0.2);color:var(--green);}
+
+        .field{margin-bottom:16px;}
+        .field label{display:block;font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.4px;margin-bottom:6px;}
+        .field-wrap{position:relative;}
+        .field-input{width:100%;padding:12px 14px 12px 40px;border:1.5px solid var(--border);border-radius:11px;font-size:13px;font-family:'DM Sans',sans-serif;color:var(--ink);background:var(--mist);transition:all 0.2s;}
+        .field-input:focus{outline:none;border-color:var(--gold);background:white;box-shadow:0 0 0 3px rgba(201,168,76,0.1);}
+        .field-icon{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:#c8d0da;font-size:14px;}
+
+        .btn-login{width:100%;padding:13px;background:var(--ink);color:var(--gold);border:none;border-radius:12px;font-size:13px;font-weight:800;cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;transition:all 0.2s;margin-top:6px;}
+        .btn-login:hover{background:#1a2332;transform:translateY(-1px);}
+
+        @media(max-width:640px){.wrapper{grid-template-columns:1fr;}.left{padding:28px 24px;}.right{padding:28px 24px;}}
+        @keyframes appear{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+        .wrapper{animation:appear 0.6s cubic-bezier(0.22,1,0.36,1) both;}
+    </style>
+</head>
+<body>
+
+<div class="wrapper">
+    <div class="left">
+        <div class="brand">
+            <div class="brand-icon">🎓</div>
+            <span class="brand-name">EduBulletin</span>
+        </div>
+        <div class="left-title">Espace<br><em>Professeur</em></div>
+        <p class="left-sub">Connectez-vous pour accéder à vos classes et saisir les notes de vos élèves.</p>
+        <div class="features">
+            <div class="feat"><i class="bi bi-diagram-3-fill"></i> Vos classes et matières affectées</div>
+            <div class="feat"><i class="bi bi-pencil-square"></i> Saisie des notes par trimestre</div>
+            <div class="feat"><i class="bi bi-shield-check"></i> Accès sécurisé et limité</div>
+        </div>
+        <div class="diff-link">
+            Vous êtes directeur d'école ?
+            <a href="{{ url_for('auth.login') }}">Connexion école →</a>
+        </div>
+    </div>
+
+    <div class="right">
+        <div class="right-title">Connexion professeur</div>
+        <div class="right-sub">Entrez vos identifiants fournis par votre établissement</div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for cat, msg in messages %}
+        <div class="flash {{ cat }}"><i class="bi bi-info-circle"></i> {{ msg }}</div>
+        {% endfor %}
+        {% endwith %}
+
+        <form method="POST">
+            <div class="field">
+                <label>Adresse email</label>
+                <div class="field-wrap">
+                    <input type="email" name="email" class="field-input"
+                           placeholder="votre@email.com" required autofocus>
+                    <i class="bi bi-envelope field-icon"></i>
+                </div>
+            </div>
+            <div class="field">
+                <label>Mot de passe</label>
+                <div class="field-wrap">
+                    <input type="password" name="password" class="field-input"
+                           placeholder="••••••••" required>
+                    <i class="bi bi-lock field-icon"></i>
+                </div>
+            </div>
+            <button type="submit" class="btn-login">
+                <i class="bi bi-box-arrow-in-right"></i>
+                Me connecter
+            </button>
+        </form>
+    </div>
+</div>
+</body>
+</html>

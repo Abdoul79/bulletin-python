@@ -30,6 +30,57 @@ class Ecole(db.Model):
     classes           = db.relationship('Classe',        backref='ecole', lazy=True, cascade='all, delete-orphan')
     matricules_utilises = db.relationship('MatriculeUsed', backref='ecole', lazy=True, cascade='all, delete-orphan')
 
+# ═══════════════════════════════════════════════════════
+#  AJOUTER DANS models.py
+# ═══════════════════════════════════════════════════════
+
+class Professeur(db.Model):
+    """Compte professeur lié à une école"""
+    __tablename__ = 'professeur'
+
+    id           = db.Column(db.Integer, primary_key=True)
+    ecole_id     = db.Column(db.Integer, db.ForeignKey('ecole.id'), nullable=False)
+    nom          = db.Column(db.String(100), nullable=False)
+    prenom       = db.Column(db.String(100), nullable=False)
+    email        = db.Column(db.String(150), unique=True, nullable=False)
+    mot_de_passe = db.Column(db.String(255), nullable=False)
+    telephone    = db.Column(db.String(30), nullable=True)
+    actif        = db.Column(db.Boolean, default=True)
+    date_creation = db.Column(db.DateTime, default=datetime.utcnow)
+
+    ecole        = db.relationship('Ecole', backref=db.backref('professeurs', lazy=True))
+    affectations = db.relationship('ProfesseurAffectation', backref='professeur', lazy=True, cascade='all, delete-orphan')
+
+    @property
+    def nom_complet(self):
+        return f"{self.prenom} {self.nom}"
+
+    def __repr__(self):
+        return f'<Professeur {self.nom_complet}>'
+
+
+class ProfesseurAffectation(db.Model):
+    """
+    Affectation d'un professeur à une matière dans une classe.
+    Un prof peut avoir plusieurs (classe, matière) paires.
+    """
+    __tablename__ = 'professeur_affectation'
+
+    id            = db.Column(db.Integer, primary_key=True)
+    professeur_id = db.Column(db.Integer, db.ForeignKey('professeur.id'), nullable=False)
+    classe_id     = db.Column(db.Integer, db.ForeignKey('classe.id'), nullable=False)
+    matiere_id    = db.Column(db.Integer, db.ForeignKey('matiere.id'), nullable=False)
+
+    classe  = db.relationship('Classe',  backref=db.backref('affectations', lazy=True))
+    matiere = db.relationship('Matiere', backref=db.backref('affectations', lazy=True, passive_deletes=True))
+
+    __table_args__ = (
+        db.UniqueConstraint('professeur_id', 'classe_id', 'matiere_id',
+                            name='uq_prof_classe_matiere'),
+    )
+
+    def __repr__(self):
+        return f'<Affectation prof={self.professeur_id} classe={self.classe_id} mat={self.matiere_id}>'
 
 class Classe(db.Model):
     __tablename__ = 'classe'
@@ -110,6 +161,9 @@ class Eleve(db.Model):
     telephone_tuteur = db.Column(db.String(15))
     date_enregistrement = db.Column(db.DateTime, default=datetime.utcnow)
     photo_url = db.Column(db.String(255), nullable=True)
+    archive      = db.Column(db.Boolean, default=False, nullable=False)
+    date_archive = db.Column(db.DateTime, nullable=True)
+    motif_archive = db.Column(db.String(200), nullable=True)
 
     #notes = db.relationship('Note', backref='eleve', lazy=True, cascade='all, delete-orphan')
     #scolarites = db.relationship('Scolarite', backref='eleve', cascade="all, delete-orphan")
@@ -231,6 +285,8 @@ class Note(db.Model):
     trimestre  = db.Column(db.String(2), nullable=False)
     statut     = db.Column(db.String(10), default='active')
     date_saisie = db.Column(db.DateTime, default=datetime.utcnow)
+    professeur_id = db.Column(db.Integer, db.ForeignKey('professeur.id'), nullable=True)
+    professeur    = db.relationship('Professeur', backref=db.backref('notes_saisies', lazy=True)) 
 
     def __repr__(self):
         return f'<Note {self.note} - Élève:{self.eleve_id} Matière:{self.matiere_id}>'

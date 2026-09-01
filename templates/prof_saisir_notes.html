@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saisie notes — {{ matiere.nom }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=DM+Serif+Display&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root{--ink:#0d1117;--cream:#f5f0e8;--gold:#c9a84c;--gold-l:#e8d5a3;--mist:#e8edf2;--muted:#6b7685;--green:#228B22;--orange:#FF8C00;--red:#dc2626;--border:#e8edf2;}
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{font-family:'DM Sans',sans-serif;background:var(--cream);min-height:100vh;color:var(--ink);}
+        body::before{content:'';position:fixed;inset:0;z-index:0;background:radial-gradient(circle at 90% 10%,rgba(201,168,76,0.1),transparent 55%);pointer-events:none;}
+        body::after{content:'';position:fixed;inset:0;z-index:0;background-image:radial-gradient(circle,#c9a84c18 1px,transparent 1px);background-size:24px 24px;pointer-events:none;}
+
+        .navbar{position:sticky;top:0;z-index:100;background:rgba(245,240,232,0.95);backdrop-filter:blur(12px);border-bottom:1px solid rgba(201,168,76,0.15);padding:0 36px;height:62px;display:flex;align-items:center;justify-content:space-between;}
+        .brand{display:flex;align-items:center;gap:10px;text-decoration:none;}
+        .brand-icon{width:34px;height:34px;background:var(--ink);border-radius:9px;display:flex;align-items:center;justify-content:center;color:var(--gold);}
+        .brand-name{font-size:1rem;font-weight:800;color:var(--ink);}
+        .nav-links{display:flex;gap:8px;}
+        .btn-nav{display:flex;align-items:center;gap:6px;padding:8px 16px;border-radius:50px;border:1.5px solid var(--border);background:transparent;color:var(--muted);font-size:12px;font-weight:600;text-decoration:none;transition:all 0.2s;}
+        .btn-nav:hover{border-color:var(--ink);color:var(--ink);}
+
+        .main{position:relative;z-index:1;max-width:860px;margin:0 auto;padding:28px 24px;}
+
+        .hero{background:var(--ink);border-radius:20px;padding:22px 28px;margin-bottom:22px;position:relative;overflow:hidden;}
+        .hero::before{content:'';position:absolute;top:-50px;right:-50px;width:200px;height:200px;background:radial-gradient(circle,rgba(201,168,76,0.1),transparent 70%);border-radius:50%;}
+        .hero-label{display:inline-flex;align-items:center;gap:6px;background:rgba(201,168,76,0.12);border:1px solid rgba(201,168,76,0.2);color:var(--gold);padding:4px 12px;border-radius:50px;font-size:10px;font-weight:700;margin-bottom:8px;}
+        .hero-row{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;}
+        .hero-title{font-size:1.2rem;font-weight:800;color:#e8edf2;margin-bottom:2px;}
+        .hero-sub{font-size:11px;color:#4a5568;}
+
+        /* Onglets trimestres */
+        .trim-tabs{display:flex;gap:8px;margin-bottom:20px;}
+        .trim-tab{padding:9px 20px;border-radius:50px;border:1.5px solid var(--border);background:white;font-size:12px;font-weight:700;color:var(--muted);text-decoration:none;transition:all 0.2s;}
+        .trim-tab:hover{border-color:var(--gold);color:var(--gold);}
+        .trim-tab.active{background:var(--ink);color:var(--gold);border-color:var(--ink);}
+
+        .flash{padding:12px 16px;border-radius:12px;margin-bottom:16px;font-size:12px;font-weight:600;display:flex;align-items:center;gap:8px;}
+        .flash.success{background:rgba(34,139,34,0.1);border:1px solid rgba(34,139,34,0.2);color:#1a5c1a;}
+        .flash.error{background:rgba(220,38,38,0.08);border:1px solid rgba(220,38,38,0.2);color:var(--red);}
+
+        /* Tableau saisie */
+        .table-card{background:white;border:1.5px solid var(--border);border-radius:18px;overflow:hidden;}
+        .table-head-bar{background:var(--ink);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;}
+        .table-head-title{font-size:13px;font-weight:800;color:#e8edf2;display:flex;align-items:center;gap:8px;}
+        .trim-badge{background:rgba(201,168,76,0.15);color:var(--gold);padding:4px 12px;border-radius:50px;font-size:11px;font-weight:700;}
+
+        table{width:100%;border-collapse:collapse;}
+        thead th{padding:10px 16px;font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;background:#f8f9fa;border-bottom:1px solid var(--border);text-align:left;}
+        thead th.th-center{text-align:center;}
+        tbody td{padding:10px 16px;border-bottom:1px solid var(--mist);vertical-align:middle;font-size:13px;}
+        tbody tr:last-child td{border-bottom:none;}
+        tbody tr:hover td{background:rgba(201,168,76,0.02);}
+
+        .eleve-cell{display:flex;align-items:center;gap:10px;}
+        .eleve-av{width:32px;height:32px;border-radius:8px;background:var(--ink);display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:10px;font-weight:800;flex-shrink:0;}
+        .eleve-nm{font-size:12px;font-weight:700;color:var(--ink);}
+        .eleve-mat{font-size:10px;color:var(--muted);}
+
+        /* Input note */
+        .note-input{
+            width:80px;padding:8px 10px;border:1.5px solid var(--border);
+            border-radius:10px;font-size:14px;font-weight:700;font-family:'DM Sans',sans-serif;
+            color:var(--ink);background:var(--mist);text-align:center;transition:all 0.2s;
+        }
+        .note-input:focus{outline:none;border-color:var(--gold);background:white;box-shadow:0 0 0 3px rgba(201,168,76,0.1);}
+        .note-input.filled{background:rgba(34,139,34,0.06);border-color:rgba(34,139,34,0.25);color:var(--green);}
+
+        /* Appréciation auto */
+        .appr-chip{display:inline-block;padding:2px 8px;border-radius:6px;font-size:9px;font-weight:700;margin-right:2px;}
+        .appr-tb{background:rgba(34,139,34,0.1);color:var(--green);}
+        .appr-b{background:rgba(99,102,241,0.1);color:#4f46e5;}
+        .appr-ab{background:rgba(6,182,212,0.1);color:#0e6e80;}
+        .appr-p{background:rgba(255,140,0,0.1);color:var(--orange);}
+        .appr-i{background:rgba(220,38,38,0.08);color:var(--red);}
+
+        /* Barre bottom */
+        .bottom-bar{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;background:#f8f9fa;border-top:1px solid var(--border);}
+        .bottom-stat{font-size:11px;color:var(--muted);}
+        .bottom-stat strong{color:var(--ink);font-size:13px;}
+        .btn-save{padding:11px 28px;background:var(--ink);color:var(--gold);border:none;border-radius:11px;font-size:13px;font-weight:800;cursor:pointer;font-family:'DM Sans',sans-serif;display:inline-flex;align-items:center;gap:7px;transition:all 0.2s;}
+        .btn-save:hover{background:#1a2332;transform:translateY(-1px);}
+
+        @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+        .fade-in{animation:fadeUp 0.4s ease both;}
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <a href="{{ url_for('professeurs.prof_dashboard') }}" class="brand">
+        <div class="brand-icon">🎓</div>
+        <span class="brand-name">EduBulletin</span>
+    </a>
+    <div class="nav-links">
+        <a href="{{ url_for('professeurs.prof_dashboard') }}" class="btn-nav">
+            <i class="bi bi-arrow-left"></i> Mes classes
+        </a>
+        <a href="{{ url_for('professeurs.prof_logout') }}" class="btn-nav">
+            <i class="bi bi-box-arrow-right"></i> Déconnexion
+        </a>
+    </div>
+</nav>
+
+<div class="main">
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for cat, msg in messages %}
+    <div class="flash {{ cat }}"><i class="bi bi-check-circle"></i> {{ msg }}</div>
+    {% endfor %}
+    {% endwith %}
+
+    <div class="hero fade-in">
+        <div class="hero-label">✏️ Saisie des notes</div>
+        <div class="hero-row">
+            <div>
+                <div class="hero-title">{{ matiere.nom }}</div>
+                <div class="hero-sub">{{ classe.nom }} — {{ classe.annee_scolaire }} — {{ eleves|length }} élève(s)</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Onglets trimestres -->
+    <div class="trim-tabs fade-in">
+        {% for t in ['T1', 'T2', 'T3'] %}
+        <a href="{{ url_for('professeurs.prof_saisir_notes', classe_id=classe.id, matiere_id=matiere.id, trimestre=t) }}"
+           class="trim-tab {% if t == trimestre %}active{% endif %}">
+            {{ t }}
+        </a>
+        {% endfor %}
+    </div>
+
+    <!-- Tableau de saisie -->
+    <form method="POST" id="notesForm">
+        <input type="hidden" name="trimestre" value="{{ trimestre }}">
+
+        <div class="table-card fade-in">
+            <div class="table-head-bar">
+                <div class="table-head-title">
+                    <i class="bi bi-pencil-square" style="color:var(--gold)"></i>
+                    {{ matiere.nom }} — Notes
+                </div>
+                <span class="trim-badge">{{ trimestre }}</span>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width:40%;">Élève</th>
+                        <th class="th-center" style="width:20%;">Note /20</th>
+                        <th style="width:40%;">Appréciation</th>
+                    </tr>
+                </thead>
+                <tbody id="notesBody">
+                {% for eleve in eleves %}
+                {% set note_val = notes_existantes.get(eleve.id, '') %}
+                <tr>
+                    <td>
+                        <div class="eleve-cell">
+                            <div class="eleve-av">{{ eleve.prenom[0] }}{{ eleve.nom[0] }}</div>
+                            <div>
+                                <div class="eleve-nm">{{ eleve.prenom }} {{ eleve.nom }}</div>
+                                <div class="eleve-mat">{{ eleve.matricule or '—' }}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="th-center">
+                        <input type="number" name="note_{{ eleve.id }}"
+                               class="note-input {% if note_val != '' %}filled{% endif %}"
+                               id="note-{{ eleve.id }}"
+                               value="{{ '%.2f'|format(note_val) if note_val != '' else '' }}"
+                               min="0" max="20" step="0.25" placeholder="—"
+                               oninput="updateAppr({{ eleve.id }}, this.value)">
+                    </td>
+                    <td>
+                        <span id="appr-{{ eleve.id }}">
+                            {% if note_val != '' %}
+                                {% if note_val >= 16 %}<span class="appr-chip appr-tb">Très bien</span>
+                                {% elif note_val >= 14 %}<span class="appr-chip appr-b">Bien</span>
+                                {% elif note_val >= 12 %}<span class="appr-chip appr-ab">Assez bien</span>
+                                {% elif note_val >= 10 %}<span class="appr-chip appr-p">Passable</span>
+                                {% else %}<span class="appr-chip appr-i">Insuffisant</span>
+                                {% endif %}
+                            {% endif %}
+                        </span>
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+
+            <div class="bottom-bar">
+                <div class="bottom-stat">
+                    <strong id="nbSaisies">{{ notes_existantes|length }}</strong> / {{ eleves|length }}
+                    notes saisies pour {{ trimestre }}
+                </div>
+                <button type="submit" class="btn-save">
+                    <i class="bi bi-save"></i> Enregistrer les notes
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+function updateAppr(eleveId, val) {
+    const input  = document.getElementById('note-' + eleveId);
+    const apprEl = document.getElementById('appr-' + eleveId);
+    const v = parseFloat(val);
+
+    if (isNaN(v) || val === '') {
+        input.className = 'note-input';
+        apprEl.innerHTML = '';
+        return;
+    }
+
+    input.className = 'note-input filled';
+
+    let cls = '', lbl = '';
+    if      (v >= 16) { cls = 'appr-tb'; lbl = 'Très bien';   }
+    else if (v >= 14) { cls = 'appr-b';  lbl = 'Bien';        }
+    else if (v >= 12) { cls = 'appr-ab'; lbl = 'Assez bien';  }
+    else if (v >= 10) { cls = 'appr-p';  lbl = 'Passable';    }
+    else              { cls = 'appr-i';  lbl = 'Insuffisant'; }
+
+    apprEl.innerHTML = `<span class="appr-chip ${cls}">${lbl}</span>`;
+
+    // Compter les notes saisies
+    const filled = document.querySelectorAll('.note-input.filled').length;
+    document.getElementById('nbSaisies').textContent = filled;
+}
+
+// Clavier — Tab pour passer à la note suivante
+document.querySelectorAll('.note-input').forEach((input, i, all) => {
+    input.addEventListener('keydown', e => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            const next = all[i + 1];
+            if (next) next.focus();
+        }
+    });
+});
+</script>
+</body>
+</html>

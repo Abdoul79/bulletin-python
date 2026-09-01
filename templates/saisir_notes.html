@@ -387,6 +387,19 @@
                             <span style="font-size:0.72rem;font-weight:600;color:var(--gold);background:rgba(201,168,76,0.15);border-radius:6px;padding:2px 8px;">{{ student_mat }}</span>
                         </div>
                         <span class="student-count">{{ student_notes|length }} note(s)</span>
+                        {% set profs_noms = student_notes
+    | selectattr('professeur_id')
+    | map(attribute='professeur')
+    | unique
+    | list %}
+{% if profs_noms %}
+<span style="
+    font-size:9px;font-weight:700;color:rgba(201,168,76,0.7);
+    margin-right:8px;
+">
+    {% for p in profs_noms %}👨‍🏫 {{ p.prenom }} {{ p.nom[0] }}.{% if not loop.last %}, {% endif %}{% endfor %}
+</span>
+{% endif %}
                     </div>
                     <div class="notes-list">
                         {% for note in student_notes %}
@@ -394,15 +407,48 @@
                              data-trimestre="{{ note.trimestre }}"
                              data-note-id="{{ note.id }}"
                              data-searchable="{{ student_mat }} {{ student_name }} {{ note.matiere.nom }} {{ note.note }} {{ note.trimestre }}">
+
+
+
                             <div class="note-details">
-                                <span class="chip chip-{{ note.trimestre|lower }}">{{ note.trimestre }}</span>
-                                <span class="note-matiere">{{ note.matiere.nom }}</span>
-                                <span class="score-chip {{ 'score-good' if note.note >= 10 else 'score-medium' if note.note >= 8 else 'score-bad' }}">
-                                    {{ note.note }}/20
-                                </span>
-                                <span class="status-dot {{ 'status-active' if note.statut == 'active' else 'status-suspended' }}" title="{{ 'Active' if note.statut == 'active' else 'Suspendue' }}"></span>
-                                <span class="note-date">{{ note.date_saisie.strftime('%d/%m %H:%M') if note.date_saisie else '—' }}</span>
-                            </div>
+    <span class="chip chip-{{ note.trimestre|lower }}">{{ note.trimestre }}</span>
+    <span class="note-matiere">{{ note.matiere.nom }}</span>
+    <span class="score-chip {{ 'score-good' if note.note >= 10 else 'score-medium' if note.note >= 8 else 'score-bad' }}">
+        {{ note.note }}/20
+    </span>
+ 
+    {# ── Badge Prof — s'affiche si la note a été saisie par un professeur ── #}
+    {% if note.professeur_id %}
+    <span style="
+        display:inline-flex;align-items:center;gap:4px;
+        background:rgba(99,102,241,0.1);
+        border:1px solid rgba(99,102,241,0.2);
+        color:#4f46e5;
+        padding:2px 8px;border-radius:50px;
+        font-size:9px;font-weight:700;
+    " title="Saisi par {{ note.professeur.prenom }} {{ note.professeur.nom }}">
+        👨‍🏫 Prof
+    </span>
+    {% else %}
+    <span style="
+        display:inline-flex;align-items:center;gap:4px;
+        background:rgba(34,139,34,0.08);
+        border:1px solid rgba(34,139,34,0.2);
+        color:#1a6b3c;
+        padding:2px 8px;border-radius:50px;
+        font-size:9px;font-weight:700;
+    ">
+        🏫 École
+    </span>
+    {% endif %}
+ 
+    <span class="status-dot {{ 'status-active' if note.statut == 'active' else 'status-suspended' }}"
+          title="{{ 'Active' if note.statut == 'active' else 'Suspendue' }}"></span>
+    <span class="note-date">{{ note.date_saisie.strftime('%d/%m %H:%M') if note.date_saisie else '—' }}</span>
+</div>
+
+
+
                             <div class="note-actions">
                                 <button class="icon-btn edit btn-modifier"
                                         data-note-id="{{ note.id }}"

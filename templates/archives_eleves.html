@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Archives des élèves — EduBulletin</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=DM+Serif+Display&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root{--ink:#0d1117;--cream:#f5f0e8;--gold:#c9a84c;--gold-l:#e8d5a3;--mist:#e8edf2;--muted:#6b7685;--green:#228B22;--orange:#FF8C00;--red:#dc2626;--border:#e8edf2;}
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{font-family:'DM Sans',sans-serif;background:var(--cream);min-height:100vh;color:var(--ink);}
+        body::before{content:'';position:fixed;inset:0;z-index:0;background:radial-gradient(circle at 90% 10%,rgba(201,168,76,0.1),transparent 55%),radial-gradient(circle at 5% 90%,rgba(196,98,45,0.07),transparent 50%);pointer-events:none;}
+        body::after{content:'';position:fixed;inset:0;z-index:0;background-image:radial-gradient(circle,#c9a84c18 1px,transparent 1px);background-size:24px 24px;pointer-events:none;}
+
+        .navbar{position:sticky;top:0;z-index:100;background:rgba(245,240,232,0.95);backdrop-filter:blur(12px);border-bottom:1px solid rgba(201,168,76,0.15);padding:0 36px;height:62px;display:flex;align-items:center;justify-content:space-between;}
+        .brand{display:flex;align-items:center;gap:10px;text-decoration:none;}
+        .brand-icon{width:34px;height:34px;background:var(--ink);border-radius:9px;display:flex;align-items:center;justify-content:center;color:var(--gold);}
+        .brand-name{font-size:1rem;font-weight:800;color:var(--ink);}
+        .btn-nav{display:flex;align-items:center;gap:6px;padding:8px 16px;border-radius:50px;border:1.5px solid var(--border);background:transparent;color:var(--muted);font-size:12px;font-weight:600;text-decoration:none;transition:all 0.2s;}
+        .btn-nav:hover{border-color:var(--ink);color:var(--ink);}
+
+        .main{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:28px 24px;}
+
+        /* Hero */
+        .hero{background:var(--ink);border-radius:20px;padding:24px 28px;margin-bottom:22px;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:space-between;gap:20px;}
+        .hero::before{content:'';position:absolute;top:-50px;right:-50px;width:200px;height:200px;background:radial-gradient(circle,rgba(201,168,76,0.1),transparent 70%);border-radius:50%;}
+        .hero-label{display:inline-flex;align-items:center;gap:6px;background:rgba(201,168,76,0.12);border:1px solid rgba(201,168,76,0.2);color:var(--gold);padding:4px 12px;border-radius:50px;font-size:10px;font-weight:700;margin-bottom:8px;}
+        .hero-title{font-size:1.3rem;font-weight:800;color:#e8edf2;margin-bottom:2px;}
+        .hero-sub{font-size:11px;color:#4a5568;}
+        .hero-badge{background:rgba(201,168,76,0.12);border:1px solid rgba(201,168,76,0.2);border-radius:14px;padding:14px 20px;text-align:center;flex-shrink:0;}
+        .hero-badge-num{font-size:2rem;font-weight:800;color:var(--gold);line-height:1;}
+        .hero-badge-lbl{font-size:10px;color:#4a5568;margin-top:2px;}
+
+        /* Flash */
+        .flash{padding:12px 16px;border-radius:12px;margin-bottom:16px;font-size:12px;font-weight:600;display:flex;align-items:center;gap:8px;}
+        .flash.success{background:rgba(34,139,34,0.1);border:1px solid rgba(34,139,34,0.2);color:#1a5c1a;}
+        .flash.error{background:rgba(220,38,38,0.08);border:1px solid rgba(220,38,38,0.2);color:var(--red);}
+        .flash.warning{background:rgba(255,140,0,0.1);border:1px solid rgba(255,140,0,0.2);color:#92400e;}
+
+        /* Filtres */
+        .filters-card{background:white;border:1.5px solid var(--border);border-radius:16px;padding:18px 20px;margin-bottom:20px;}
+        .filters-title{font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:0.4px;margin-bottom:12px;display:flex;align-items:center;gap:6px;}
+        .filters-grid{display:grid;grid-template-columns:1fr 1fr 2fr auto;gap:12px;align-items:end;}
+        .filter-field label{display:block;font-size:10px;font-weight:700;color:var(--muted);margin-bottom:5px;text-transform:uppercase;}
+        .filter-select,.filter-input{width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;font-family:'DM Sans',sans-serif;color:var(--ink);background:var(--mist);transition:all 0.2s;}
+        .filter-select:focus,.filter-input:focus{outline:none;border-color:var(--gold);background:white;}
+        .btn-filter{padding:9px 20px;background:var(--ink);color:var(--gold);border:none;border-radius:10px;font-size:12px;font-weight:800;cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;align-items:center;gap:6px;white-space:nowrap;}
+        .btn-filter:hover{background:#1a2332;}
+        .btn-reset-filter{padding:9px 16px;background:var(--mist);color:var(--muted);border:none;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;text-decoration:none;display:inline-flex;align-items:center;gap:5px;}
+        .btn-reset-filter:hover{background:var(--border);color:var(--ink);}
+
+        /* Table */
+        .table-card{background:white;border:1.5px solid var(--border);border-radius:18px;overflow:hidden;}
+        .table-head-bar{background:var(--ink);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;}
+        .table-head-title{font-size:13px;font-weight:800;color:#e8edf2;display:flex;align-items:center;gap:8px;}
+        .count-badge{background:rgba(201,168,76,0.15);color:var(--gold);padding:3px 10px;border-radius:50px;font-size:10px;font-weight:700;}
+
+        table{width:100%;border-collapse:collapse;}
+        thead th{padding:10px 14px;font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;background:#f8f9fa;border-bottom:1px solid var(--border);text-align:left;white-space:nowrap;}
+        tbody td{padding:11px 14px;border-bottom:1px solid var(--mist);font-size:12px;vertical-align:middle;}
+        tbody tr:last-child td{border-bottom:none;}
+        tbody tr:hover td{background:rgba(201,168,76,0.02);}
+
+        /* Photo */
+        .tbl-photo{width:36px;height:44px;border-radius:7px;object-fit:cover;border:2px solid var(--border);display:block;}
+        .tbl-photo-ph{width:36px;height:44px;border-radius:7px;background:var(--mist);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;color:#c8d0da;font-size:1rem;}
+
+        .m-badge{display:inline-flex;align-items:center;gap:4px;background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.2);color:#7a5c10;padding:3px 9px;border-radius:50px;font-size:10px;font-weight:700;}
+        .classe-badge{display:inline-flex;align-items:center;gap:4px;background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.15);color:#4f46e5;padding:3px 9px;border-radius:50px;font-size:10px;font-weight:700;}
+        .annee-badge{display:inline-flex;align-items:center;gap:4px;background:var(--mist);color:var(--muted);padding:3px 9px;border-radius:50px;font-size:10px;font-weight:600;}
+        .date-archive{font-size:10px;color:var(--muted);}
+        .motif-text{font-size:10px;color:var(--muted);font-style:italic;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+
+        /* Actions */
+        .action-btns{display:flex;gap:5px;justify-content:flex-end;}
+        .icon-btn{width:30px;height:30px;border-radius:8px;border:1.5px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;transition:all 0.2s;text-decoration:none;}
+        .icon-btn.restore:hover{background:rgba(34,139,34,0.1);border-color:rgba(34,139,34,0.3);color:var(--green);}
+        .icon-btn.del:hover{background:rgba(220,38,38,0.08);border-color:rgba(220,38,38,0.2);color:var(--red);}
+        .icon-btn.bulletin:hover{background:rgba(201,168,76,0.1);border-color:rgba(201,168,76,0.3);color:#7a5c10;}
+
+        /* Empty */
+        .empty-state{text-align:center;padding:56px;color:var(--muted);}
+        .empty-icon{font-size:3rem;margin-bottom:12px;opacity:0.4;}
+
+        /* Modal */
+        .modal-overlay{display:none;position:fixed;inset:0;z-index:500;background:rgba(13,17,23,0.5);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:24px;}
+        .modal-overlay.open{display:flex;}
+        .modal-box{background:white;border-radius:20px;padding:28px;width:100%;max-width:420px;box-shadow:0 24px 64px rgba(0,0,0,0.15);}
+        .modal-title{font-size:1rem;font-weight:800;color:var(--ink);margin-bottom:4px;}
+        .modal-sub{font-size:11px;color:var(--muted);margin-bottom:16px;}
+        .modal-name{background:var(--mist);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:700;color:var(--ink);margin-bottom:16px;}
+        .modal-warn{background:rgba(220,38,38,0.06);border:1px solid rgba(220,38,38,0.2);border-radius:10px;padding:10px 14px;font-size:11px;color:var(--red);margin-bottom:16px;}
+        .modal-foot{display:flex;gap:8px;}
+        .btn-cancel{flex:1;padding:11px;background:var(--mist);border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;}
+        .btn-confirm-del{flex:2;padding:11px;background:var(--red);color:white;border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;}
+
+        @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+        .fade-in{animation:fadeUp 0.4s ease both;}
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <a href="{{ url_for('main.dashboard') }}" class="brand">
+        <div class="brand-icon">🎓</div>
+        <span class="brand-name">EduBulletin</span>
+    </a>
+    <a href="{{ url_for('main.dashboard') }}" class="btn-nav">
+        <i class="bi bi-arrow-left"></i> Dashboard
+    </a>
+</nav>
+
+<div class="main">
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for cat, msg in messages %}
+    <div class="flash {{ cat }}"><i class="bi bi-info-circle"></i> {{ msg }}</div>
+    {% endfor %}
+    {% endwith %}
+
+    <!-- Hero -->
+    <div class="hero fade-in">
+        <div>
+            <div class="hero-label">🗃️ Archives</div>
+            <div class="hero-title">Élèves archivés</div>
+            <div class="hero-sub">Consultez, restaurez ou supprimez définitivement les élèves archivés</div>
+        </div>
+        <div class="hero-badge">
+            <div class="hero-badge-num">{{ eleves_archives|length }}</div>
+            <div class="hero-badge-lbl">élève(s) archivé(s)</div>
+        </div>
+    </div>
+
+    <!-- Filtres -->
+    <div class="filters-card fade-in">
+        <div class="filters-title"><i class="bi bi-funnel" style="color:var(--gold)"></i> Filtrer les archives</div>
+        <form method="GET">
+            <div class="filters-grid">
+                <div class="filter-field">
+                    <label>Classe</label>
+                    <select name="classe_id" class="filter-select">
+                        <option value="">Toutes les classes</option>
+                        {% for c in classes %}
+                        <option value="{{ c.id }}" {% if c.id == classe_id_filter %}selected{% endif %}>
+                            {{ c.nom }} ({{ c.annee_scolaire }})
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="filter-field">
+                    <label>Année scolaire</label>
+                    <select name="annee" class="filter-select">
+                        <option value="">Toutes les années</option>
+                        {% for a in annees %}
+                        <option value="{{ a }}" {% if a == annee_filter %}selected{% endif %}>{{ a }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="filter-field">
+                    <label>Recherche</label>
+                    <input type="text" name="q" class="filter-input"
+                           value="{{ search }}" placeholder="Nom, prénom, matricule…">
+                </div>
+                <div style="display:flex;gap:8px;align-items:flex-end;">
+                    <button type="submit" class="btn-filter">
+                        <i class="bi bi-search"></i> Filtrer
+                    </button>
+                    <a href="{{ url_for('eleve.archives_eleves') }}" class="btn-reset-filter">
+                        <i class="bi bi-x"></i> Reset
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Tableau des archives -->
+    <div class="table-card fade-in">
+        <div class="table-head-bar">
+            <div class="table-head-title">
+                <i class="bi bi-archive" style="color:var(--gold)"></i>
+                Archives
+                <span class="count-badge">{{ eleves_archives|length }}</span>
+            </div>
+        </div>
+
+        {% if eleves_archives %}
+        <div style="overflow-x:auto;">
+        <table>
+            <thead>
+                <tr>
+                    <th>Photo</th>
+                    <th>Matricule</th>
+                    <th>Élève</th>
+                    <th>Classe</th>
+                    <th>Année</th>
+                    <th>Naissance</th>
+                    <th>Archivé le</th>
+                    <th>Motif</th>
+                    <th style="text-align:right;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for e in eleves_archives %}
+            <tr>
+                <td>
+                    {% if e.photo_url %}
+                    <img src="{{ e.photo_url }}" class="tbl-photo" alt="{{ e.prenom }}">
+                    {% else %}
+                    <div class="tbl-photo-ph"><i class="bi bi-person"></i></div>
+                    {% endif %}
+                </td>
+                <td><span class="m-badge"><i class="bi bi-hash"></i>{{ e.matricule }}</span></td>
+                <td>
+                    <div style="font-size:13px;font-weight:700;color:var(--ink);">{{ e.prenom }} {{ e.nom }}</div>
+                    <div style="font-size:10px;color:var(--muted);">{{ 'M' if e.sexe == 'M' else 'F' }}</div>
+                </td>
+                <td><span class="classe-badge"><i class="bi bi-building"></i> {{ e.classe.nom }}</span></td>
+                <td><span class="annee-badge">{{ e.classe.annee_scolaire }}</span></td>
+                <td class="date-archive">{{ e.date_naissance.strftime('%d/%m/%Y') if e.date_naissance else '—' }}</td>
+                <td class="date-archive">
+                    {{ e.date_archive.strftime('%d/%m/%Y') if e.date_archive else '—' }}
+                </td>
+                <td>
+                    <span class="motif-text" title="{{ e.motif_archive or '' }}">
+                        {{ e.motif_archive or '—' }}
+                    </span>
+                </td>
+                <td>
+                    <div class="action-btns">
+                        <!-- Voir bulletin -->
+                        <a href="{{ url_for('pdf.preview_bulletin', eleve_id=e.id) }}"
+                           class="icon-btn bulletin" title="Voir le bulletin" target="_blank">
+                            <i class="bi bi-file-earmark-text"></i>
+                        </a>
+                        <!-- Restaurer -->
+                        <form method="POST" action="{{ url_for('eleve.restaurer_eleve', eleve_id=e.id) }}" style="display:inline;">
+                            <button type="submit" class="icon-btn restore" title="Restaurer dans sa classe"
+                                    onclick="return confirm('Restaurer {{ e.prenom }} {{ e.nom }} dans {{ e.classe.nom }} ?')">
+                                <i class="bi bi-arrow-counterclockwise"></i>
+                            </button>
+                        </form>
+                        <!-- Supprimer définitivement -->
+                        <button class="icon-btn del" title="Supprimer définitivement"
+                                onclick="openDelModal({{ e.id }}, '{{ e.prenom|e }} {{ e.nom|e }}')">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">🗃️</div>
+            <div style="font-size:14px;font-weight:700;color:var(--ink);margin-bottom:6px;">Aucun élève archivé</div>
+            <div style="font-size:12px;">
+                {% if search or classe_id_filter or annee_filter %}
+                Aucun résultat pour ces filtres. <a href="{{ url_for('eleve.archives_eleves') }}" style="color:var(--gold);">Voir tous</a>
+                {% else %}
+                Les élèves archivés apparaîtront ici.
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Modal suppression définitive -->
+<div class="modal-overlay" id="delModal">
+    <div class="modal-box">
+        <div class="modal-title">Suppression définitive</div>
+        <div class="modal-sub">Cette action est irréversible</div>
+        <div class="modal-name" id="delModalName"></div>
+        <div class="modal-warn">
+            <i class="bi bi-exclamation-triangle"></i>
+            Toutes les données (notes, absences, paiements) seront supprimées définitivement.
+            Cette action ne peut pas être annulée.
+        </div>
+        <form method="POST" id="delForm">
+            <div class="modal-foot">
+                <button type="button" class="btn-cancel" onclick="closeDelModal()">Annuler</button>
+                <button type="submit" class="btn-confirm-del">
+                    <i class="bi bi-trash"></i> Supprimer définitivement
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function openDelModal(eleveId, nom) {
+    document.getElementById('delModalName').textContent = nom;
+    document.getElementById('delForm').action = `/ecole/archives/supprimer/${eleveId}`;
+    document.getElementById('delModal').classList.add('open');
+}
+function closeDelModal() {
+    document.getElementById('delModal').classList.remove('open');
+}
+document.getElementById('delModal').addEventListener('click', e => {
+    if (e.target === document.getElementById('delModal')) closeDelModal();
+});
+</script>
+</body>
+</html>

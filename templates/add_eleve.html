@@ -28,6 +28,8 @@
         .nav-right { display:flex; align-items:center; gap:10px; }
         .btn-back { display:flex; align-items:center; gap:8px; padding:8px 18px; background:transparent; border:1.5px solid var(--border); border-radius:50px; font-size:0.85rem; font-weight:600; color:var(--text-muted); text-decoration:none; transition:all 0.2s; }
         .btn-back:hover { border-color:var(--ink); color:var(--ink); }
+        .btn-back.archive { border-color:rgba(201,168,76,0.4); color:var(--gold); background:rgba(201,168,76,0.06); }
+        .btn-back.archive:hover { background:rgba(201,168,76,0.12); }
 
         .page-content { position:relative; z-index:1; padding:40px; max-width:1200px; margin:0 auto; }
 
@@ -54,54 +56,24 @@
         .form-card-title { font-family:'DM Serif Display',serif; font-size:1.3rem; color:var(--ink); }
         .form-card-sub { color:var(--text-muted); font-size:0.83rem; }
 
-        /* ══ PHOTO UPLOAD ══ */
-        .photo-section {
-            display: flex; align-items: flex-start; gap: 20px;
-            background: linear-gradient(135deg,rgba(201,168,76,0.06),rgba(196,98,45,0.03));
-            border: 1.5px dashed rgba(201,168,76,0.35); border-radius: 16px;
-            padding: 20px; margin-bottom: 20px;
-        }
-        .photo-preview-wrap { flex-shrink: 0; }
-        .photo-preview {
-            width: 90px; height: 110px; border-radius: 10px;
-            background: var(--mist); border: 2px solid var(--border);
-            display: flex; align-items: center; justify-content: center;
-            overflow: hidden; cursor: pointer; transition: all 0.2s;
-            position: relative;
-        }
-        .photo-preview:hover { border-color: var(--gold); }
-        .photo-preview img { width: 100%; height: 100%; object-fit: cover; display: none; }
-        .photo-preview .photo-placeholder-icon { font-size: 2rem; color: #c8d0da; transition: all 0.2s; }
-        .photo-preview:hover .photo-placeholder-icon { color: var(--gold); }
-        .photo-preview .photo-overlay {
-            position: absolute; inset: 0; background: rgba(13,17,23,0.55);
-            display: none; align-items: center; justify-content: center;
-            border-radius: 8px; color: white; font-size: 0.75rem; font-weight: 700;
-            flex-direction: column; gap: 4px;
-        }
-        .photo-preview:hover .photo-overlay { display: flex; }
-
-        .photo-info { flex: 1; }
-        .photo-info label { display: flex; align-items: center; gap: 8px; font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
-        .photo-info label span { font-weight: 400; text-transform: none; letter-spacing: 0; color: #aab0ba; font-size: 0.75rem; }
-        .photo-upload-btn {
-            display: inline-flex; align-items: center; gap: 8px;
-            padding: 9px 18px; background: var(--ink); color: var(--gold);
-            border: none; border-radius: 10px; font-family: 'DM Sans',sans-serif;
-            font-size: 0.85rem; font-weight: 700; cursor: pointer; transition: all 0.2s;
-            margin-bottom: 8px;
-        }
-        .photo-upload-btn:hover { background: #1a2332; transform: translateY(-1px); }
-        .photo-hints { font-size: 0.75rem; color: var(--text-muted); line-height: 1.6; }
-        .photo-hints i { color: var(--gold); }
-        .photo-name { font-size: 0.78rem; color: var(--success-color); font-weight: 600; margin-top: 6px; display: none; }
-        .photo-name i { color: var(--success-color); }
-        .btn-remove-photo { display: none; align-items: center; gap: 5px; padding: 5px 12px; background: rgba(196,98,45,0.08); border: 1px solid rgba(196,98,45,0.2); border-radius: 8px; color: var(--rust); font-size: 0.78rem; font-weight: 700; cursor: pointer; margin-top: 6px; font-family: 'DM Sans',sans-serif; }
+        /* Photo */
+        .photo-section { display:flex; align-items:flex-start; gap:20px; background:linear-gradient(135deg,rgba(201,168,76,0.06),rgba(196,98,45,0.03)); border:1.5px dashed rgba(201,168,76,0.35); border-radius:16px; padding:20px; margin-bottom:20px; }
+        .photo-preview { width:90px; height:110px; border-radius:10px; background:var(--mist); border:2px solid var(--border); display:flex; align-items:center; justify-content:center; overflow:hidden; cursor:pointer; transition:all 0.2s; position:relative; }
+        .photo-preview:hover { border-color:var(--gold); }
+        .photo-preview img { width:100%; height:100%; object-fit:cover; display:none; }
+        .photo-preview .photo-placeholder-icon { font-size:2rem; color:#c8d0da; }
+        .photo-preview .photo-overlay { position:absolute; inset:0; background:rgba(13,17,23,0.55); display:none; align-items:center; justify-content:center; border-radius:8px; color:white; font-size:0.75rem; font-weight:700; flex-direction:column; gap:4px; }
+        .photo-preview:hover .photo-overlay { display:flex; }
+        .photo-info label { display:flex; align-items:center; gap:8px; font-size:0.75rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px; }
+        .photo-upload-btn { display:inline-flex; align-items:center; gap:8px; padding:9px 18px; background:var(--ink); color:var(--gold); border:none; border-radius:10px; font-family:'DM Sans',sans-serif; font-size:0.85rem; font-weight:700; cursor:pointer; transition:all 0.2s; margin-bottom:8px; }
+        .photo-upload-btn:hover { background:#1a2332; }
+        .photo-hints { font-size:0.75rem; color:var(--text-muted); line-height:1.6; }
+        .photo-name { font-size:0.78rem; color:var(--success-color); font-weight:600; margin-top:6px; display:none; }
+        .btn-remove-photo { display:none; align-items:center; gap:5px; padding:5px 12px; background:rgba(196,98,45,0.08); border:1px solid rgba(196,98,45,0.2); border-radius:8px; color:var(--rust); font-size:0.78rem; font-weight:700; cursor:pointer; margin-top:6px; font-family:'DM Sans',sans-serif; }
 
         /* Matricule */
         .matricule-box { background:linear-gradient(135deg,rgba(201,168,76,0.07),rgba(196,98,45,0.04)); border:1.5px dashed rgba(201,168,76,0.4); border-radius:16px; padding:20px; margin-bottom:20px; }
         .matricule-box > label { display:flex; align-items:center; gap:8px; font-size:0.78rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:10px; }
-        .matricule-box > label .hint { font-weight:400; text-transform:none; letter-spacing:0; color:#aab0ba; font-size:0.75rem; }
         .matricule-row { display:flex; align-items:center; gap:14px; }
         .matricule-prefix { width:40px; height:44px; background:var(--ink); border-radius:10px 0 0 10px; display:flex; align-items:center; justify-content:center; color:var(--gold); font-weight:700; font-size:1rem; flex-shrink:0; }
         .matricule-input { width:150px; background:var(--mist); border:1.5px solid var(--border); border-radius:0 10px 10px 0; padding:12px 14px; color:var(--ink); font-family:'DM Sans',sans-serif; font-size:0.92rem; font-weight:700; outline:none; transition:all 0.2s; border-left:none; }
@@ -116,10 +88,9 @@
         .field input:focus, .field select:focus { border-color:var(--gold); background:white; box-shadow:0 0 0 3px rgba(201,168,76,0.12); }
         .field input::placeholder { color:#c8d0da; }
         .mt-14 { margin-top:14px; }
-
         .btn-save { display:flex; align-items:center; justify-content:center; gap:8px; background:var(--ink); color:var(--cream); padding:12px 24px; border-radius:12px; border:2px solid var(--ink); font-family:'DM Sans',sans-serif; font-size:0.9rem; font-weight:700; cursor:pointer; transition:all 0.25s; white-space:nowrap; align-self:end; }
-        .btn-save:hover { background:transparent; color:var(--ink); transform:translateY(-2px); }
-        .btn-reset { display:flex; align-items:center; justify-content:center; gap:8px; background:var(--mist); color:var(--text-muted); padding:12px 20px; border-radius:12px; border:none; font-family:'DM Sans',sans-serif; font-size:0.88rem; font-weight:600; cursor:pointer; transition:background 0.2s; white-space:nowrap; align-self:end; }
+        .btn-save:hover { background:transparent; color:var(--ink); }
+        .btn-reset { display:flex; align-items:center; justify-content:center; gap:8px; background:var(--mist); color:var(--text-muted); padding:12px 20px; border-radius:12px; border:none; font-family:'DM Sans',sans-serif; font-size:0.88rem; font-weight:600; cursor:pointer; white-space:nowrap; align-self:end; }
         .btn-reset:hover { background:var(--border); color:var(--ink); }
 
         .table-card { background:white; border:1px solid var(--border); border-radius:24px; overflow:hidden; animation:fadeUp 0.6s ease 0.2s both; }
@@ -128,15 +99,16 @@
         .count-badge { background:var(--ink); color:var(--gold); padding:3px 12px; border-radius:50px; font-family:'DM Sans',sans-serif; font-size:0.75rem; font-weight:600; }
         .table-actions { display:flex; gap:8px; flex-wrap:wrap; }
         .btn-tbl { display:flex; align-items:center; gap:7px; padding:8px 16px; border-radius:10px; font-size:0.82rem; font-weight:600; cursor:pointer; transition:all 0.2s; font-family:'DM Sans',sans-serif; border:1.5px solid; }
-        .btn-tbl-red  { border-color:rgba(196,98,45,0.3); background:rgba(196,98,45,0.06); color:var(--rust); }
-        .btn-tbl-red:hover  { background:rgba(196,98,45,0.12); }
+        /* Archive all — orange */
+        .btn-tbl-orange { border-color:rgba(255,140,0,0.35); background:rgba(255,140,0,0.07); color:#92400e; }
+        .btn-tbl-orange:hover { background:rgba(255,140,0,0.14); }
         .btn-tbl-green { border-color:rgba(39,174,96,0.3); background:rgba(39,174,96,0.06); color:var(--success-color); }
         .btn-tbl-green:hover { background:rgba(39,174,96,0.12); }
 
         .search-wrap { padding:20px 28px; border-bottom:1px solid var(--border); position:relative; }
         .search-wrap i { position:absolute; left:44px; top:50%; transform:translateY(-50%); color:#c8d0da; }
         .search-input { width:100%; background:var(--mist); border:1.5px solid var(--border); border-radius:12px; padding:12px 16px 12px 40px; color:var(--ink); font-family:'DM Sans',sans-serif; font-size:0.92rem; outline:none; transition:all 0.2s; }
-        .search-input:focus { border-color:var(--gold); background:white; box-shadow:0 0 0 3px rgba(201,168,76,0.12); }
+        .search-input:focus { border-color:var(--gold); background:white; }
 
         .eleves-table { width:100%; border-collapse:collapse; }
         .eleves-table th { padding:12px 16px; text-align:left; font-size:0.72rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; background:var(--mist); border-bottom:1px solid var(--border); }
@@ -144,10 +116,8 @@
         .eleves-table tbody tr:last-child td { border-bottom:none; }
         .eleves-table tbody tr:hover td { background:rgba(201,168,76,0.03); }
 
-        /* Photo dans la table */
         .tbl-photo { width:38px; height:46px; border-radius:7px; object-fit:cover; border:2px solid var(--border); display:block; }
         .tbl-photo-placeholder { width:38px; height:46px; border-radius:7px; background:var(--mist); border:2px solid var(--border); display:flex; align-items:center; justify-content:center; color:#c8d0da; font-size:1.1rem; }
-
         .m-badge { display:inline-flex; align-items:center; gap:5px; background:rgba(13,17,23,0.06); border:1px solid rgba(13,17,23,0.12); color:var(--ink); border-radius:50px; padding:4px 12px; font-size:0.78rem; font-weight:700; }
         .m-badge i { color:var(--gold); font-size:0.7rem; }
         .s-badge { display:inline-flex; align-items:center; gap:5px; border-radius:50px; padding:4px 12px; font-size:0.75rem; font-weight:700; }
@@ -155,45 +125,44 @@
         .s-badge.f { background:rgba(196,98,45,0.08); color:var(--rust); }
 
         .row-actions { display:flex; gap:6px; justify-content:flex-end; }
-        .icon-btn { width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center; border:1.5px solid var(--border); background:transparent; color:var(--text-muted); cursor:pointer; transition:all 0.2s; font-size:0.85rem; }
-        .icon-btn.edit:hover { background:var(--ink); border-color:var(--ink); color:var(--cream); }
-        .icon-btn.del:hover  { background:rgba(196,98,45,0.1); border-color:rgba(196,98,45,0.3); color:var(--rust); }
-        .icon-btn.carte:hover { background:rgba(201,168,76,0.1); border-color:rgba(201,168,76,0.3); color:#7a5c10; }
-
-        .tip-bar { margin:20px 28px 0; background:rgba(201,168,76,0.08); border:1px solid rgba(201,168,76,0.25); border-radius:12px; padding:12px 16px; display:flex; align-items:center; gap:10px; font-size:0.83rem; color:#7a5c10; }
-        .progress-bg { flex:1; height:4px; background:rgba(201,168,76,0.2); border-radius:4px; margin-top:4px; }
-        .progress-fill { height:4px; background:var(--gold); border-radius:4px; }
+        .icon-btn { width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center; border:1.5px solid var(--border); background:transparent; color:var(--text-muted); cursor:pointer; transition:all 0.2s; font-size:0.85rem; text-decoration:none; }
+        .icon-btn.edit:hover   { background:var(--ink); border-color:var(--ink); color:var(--cream); }
+        /* Archive btn — orange */
+        .icon-btn.archive:hover { background:rgba(255,140,0,0.1); border-color:rgba(255,140,0,0.35); color:#92400e; }
+        .icon-btn.carte:hover  { background:rgba(201,168,76,0.1); border-color:rgba(201,168,76,0.3); color:#7a5c10; }
 
         .empty-state { padding:72px 40px; text-align:center; }
         .empty-icon { width:80px; height:80px; background:var(--mist); border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 24px; font-size:2rem; color:#c8d0da; }
         .empty-state h3 { font-family:'DM Serif Display',serif; font-size:1.5rem; color:var(--ink); margin-bottom:8px; }
         .empty-state p { color:var(--text-muted); font-size:0.9rem; }
 
+        /* Modal archive */
         .modal-overlay { display:none; position:fixed; inset:0; z-index:500; background:rgba(13,17,23,0.5); backdrop-filter:blur(4px); align-items:center; justify-content:center; padding:24px; }
         .modal-overlay.open { display:flex; }
         .modal-box { background:white; border-radius:24px; padding:36px; width:100%; max-width:480px; box-shadow:0 32px 80px rgba(0,0,0,0.2); animation:popIn 0.3s cubic-bezier(0.22,1,0.36,1); }
         @keyframes popIn { from{opacity:0;transform:scale(0.95) translateY(10px)} to{opacity:1;transform:scale(1) translateY(0)} }
         .modal-title { font-family:'DM Serif Display',serif; font-size:1.4rem; color:var(--ink); margin-bottom:4px; }
-        .modal-sub { color:var(--text-muted); font-size:0.85rem; margin-bottom:24px; }
-        .delete-info { background:rgba(196,98,45,0.06); border:1px solid rgba(196,98,45,0.18); border-radius:14px; padding:16px; margin-bottom:20px; }
-        .delete-name { font-family:'DM Serif Display',serif; font-size:1.2rem; color:var(--ink); margin-bottom:8px; }
-        .delete-warn { font-size:0.8rem; color:var(--text-muted); display:flex; align-items:center; gap:6px; margin-top:8px; }
-        .modal-footer-btns { display:flex; gap:10px; margin-top:24px; }
-        .btn-cancel  { flex:1; padding:13px; background:var(--mist); border:none; border-radius:12px; font-family:'DM Sans',sans-serif; font-size:0.9rem; font-weight:600; color:var(--text-muted); cursor:pointer; }
+        .modal-sub { color:var(--text-muted); font-size:0.85rem; margin-bottom:20px; }
+        .archive-info { background:rgba(255,140,0,0.06); border:1px solid rgba(255,140,0,0.2); border-radius:14px; padding:16px; margin-bottom:16px; }
+        .archive-name { font-family:'DM Serif Display',serif; font-size:1.1rem; color:var(--ink); margin-bottom:6px; }
+        .archive-notice { font-size:0.8rem; color:var(--text-muted); display:flex; align-items:center; gap:6px; }
+        .archive-notice i { color:#92400e; }
+        .motif-field { margin-bottom:16px; }
+        .motif-field label { display:block; font-size:0.75rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px; }
+        .motif-field input { width:100%; background:var(--mist); border:1.5px solid var(--border); border-radius:12px; padding:11px 14px; color:var(--ink); font-family:'DM Sans',sans-serif; font-size:0.9rem; outline:none; transition:all 0.2s; }
+        .motif-field input:focus { border-color:var(--gold); background:white; }
+        .modal-footer-btns { display:flex; gap:10px; }
+        .btn-cancel { flex:1; padding:13px; background:var(--mist); border:none; border-radius:12px; font-family:'DM Sans',sans-serif; font-size:0.9rem; font-weight:600; color:var(--text-muted); cursor:pointer; }
         .btn-cancel:hover { background:var(--border); }
-        .btn-confirm { flex:2; padding:13px; background:var(--ink); border:none; border-radius:12px; font-family:'DM Sans',sans-serif; font-size:0.9rem; font-weight:600; color:var(--cream); cursor:pointer; transition:all 0.2s; display:flex; align-items:center; justify-content:center; gap:8px; }
-        .btn-confirm:hover { background:#1a2332; transform:translateY(-1px); }
-        .btn-confirm.danger { background:var(--rust); }
-        .btn-confirm.danger:hover { background:#a0522d; }
+        .btn-confirm-archive { flex:2; padding:13px; background:#c97a00; border:none; border-radius:12px; font-family:'DM Sans',sans-serif; font-size:0.9rem; font-weight:700; color:white; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; transition:all 0.2s; }
+        .btn-confirm-archive:hover { background:#a06200; }
 
         @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
-        @media (max-width:900px) {
-            .navbar { padding:0 20px; }
-            .page-content { padding:24px 16px; }
-            .hero { flex-direction:column; padding:32px 24px; }
-            .row-5 { grid-template-columns:1fr 1fr; }
-            .row-3 { grid-template-columns:1fr; }
-            .photo-section { flex-direction:column; align-items:center; text-align:center; }
+        @media(max-width:900px) {
+            .navbar{padding:0 20px;} .page-content{padding:24px 16px;}
+            .hero{flex-direction:column;padding:32px 24px;}
+            .row-5{grid-template-columns:1fr 1fr;} .row-3{grid-template-columns:1fr;}
+            .photo-section{flex-direction:column;align-items:center;text-align:center;}
         }
     </style>
 </head>
@@ -207,11 +176,11 @@
         EduBulletin
     </a>
     <div class="nav-right">
+        <a href="{{ url_for('eleve.archives_eleves') }}" class="btn-back archive">
+            <i class="bi bi-archive"></i> Archives
+        </a>
         <a href="{{ url_for('main.voir_classe', classe_id=classe.id) }}" class="btn-back">
             <i class="bi bi-arrow-left"></i> Retour à la classe
-        </a>
-        <a href="{{ url_for('main.dashboard') }}" class="btn-back">
-            <i class="bi bi-speedometer2"></i> Dashboard
         </a>
     </div>
 </nav>
@@ -254,97 +223,51 @@
             <input type="hidden" name="action" value="add" id="formAction">
             <input type="hidden" name="eleve_id" id="eleveId">
 
-            <!-- ══ PHOTO ══ -->
             <div class="photo-section">
                 <div class="photo-preview-wrap">
                     <div class="photo-preview" id="photoPreview" onclick="document.getElementById('photoInput').click()">
                         <i class="bi bi-person-fill photo-placeholder-icon" id="photoIcon"></i>
                         <img id="photoImg" src="" alt="Photo">
-                        <div class="photo-overlay">
-                            <i class="bi bi-camera" style="font-size:1.2rem;"></i>
-                            <span>Changer</span>
-                        </div>
+                        <div class="photo-overlay"><i class="bi bi-camera" style="font-size:1.2rem;"></i><span>Changer</span></div>
                     </div>
                 </div>
                 <div class="photo-info">
-                    <label for="photoInput">
-                        <i class="bi bi-camera" style="color:var(--gold);"></i>
-                        Photo de l'élève
-                        <span>— optionnel, recommandé pour la carte scolaire</span>
-                    </label>
+                    <label for="photoInput"><i class="bi bi-camera" style="color:var(--gold);"></i> Photo de l'élève <span>— optionnel</span></label>
                     <input type="file" name="photo" id="photoInput" accept="image/jpeg,image/png,image/webp" style="display:none;">
-                    <button type="button" class="photo-upload-btn" onclick="document.getElementById('photoInput').click()">
-                        <i class="bi bi-upload"></i> Choisir une photo
-                    </button>
+                    <button type="button" class="photo-upload-btn" onclick="document.getElementById('photoInput').click()"><i class="bi bi-upload"></i> Choisir une photo</button>
                     <div class="photo-name" id="photoName"><i class="bi bi-check-circle-fill"></i> <span id="photoNameText"></span></div>
-                    <button type="button" class="btn-remove-photo" id="removePhotoBtn">
-                        <i class="bi bi-x-circle"></i> Supprimer la photo
-                    </button>
-                    <div class="photo-hints">
-                        <i class="bi bi-info-circle"></i> Format JPG, PNG ou WEBP — max 5 Mo<br>
-                        <i class="bi bi-aspect-ratio"></i> Idéalement une photo portrait (3×4)<br>
-                        <i class="bi bi-id-card"></i> Utilisée sur la carte scolaire et les bulletins
-                    </div>
+                    <button type="button" class="btn-remove-photo" id="removePhotoBtn"><i class="bi bi-x-circle"></i> Supprimer la photo</button>
+                    <div class="photo-hints"><i class="bi bi-info-circle"></i> JPG, PNG ou WEBP — max 5 Mo</div>
                 </div>
             </div>
 
-            <!-- Matricule -->
             <div class="matricule-box">
-                <label>
-                    <i class="bi bi-hash" style="color:var(--gold);"></i>
-                    Matricule
-                    <span class="hint">— généré automatiquement, modifiable</span>
-                </label>
+                <label><i class="bi bi-hash" style="color:var(--gold);"></i> Matricule <span style="font-weight:400;color:#aab0ba;font-size:0.75rem;">— généré automatiquement</span></label>
                 <div class="matricule-row">
                     <div class="matricule-prefix">#</div>
-                    <input type="text" name="matricule" id="matricule" class="matricule-input"
-                           value="{{ suggested_matricule }}" placeholder="1001" required>
-                    <span class="matricule-hint">
-                        <i class="bi bi-lock" style="color:var(--gold);"></i>
-                        Unique — jamais réattribué après suppression
-                    </span>
+                    <input type="text" name="matricule" id="matricule" class="matricule-input" value="{{ suggested_matricule }}" required>
+                    <span class="matricule-hint"><i class="bi bi-lock" style="color:var(--gold);"></i> Unique — jamais réattribué</span>
                 </div>
             </div>
 
-            <!-- Champs principaux -->
             <div class="form-row row-5">
+                <div class="field"><label>Prénom *</label><input type="text" name="prenom" id="prenom" placeholder="Fatou" required></div>
+                <div class="field"><label>Nom *</label><input type="text" name="nom" id="nom" placeholder="Coulibaly" required></div>
+                <div class="field"><label>Date de naissance *</label><input type="date" name="date_naissance" id="date_naissance" required></div>
                 <div class="field">
-                    <label>Prénom <span style="color:var(--rust)">*</span></label>
-                    <input type="text" name="prenom" id="prenom" placeholder="Fatou" required>
-                </div>
-                <div class="field">
-                    <label>Nom <span style="color:var(--rust)">*</span></label>
-                    <input type="text" name="nom" id="nom" placeholder="Coulibaly" required>
-                </div>
-                <div class="field">
-                    <label>Date de naissance <span style="color:var(--rust)">*</span></label>
-                    <input type="date" name="date_naissance" id="date_naissance" required>
-                </div>
-                <div class="field">
-                    <label>Sexe <span style="color:var(--rust)">*</span></label>
+                    <label>Sexe *</label>
                     <select name="sexe" id="sexe" required>
                         <option value="">Choisir…</option>
                         <option value="M">Masculin</option>
                         <option value="F">Féminin</option>
                     </select>
                 </div>
-                <button type="submit" class="btn-save">
-                    <i class="bi bi-check-lg"></i> Enregistrer
-                </button>
+                <button type="submit" class="btn-save"><i class="bi bi-check-lg"></i> Enregistrer</button>
             </div>
-
             <div class="form-row row-3 mt-14">
-                <div class="field">
-                    <label>Nom du père / tuteur</label>
-                    <input type="text" name="tuteur" id="tuteur" placeholder="Abdoulaye Coulibaly">
-                </div>
-                <div class="field">
-                    <label>Téléphone</label>
-                    <input type="text" name="telephone_tuteur" id="telephone_tuteur" placeholder="+225 XX XX XX XX">
-                </div>
-                <button type="button" id="resetFormBtn" class="btn-reset">
-                    <i class="bi bi-arrow-counterclockwise"></i> Annuler la modification
-                </button>
+                <div class="field"><label>Père / Tuteur</label><input type="text" name="tuteur" id="tuteur" placeholder="Abdoulaye Coulibaly"></div>
+                <div class="field"><label>Téléphone</label><input type="text" name="telephone_tuteur" id="telephone_tuteur" placeholder="+225 XX XX XX XX"></div>
+                <button type="button" id="resetFormBtn" class="btn-reset"><i class="bi bi-arrow-counterclockwise"></i> Annuler</button>
             </div>
         </form>
     </div>
@@ -352,19 +275,14 @@
     <!-- Liste -->
     <div class="table-card">
         <div class="table-header">
-            <div class="table-title">
-                Liste des élèves
-                <span class="count-badge">{{ eleves|length }}</span>
-            </div>
+            <div class="table-title">Liste des élèves <span class="count-badge">{{ eleves|length }}</span></div>
             {% if eleves|length > 0 %}
             <div class="table-actions">
-                <button class="btn-tbl btn-tbl-red" id="deleteAllBtn">
-                    <i class="bi bi-trash"></i> Tout supprimer
+                <button class="btn-tbl btn-tbl-orange" id="archiveAllBtn">
+                    <i class="bi bi-archive"></i> Tout archiver
                 </button>
                 <button class="btn-tbl btn-tbl-green" id="exportPdf"
-                        data-classe="{{ classe.nom|e }}"
-                        data-annee="{{ classe.annee_scolaire|e }}"
-                        data-total="{{ eleves|length }}">
+                        data-classe="{{ classe.nom|e }}" data-annee="{{ classe.annee_scolaire|e }}" data-total="{{ eleves|length }}">
                     <i class="bi bi-file-earmark-pdf"></i> Exporter PDF
                 </button>
             </div>
@@ -372,34 +290,16 @@
         </div>
 
         {% if eleves %}
-            {% if eleves|length < 5 %}
-            <div class="tip-bar">
-                <i class="bi bi-lightbulb" style="color:var(--gold);flex-shrink:0;"></i>
-                <div style="flex:1;">
-                    <strong>Conseil :</strong> Ajoutez au moins 5 élèves
-                    <div class="progress-bg"><div class="progress-fill" style="width:{{ (eleves|length/5)*100 }}%;"></div></div>
-                </div>
-            </div>
-            {% endif %}
-
             <div class="search-wrap">
                 <i class="bi bi-search"></i>
                 <input type="text" class="search-input" id="searchInput" placeholder="Rechercher par nom, prénom ou matricule…">
             </div>
-
             <div style="overflow-x:auto;">
                 <table class="eleves-table" id="elevesTable">
                     <thead>
                         <tr>
-                            <th>#</th>
-                            <th>Photo</th>
-                            <th>Matricule</th>
-                            <th>Prénom</th>
-                            <th>Nom</th>
-                            <th>Naissance</th>
-                            <th>Sexe</th>
-                            <th>Père / Tuteur</th>
-                            <th>Téléphone</th>
+                            <th>#</th><th>Photo</th><th>Matricule</th><th>Prénom</th><th>Nom</th>
+                            <th>Naissance</th><th>Sexe</th><th>Père / Tuteur</th><th>Téléphone</th>
                             <th style="text-align:right;">Actions</th>
                         </tr>
                     </thead>
@@ -408,11 +308,8 @@
                         <tr>
                             <td><strong>{{ loop.index }}</strong></td>
                             <td>
-                                {% if e.photo_url %}
-                                <img src="{{ e.photo_url }}" class="tbl-photo" alt="{{ e.prenom }}">
-                                {% else %}
-                                <div class="tbl-photo-placeholder"><i class="bi bi-person"></i></div>
-                                {% endif %}
+                                {% if e.photo_url %}<img src="{{ e.photo_url }}" class="tbl-photo" alt="{{ e.prenom }}">
+                                {% else %}<div class="tbl-photo-placeholder"><i class="bi bi-person"></i></div>{% endif %}
                             </td>
                             <td class="searchable"><span class="m-badge"><i class="bi bi-hash"></i>{{ e.matricule }}</span></td>
                             <td class="searchable">{{ e.prenom }}</td>
@@ -423,24 +320,18 @@
                             <td class="searchable">{{ e.telephone_tuteur or '–' }}</td>
                             <td>
                                 <div class="row-actions">
-                                    <a href="{{ url_for('analytics.carte_scolaire', eleve_id=e.id) }}" class="icon-btn carte" title="Carte scolaire" target="_blank">
-                                        <i class="bi bi-person-badge"></i>
-                                    </a>
+                                    <a href="{{ url_for('analytics.carte_scolaire', eleve_id=e.id) }}" class="icon-btn carte" title="Carte scolaire" target="_blank"><i class="bi bi-person-badge"></i></a>
                                     <button class="icon-btn edit btn-modifier"
                                             data-id="{{ e.id }}" data-matricule="{{ e.matricule }}"
                                             data-prenom="{{ e.prenom }}" data-nom="{{ e.nom }}"
                                             data-date="{{ e.date_naissance.strftime('%Y-%m-%d') if e.date_naissance else '' }}"
                                             data-sexe="{{ e.sexe or '' }}" data-tuteur="{{ e.tuteur or '' }}"
-                                            data-tel="{{ e.telephone_tuteur or '' }}"
-                                            data-photo="{{ e.photo_url or '' }}"
-                                            title="Modifier">
-                                        <i class="bi bi-pencil"></i>
-                                    </button>
-                                    <button class="icon-btn del btn-supprimer"
+                                            data-tel="{{ e.telephone_tuteur or '' }}" data-photo="{{ e.photo_url or '' }}"
+                                            title="Modifier"><i class="bi bi-pencil"></i></button>
+                                    <!-- ARCHIVE au lieu de DELETE -->
+                                    <button class="icon-btn archive btn-archiver"
                                             data-id="{{ e.id }}" data-nom="{{ e.prenom }} {{ e.nom }}"
-                                            data-matricule="{{ e.matricule }}" title="Supprimer">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
+                                            title="Archiver cet élève"><i class="bi bi-archive"></i></button>
                                 </div>
                             </td>
                         </tr>
@@ -458,46 +349,56 @@
     </div>
 </div>
 
-<!-- Modal supprimer un élève -->
-<div class="modal-overlay" id="deleteModal">
+<!-- Modal archiver un élève -->
+<div class="modal-overlay" id="archiveModal">
     <div class="modal-box">
-        <h3 class="modal-title">Supprimer un élève</h3>
-        <p class="modal-sub">Cette action est irréversible</p>
-        <div class="delete-info">
-            <div class="delete-name" id="deleteNom"></div>
-            <div style="display:flex;align-items:center;gap:8px;">
-                <span style="font-size:0.78rem;color:var(--text-muted);">Matricule :</span>
-                <span class="m-badge" id="deleteMatricule"></span>
-            </div>
-            <div class="delete-warn"><i class="bi bi-lock" style="color:var(--gold);"></i> Le matricule sera définitivement réservé et ne pourra plus être réattribué.</div>
+        <h3 class="modal-title">Archiver un élève</h3>
+        <p class="modal-sub">L'élève sera retiré de la classe mais ses données seront conservées</p>
+        <div class="archive-info">
+            <div class="archive-name" id="archiveNom"></div>
+            <div class="archive-notice"><i class="bi bi-archive"></i> Toutes les notes et données sont préservées dans l'archive.</div>
         </div>
-        <form method="POST" id="deleteForm">
-            <input type="hidden" name="action" value="delete">
-            <input type="hidden" name="eleve_id" id="deleteEleveId">
+        <div class="motif-field">
+            <label>Motif de l'archivage <span style="font-weight:400;color:#aab0ba;">(optionnel)</span></label>
+            <input type="text" id="motifInput" placeholder="Ex: déménagement, fin d'année, transfert…">
+        </div>
+        <form method="POST" id="archiveForm">
+            <input type="hidden" name="action" value="archive">
+            <input type="hidden" name="eleve_id" id="archiveEleveId">
+            <input type="hidden" name="motif_archive" id="motifHidden">
             <div class="modal-footer-btns">
-                <button type="button" class="btn-cancel" onclick="closeModal('deleteModal')">Annuler</button>
-                <button type="submit" class="btn-confirm danger"><i class="bi bi-trash"></i> Supprimer</button>
+                <button type="button" class="btn-cancel" onclick="closeModal('archiveModal')">Annuler</button>
+                <button type="submit" class="btn-confirm-archive" onclick="document.getElementById('motifHidden').value=document.getElementById('motifInput').value">
+                    <i class="bi bi-archive"></i> Archiver
+                </button>
             </div>
         </form>
     </div>
 </div>
 
-<!-- Modal supprimer tous -->
-<div class="modal-overlay" id="deleteAllModal">
+<!-- Modal archiver tous -->
+<div class="modal-overlay" id="archiveAllModal">
     <div class="modal-box">
-        <h3 class="modal-title">Supprimer tous les élèves ?</h3>
-        <p class="modal-sub">Cette action est irréversible</p>
-        <div class="delete-info">
+        <h3 class="modal-title">Archiver tous les élèves ?</h3>
+        <p class="modal-sub">Les données sont préservées — les élèves restent consultables dans les archives</p>
+        <div class="archive-info">
             <div style="font-size:0.9rem;color:var(--ink);margin-bottom:8px;">
-                Vous supprimerez <strong>{{ eleves|length }} élève(s)</strong> de la classe <strong>{{ classe.nom }}</strong>.
+                <strong>{{ eleves|length }} élève(s)</strong> de la classe <strong>{{ classe.nom }}</strong> seront archivés.
             </div>
-            <div class="delete-warn"><i class="bi bi-lock" style="color:var(--gold);"></i> Tous leurs matricules seront définitivement réservés.</div>
+            <div class="archive-notice"><i class="bi bi-shield-check" style="color:var(--gold);"></i> Notes, bulletins et paiements conservés intégralement.</div>
+        </div>
+        <div class="motif-field">
+            <label>Motif <span style="font-weight:400;color:#aab0ba;">(optionnel)</span></label>
+            <input type="text" id="motifAllInput" placeholder="Ex: fin d'année scolaire 2024-2025…">
         </div>
         <form method="POST">
-            <input type="hidden" name="action" value="delete_all">
+            <input type="hidden" name="action" value="archive_all">
+            <input type="hidden" name="motif_archive" id="motifAllHidden">
             <div class="modal-footer-btns">
-                <button type="button" class="btn-cancel" onclick="closeModal('deleteAllModal')">Annuler</button>
-                <button type="submit" class="btn-confirm danger"><i class="bi bi-trash"></i> Tout supprimer</button>
+                <button type="button" class="btn-cancel" onclick="closeModal('archiveAllModal')">Annuler</button>
+                <button type="submit" class="btn-confirm-archive" onclick="document.getElementById('motifAllHidden').value=document.getElementById('motifAllInput').value">
+                    <i class="bi bi-archive"></i> Tout archiver
+                </button>
             </div>
         </form>
     </div>
@@ -511,137 +412,98 @@ function closeModal(id) { document.getElementById(id).classList.remove('open'); 
 document.querySelectorAll('.modal-overlay').forEach(o => o.addEventListener('click', e => { if(e.target===o) o.classList.remove('open'); }));
 document.addEventListener('keydown', e => { if(e.key==='Escape') document.querySelectorAll('.modal-overlay.open').forEach(m=>m.classList.remove('open')); });
 
-// ── Photo handling ──────────────────────────────────────────
-const photoInput   = document.getElementById('photoInput');
-const photoImg     = document.getElementById('photoImg');
-const photoIcon    = document.getElementById('photoIcon');
-const photoName    = document.getElementById('photoName');
-const photoNameTxt = document.getElementById('photoNameText');
-const removeBtn    = document.getElementById('removePhotoBtn');
-
-photoInput.addEventListener('change', function() {
-    if (!this.files || !this.files[0]) return;
-    const file = this.files[0];
-    // Validation taille (5 Mo)
-    if (file.size > 5 * 1024 * 1024) {
-        alert('La photo ne doit pas dépasser 5 Mo.');
-        this.value = ''; return;
-    }
-    const reader = new FileReader();
-    reader.onload = e => {
-        photoImg.src = e.target.result;
-        photoImg.style.display = 'block';
-        photoIcon.style.display = 'none';
-        photoName.style.display = 'flex';
-        photoName.style.alignItems = 'center';
-        photoName.style.gap = '5px';
-        photoNameTxt.textContent = file.name;
-        removeBtn.style.display = 'flex';
-    };
-    reader.readAsDataURL(file);
+// ── Photo ──
+const photoInput=document.getElementById('photoInput'),photoImg=document.getElementById('photoImg'),photoIcon=document.getElementById('photoIcon'),photoName=document.getElementById('photoName'),photoNameTxt=document.getElementById('photoNameText'),removeBtn=document.getElementById('removePhotoBtn');
+photoInput.addEventListener('change',function(){
+    if(!this.files||!this.files[0])return;
+    if(this.files[0].size>5*1024*1024){alert('Max 5 Mo.');this.value='';return;}
+    const r=new FileReader();
+    r.onload=e=>{photoImg.src=e.target.result;photoImg.style.display='block';photoIcon.style.display='none';photoName.style.display='flex';photoNameTxt.textContent=this.files[0].name;removeBtn.style.display='flex';};
+    r.readAsDataURL(this.files[0]);
 });
-
-removeBtn.addEventListener('click', function() {
-    photoInput.value = '';
-    photoImg.src = '';
-    photoImg.style.display = 'none';
-    photoIcon.style.display = '';
-    photoName.style.display = 'none';
-    removeBtn.style.display = 'none';
-});
-
-function setPhotoFromUrl(url) {
-    if (url) {
-        photoImg.src = url;
-        photoImg.style.display = 'block';
-        photoIcon.style.display = 'none';
-        removeBtn.style.display = 'flex';
-    } else {
-        photoImg.src = '';
-        photoImg.style.display = 'none';
-        photoIcon.style.display = '';
-        photoName.style.display = 'none';
-        removeBtn.style.display = 'none';
-    }
+removeBtn.addEventListener('click',()=>{photoInput.value='';photoImg.src='';photoImg.style.display='none';photoIcon.style.display='';photoName.style.display='none';removeBtn.style.display='none';});
+function setPhotoFromUrl(url){
+    if(url){photoImg.src=url;photoImg.style.display='block';photoIcon.style.display='none';removeBtn.style.display='flex';}
+    else{photoImg.src='';photoImg.style.display='none';photoIcon.style.display='';photoName.style.display='none';removeBtn.style.display='none';}
 }
 
-// ── Reset form ──────────────────────────────────────────────
-document.getElementById('resetFormBtn').addEventListener('click', () => {
+// ── Reset form ──
+document.getElementById('resetFormBtn').addEventListener('click',()=>{
     document.getElementById('eleveForm').reset();
-    document.getElementById('form-title').textContent = 'Ajouter un élève';
-    document.getElementById('formAction').value = 'add';
-    document.getElementById('eleveId').value = '';
-    document.getElementById('matricule').value = SUGGESTED;
+    document.getElementById('form-title').textContent='Ajouter un élève';
+    document.getElementById('formAction').value='add';
+    document.getElementById('eleveId').value='';
+    document.getElementById('matricule').value=SUGGESTED;
     setPhotoFromUrl('');
-    photoName.style.display = 'none';
-    photoInput.value = '';
 });
 
-// ── Modifier ────────────────────────────────────────────────
-document.querySelectorAll('.btn-modifier').forEach(btn => {
-    btn.addEventListener('click', () => {
-        document.getElementById('form-title').textContent = "Modifier l'élève";
-        document.getElementById('formAction').value = 'edit';
-        document.getElementById('eleveId').value = btn.dataset.id;
-        document.getElementById('matricule').value = btn.dataset.matricule;
-        document.getElementById('prenom').value = btn.dataset.prenom;
-        document.getElementById('nom').value = btn.dataset.nom;
-        document.getElementById('date_naissance').value = btn.dataset.date;
-        document.getElementById('sexe').value = btn.dataset.sexe;
-        document.getElementById('tuteur').value = btn.dataset.tuteur;
-        document.getElementById('telephone_tuteur').value = btn.dataset.tel;
+// ── Modifier ──
+document.querySelectorAll('.btn-modifier').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+        document.getElementById('form-title').textContent="Modifier l'élève";
+        document.getElementById('formAction').value='edit';
+        document.getElementById('eleveId').value=btn.dataset.id;
+        document.getElementById('matricule').value=btn.dataset.matricule;
+        document.getElementById('prenom').value=btn.dataset.prenom;
+        document.getElementById('nom').value=btn.dataset.nom;
+        document.getElementById('date_naissance').value=btn.dataset.date;
+        document.getElementById('sexe').value=btn.dataset.sexe;
+        document.getElementById('tuteur').value=btn.dataset.tuteur;
+        document.getElementById('telephone_tuteur').value=btn.dataset.tel;
         setPhotoFromUrl(btn.dataset.photo);
         document.getElementById('eleveForm').scrollIntoView({behavior:'smooth'});
     });
 });
 
-// ── Supprimer ───────────────────────────────────────────────
-document.querySelectorAll('.btn-supprimer').forEach(btn => {
-    btn.addEventListener('click', () => {
-        document.getElementById('deleteNom').textContent = btn.dataset.nom;
-        document.getElementById('deleteMatricule').innerHTML = '<i class="bi bi-hash"></i>' + btn.dataset.matricule;
-        document.getElementById('deleteEleveId').value = btn.dataset.id;
-        openModal('deleteModal');
+// ── Archiver un élève ──
+document.querySelectorAll('.btn-archiver').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+        document.getElementById('archiveNom').textContent=btn.dataset.nom;
+        document.getElementById('archiveEleveId').value=btn.dataset.id;
+        document.getElementById('motifInput').value='';
+        openModal('archiveModal');
     });
 });
 
-document.getElementById('deleteAllBtn')?.addEventListener('click', () => openModal('deleteAllModal'));
+// ── Archiver tous ──
+document.getElementById('archiveAllBtn')?.addEventListener('click',()=>{
+    document.getElementById('motifAllInput').value='';
+    openModal('archiveAllModal');
+});
 
-// ── Recherche ───────────────────────────────────────────────
-document.getElementById('searchInput')?.addEventListener('input', function() {
-    const term = this.value.toLowerCase();
-    document.querySelectorAll('#elevesTable tbody tr').forEach(row => {
-        const match = [...row.querySelectorAll('.searchable')].some(td => td.textContent.toLowerCase().includes(term));
-        row.style.display = term && !match ? 'none' : '';
+// ── Recherche ──
+document.getElementById('searchInput')?.addEventListener('input',function(){
+    const t=this.value.toLowerCase();
+    document.querySelectorAll('#elevesTable tbody tr').forEach(row=>{
+        const match=[...row.querySelectorAll('.searchable')].some(td=>td.textContent.toLowerCase().includes(t));
+        row.style.display=t&&!match?'none':'';
     });
 });
 
-// ── Export PDF ──────────────────────────────────────────────
-document.getElementById('exportPdf')?.addEventListener('click', function() {
-    const cn = this.dataset.classe, an = this.dataset.annee, nb = this.dataset.total;
-    const div = document.createElement('div');
-    div.style.cssText = 'padding:20px;font-family:Arial,sans-serif;position:absolute;left:-9999px;';
-    div.innerHTML = `<div style="text-align:center;margin-bottom:20px;"><h2 style="color:#0d1117;">Liste des élèves</h2><h3 style="color:#c9a84c;">${cn}</h3><p style="color:#6b7685;">Année ${an} • ${nb} élève(s)</p></div>`;
-    const tbl = document.createElement('table');
-    tbl.style.cssText = 'width:100%;border-collapse:collapse;';
-    tbl.innerHTML = `<thead><tr style="background:#0d1117;color:white;"><th style="padding:10px;">#</th><th style="padding:10px;">Matricule</th><th style="padding:10px;">Prénom</th><th style="padding:10px;">Nom</th><th style="padding:10px;">Naissance</th><th style="padding:10px;">Sexe</th><th style="padding:10px;">Père</th><th style="padding:10px;">Téléphone</th></tr></thead>`;
-    const tb = document.createElement('tbody');
-    document.querySelectorAll('#elevesTable tbody tr').forEach((tr,i) => {
-        const td = tr.querySelectorAll('td');
-        const row = document.createElement('tr');
-        row.style.background = i%2===0?'#f9f7f3':'white';
-        row.style.borderBottom='1px solid #eee';
-        // td[0]=num, td[1]=photo, td[2]=matricule, td[3]=prenom, td[4]=nom, td[5]=naiss, td[6]=sexe, td[7]=tuteur, td[8]=tel
-        row.innerHTML = `<td style="padding:10px;text-align:center;">${i+1}</td><td style="padding:10px;"><span style="background:#f0ebe0;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:700;">${td[2]?.textContent.trim()||'–'}</span></td><td style="padding:10px;">${td[3]?.textContent.trim()||'–'}</td><td style="padding:10px;">${td[4]?.textContent.trim()||'–'}</td><td style="padding:10px;">${td[5]?.textContent.trim()||'–'}</td><td style="padding:10px;">${td[6]?.textContent.trim()||'–'}</td><td style="padding:10px;">${td[7]?.textContent.trim()||'–'}</td><td style="padding:10px;">${td[8]?.textContent.trim()||'–'}</td>`;
+// ── Export PDF ──
+document.getElementById('exportPdf')?.addEventListener('click',function(){
+    const cn=this.dataset.classe,an=this.dataset.annee,nb=this.dataset.total;
+    const div=document.createElement('div');
+    div.style.cssText='padding:20px;font-family:Arial,sans-serif;position:absolute;left:-9999px;';
+    div.innerHTML=`<div style="text-align:center;margin-bottom:20px;"><h2 style="color:#0d1117;">Liste des élèves</h2><h3 style="color:#c9a84c;">${cn}</h3><p style="color:#6b7685;">Année ${an} • ${nb} élève(s)</p></div>`;
+    const tbl=document.createElement('table');
+    tbl.style.cssText='width:100%;border-collapse:collapse;';
+    tbl.innerHTML=`<thead><tr style="background:#0d1117;color:white;"><th style="padding:10px;">#</th><th style="padding:10px;">Matricule</th><th style="padding:10px;">Prénom</th><th style="padding:10px;">Nom</th><th style="padding:10px;">Naissance</th><th style="padding:10px;">Sexe</th><th style="padding:10px;">Père</th><th style="padding:10px;">Tél.</th></tr></thead>`;
+    const tb=document.createElement('tbody');
+    document.querySelectorAll('#elevesTable tbody tr').forEach((tr,i)=>{
+        const td=tr.querySelectorAll('td');
+        const row=document.createElement('tr');
+        row.style.background=i%2===0?'#f9f7f3':'white';
+        row.innerHTML=`<td style="padding:10px;text-align:center;">${i+1}</td><td style="padding:10px;">${td[2]?.textContent.trim()||'–'}</td><td style="padding:10px;">${td[3]?.textContent.trim()||'–'}</td><td style="padding:10px;">${td[4]?.textContent.trim()||'–'}</td><td style="padding:10px;">${td[5]?.textContent.trim()||'–'}</td><td style="padding:10px;">${td[6]?.textContent.trim()||'–'}</td><td style="padding:10px;">${td[7]?.textContent.trim()||'–'}</td><td style="padding:10px;">${td[8]?.textContent.trim()||'–'}</td>`;
         tb.appendChild(row);
     });
-    tbl.appendChild(tb); div.appendChild(tbl); document.body.appendChild(div);
-    html2canvas(div).then(canvas => {
-        const img = canvas.toDataURL('image/png');
-        const w=210, h=(canvas.height*w)/canvas.width;
-        const pdf = new jspdf.jsPDF('p','mm','a4');
-        let pos=0, left=h;
-        pdf.addImage(img,'PNG',0,pos,w,h); left-=295;
+    tbl.appendChild(tb);div.appendChild(tbl);document.body.appendChild(div);
+    html2canvas(div).then(canvas=>{
+        const img=canvas.toDataURL('image/png');
+        const w=210,h=(canvas.height*w)/canvas.width;
+        const pdf=new jspdf.jsPDF('p','mm','a4');
+        let pos=0,left=h;
+        pdf.addImage(img,'PNG',0,pos,w,h);left-=295;
         while(left>=0){pos=left-h;pdf.addPage();pdf.addImage(img,'PNG',0,pos,w,h);left-=295;}
         pdf.save(`eleves_${cn.replace(/\s+/g,'_')}.pdf`);
         document.body.removeChild(div);
@@ -650,5 +512,4 @@ document.getElementById('exportPdf')?.addEventListener('click', function() {
 </script>
 </body>
 </html>
-
 
