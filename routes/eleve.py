@@ -155,9 +155,10 @@ def supprimer_eleve_complet(eleve):
 @eleve_bp.route('/add_eleve/<int:classe_id>', methods=['GET', 'POST'])
 @login_required
 def add_eleve(classe_id):
-    classe   = Classe.query.get_or_404(classe_id)
-    ecole_id = session['ecole_id']
+    classe = Classe.query.get_or_404(classe_id)
+    ecole_id = session.get('ecole_id')
 
+    # Vérification des droits d'accès
     if classe.ecole_id != ecole_id:
         flash("Accès non autorisé.", "error")
         return redirect(url_for('main.dashboard'))
@@ -166,18 +167,20 @@ def add_eleve(classe_id):
         action = request.form.get('action')
 
         try:
+            # --- ACTION: AJOUTER OU MODIFIER ---
             if action in ['add', 'edit']:
-                eleve_id         = request.form.get('eleve_id')
-                prenom           = request.form.get('prenom', '').strip()
-                nom              = request.form.get('nom', '').strip()
-                matricule        = request.form.get('matricule', '').strip()
-                tuteur           = request.form.get('tuteur', '').strip() or None
+                eleve_id = request.form.get('eleve_id')
+                prenom = request.form.get('prenom', '').strip()
+                nom = request.form.get('nom', '').strip()
+                matricule = request.form.get('matricule', '').strip()
+                tuteur = request.form.get('tuteur', '').strip() or None
                 telephone_tuteur = request.form.get('telephone_tuteur', '').strip() or None
 
                 if not prenom or not nom:
                     flash("Le prénom et le nom sont obligatoires.", "error")
                     return redirect(url_for('eleve.add_eleve', classe_id=classe_id))
 
+                # Parsing de la date
                 try:
                     date_naissance_str = request.form.get('date_naissance', '')
                     date_naissance = date.fromisoformat(date_naissance_str) if date_naissance_str else None
@@ -185,16 +188,19 @@ def add_eleve(classe_id):
                     flash("Format de date invalide. Utilisez AAAA-MM-JJ.", "error")
                     return redirect(url_for('eleve.add_eleve', classe_id=classe_id))
 
+                # Genre / Sexe
                 sexe = request.form.get('sexe', '')
                 if sexe not in ['M', 'F']:
                     sexe = None
 
+                # Génération auto si matricule vide
                 if not matricule:
                     matricule = generate_matricule(ecole_id)
 
+                # Validation du matricule
                 is_same = False
                 if action == 'edit' and eleve_id:
-                    current = Eleve.query.get(eleve_id)
+                    current = db.session.get(Eleve, eleve_id)
                     if current and current.matricule == matricule:
                         is_same = True
 
@@ -204,6 +210,7 @@ def add_eleve(classe_id):
                         flash(err, "warning")
                         return redirect(url_for('eleve.add_eleve', classe_id=classe_id))
 
+                # Création
                 if action == 'add':
                     photo_url = save_photo(request.files.get('photo'))
                     eleve = Eleve(
@@ -217,43 +224,64 @@ def add_eleve(classe_id):
                     db.session.commit()
                     flash(f"Élève {prenom} {nom} ajouté avec le matricule {matricule}.", "success")
 
+                # Modification
                 elif action == 'edit' and eleve_id:
                     eleve = Eleve.query.get_or_404(eleve_id)
                     if eleve.classe_id != classe_id:
                         flash("Action non autorisée.", "error")
                         return redirect(url_for('eleve.add_eleve', classe_id=classe_id))
+                    
                     if eleve.matricule != matricule:
                         reserve_matricule(matricule, ecole_id)
+                    
                     photo_url = save_photo(request.files.get('photo'))
-                    eleve.photo_url        = photo_url or eleve.photo_url
-                    eleve.prenom           = prenom
-                    eleve.nom              = nom
-                    eleve.matricule        = matricule
-                    eleve.date_naissance   = date_naissance
-                    eleve.sexe             = sexe
-                    eleve.tuteur           = tuteur
+                    eleve.photo_url = photo_url or eleve.photo_url
+                    eleve.prenom = prenom
+                    eleve.nom = nom
+                    eleve.matricule = matricule
+                    eleve.date_naissance = date_naissance
+                    eleve.sexe = sexe
+                    eleve.tuteur = tuteur
                     eleve.telephone_tuteur = telephone_tuteur
+                    
                     db.session.commit()
                     flash(f"Informations de {prenom} {nom} ({matricule}) mises à jour.", "success")
 
-            elif action == 'delete' and request.form.get('eleve_id'):
+            # --- ACTION: ARCHIVER UN ÉLÈVE ---
+            elif action == 'archive' and request.form.get('eleve_id'):
                 eleve = Eleve.query.get_or_404(request.form['eleve_id'])
+
                 if eleve.classe_id != classe_id:
                     flash("Action non autorisée.", "error")
                     return redirect(url_for('eleve.add_eleve', classe_id=classe_id))
-                nom_complet = f"{eleve.prenom} {eleve.nom}"
-                mat         = eleve.matricule
-                supprimer_eleve_complet(eleve)
-                db.session.commit()
-                flash(f"Élève {nom_complet} supprimé. Le matricule {mat} est définitivement réservé.", "success")
 
-            elif action == 'delete_all':
-                eleves = Eleve.query.filter_by(classe_id=classe_id).all()
-                count  = len(eleves)
-                for eleve in eleves:
-                    supprimer_eleve_complet(eleve)
+                nom_complet = f"{eleve.prenom} {eleve.nom}"
+                motif = request.form.get('motif_archive', '').strip() or None
+
+                eleve.archive = True
+                eleve.date_archive = datetime.utcnow()
+                eleve.motif_archive = motif
                 db.session.commit()
-                flash(f"{count} élève(s) supprimé(s). Leurs matricules sont définitivement réservés.", "success")
+
+                flash(
+                    f"Élève {nom_complet} archivé. Ses données sont conservées dans l'archive.",
+                    "success"
+                )
+
+            # --- ACTION: ARCHIVER TOUTE LA CLASSE ---
+            elif action == 'archive_all':
+                eleves = Eleve.query.filter_by(classe_id=classe_id, archive=False).all()
+                count = len(eleves)
+                motif = request.form.get('motif_archive', '').strip() or None
+                now = datetime.utcnow()
+
+                for eleve in eleves:
+                    eleve.archive = True
+                    eleve.date_archive = now
+                    eleve.motif_archive = motif
+
+                db.session.commit()
+                flash(f"{count} élève(s) archivé(s). Leurs données sont conservées.", "success")
 
         except Exception as e:
             db.session.rollback()
@@ -262,13 +290,21 @@ def add_eleve(classe_id):
 
         return redirect(url_for('eleve.add_eleve', classe_id=classe_id))
 
-    eleves = Eleve.query.filter_by(classe_id=classe_id).order_by(Eleve.nom, Eleve.prenom).all()
+    # --- MÉTHODE GET ---
+    eleves = Eleve.query.filter_by(classe_id=classe_id, archive=False).order_by(Eleve.nom, Eleve.prenom).all()
     for eleve in eleves:
         eleve.nb_notes = Note.query.filter_by(eleve_id=eleve.id).count()
+        
     suggested_matricule = generate_matricule(ecole_id)
 
-    return render_template('add_eleve.html',
-        classe=classe, eleves=eleves, suggested_matricule=suggested_matricule)
+    return render_template(
+        'add_eleve.html',
+        classe=classe, 
+        eleves=eleves, 
+        suggested_matricule=suggested_matricule
+    )
+
+
 
 
 # ─────────────────────────────────────────────
@@ -372,9 +408,9 @@ def add_eleve_ar(classe_id):
                 db.session.commit()
                 flash(f"تم حذف التلميذ {nom_complet}. رقم التسجيل {mat} محجوز نهائياً.", "success")
 
-            # ── DELETE ALL ── correctement avec supprimer_eleve_complet
+            # ── DELETE ALL ── correctement avec supprimer_eleve_complet#
             elif action == 'delete_all':
-                eleves = Eleve.query.filter_by(classe_id=classe_id).all()
+                eleves = Eleve.query.filter_by(classe_id=classe_id, archive=False).all()
                 count  = len(eleves)
                 for eleve in eleves:
                     supprimer_eleve_complet(eleve)
@@ -388,10 +424,126 @@ def add_eleve_ar(classe_id):
 
         return redirect(url_for('eleve.add_eleve_ar', classe_id=classe_id))
 
-    eleves = Eleve.query.filter_by(classe_id=classe_id).order_by(Eleve.nom, Eleve.prenom).all()
+    eleves = Eleve.query.filter_by(classe_id=classe_id, archive=False).order_by(Eleve.nom, Eleve.prenom).all()
     for eleve in eleves:
         eleve.nb_notes = Note.query.filter_by(eleve_id=eleve.id).count()
     suggested_matricule = generate_matricule(ecole_id)
 
     return render_template('add_eleve_ar.html',
         classe=classe, eleves=eleves, suggested_matricule=suggested_matricule)
+
+
+#  2. Nouvelle route — Page archives
+# ══════════════════════════════════════════════════════════════
+ 
+@eleve_bp.route('/archives', methods=['GET'])
+@login_required
+def archives_eleves():
+    """Page archive : tous les élèves archivés de l'école"""
+    from models import Classe
+    ecole_id = session['ecole_id']
+ 
+    # Filtres
+    classe_id_filter  = request.args.get('classe_id', type=int)
+    annee_filter      = request.args.get('annee', '').strip()
+    search            = request.args.get('q', '').strip().lower()
+ 
+    # Récupérer toutes les classes de l'école
+    classes = Classe.query.filter_by(ecole_id=ecole_id)\
+                          .order_by(Classe.annee_scolaire.desc(), Classe.nom).all()
+ 
+    # Requête de base : élèves archivés de cette école
+    query = db.session.query(Eleve)\
+                      .join(Classe)\
+                      .filter(
+                          Classe.ecole_id == ecole_id,
+                          Eleve.archive   == True
+                      )
+ 
+    if classe_id_filter:
+        query = query.filter(Eleve.classe_id == classe_id_filter)
+ 
+    if annee_filter:
+        query = query.filter(Classe.annee_scolaire == annee_filter)
+ 
+    if search:
+        query = query.filter(
+            db.or_(
+                Eleve.prenom.ilike(f'%{search}%'),
+                Eleve.nom.ilike(f'%{search}%'),
+                Eleve.matricule.ilike(f'%{search}%'),
+            )
+        )
+ 
+    eleves_archives = query.order_by(Eleve.date_archive.desc()).all()
+ 
+    # Années disponibles pour le filtre
+    annees = db.session.query(Classe.annee_scolaire)\
+                       .filter(Classe.ecole_id == ecole_id)\
+                       .distinct()\
+                       .order_by(Classe.annee_scolaire.desc())\
+                       .all()
+    annees = [a[0] for a in annees]
+ 
+    return render_template('archives_eleves.html',
+        eleves_archives=eleves_archives,
+        classes=classes,
+        annees=annees,
+        classe_id_filter=classe_id_filter,
+        annee_filter=annee_filter,
+        search=search,
+    )
+ 
+ 
+# ══════════════════════════════════════════════════════════════
+#  3. Route — Restaurer un élève archivé
+# ══════════════════════════════════════════════════════════════
+ 
+@eleve_bp.route('/archives/restaurer/<int:eleve_id>', methods=['POST'])
+@login_required
+def restaurer_eleve(eleve_id):
+    """Restaure un élève archivé vers sa classe d'origine"""
+    ecole_id = session['ecole_id']
+    eleve    = Eleve.query.get_or_404(eleve_id)
+    classe   = Classe.query.get(eleve.classe_id)
+ 
+    if not classe or classe.ecole_id != ecole_id:
+        flash("Action non autorisée.", "error")
+        return redirect(url_for('eleve.archives_eleves'))
+ 
+    eleve.archive       = False
+    eleve.date_archive  = None
+    eleve.motif_archive = None
+    db.session.commit()
+ 
+    flash(f"Élève {eleve.prenom} {eleve.nom} restauré dans {classe.nom}.", "success")
+    return redirect(url_for('eleve.archives_eleves'))
+ 
+ 
+# ══════════════════════════════════════════════════════════════
+#  4. Route — Supprimer définitivement (depuis les archives)
+# ══════════════════════════════════════════════════════════════
+ 
+@eleve_bp.route('/archives/supprimer/<int:eleve_id>', methods=['POST'])
+@login_required
+def supprimer_archive(eleve_id):
+    """Suppression définitive depuis les archives"""
+    ecole_id = session['ecole_id']
+    eleve    = Eleve.query.get_or_404(eleve_id)
+    classe   = Classe.query.get(eleve.classe_id)
+ 
+    if not classe or classe.ecole_id != ecole_id:
+        flash("Action non autorisée.", "error")
+        return redirect(url_for('eleve.archives_eleves'))
+ 
+    if not eleve.archive:
+        flash("Cet élève n'est pas archivé.", "warning")
+        return redirect(url_for('eleve.archives_eleves'))
+ 
+    nom = f"{eleve.prenom} {eleve.nom}"
+    supprimer_eleve_complet(eleve)
+    db.session.commit()
+ 
+    flash(f"Élève {nom} supprimé définitivement.", "success")
+    return redirect(url_for('eleve.archives_eleves'))
+ 

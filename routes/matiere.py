@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, sessio
 from models import db, Classe, Matiere, Note, Ecole
 from utils import login_required
 from datetime import datetime
-
+from models import Professeur
 matiere_bp = Blueprint('matiere', __name__, url_prefix='/ecole')
 
 
@@ -63,137 +63,108 @@ def parse_duree(duree_str):
 #  ROUTE FRANÇAISE
 # ─────────────────────────────────────────────
 
+
 @matiere_bp.route('/add_matiere/<int:classe_id>', methods=['GET', 'POST'])
 @login_required
 def add_matiere(classe_id):
-    classe = Classe.query.get_or_404(classe_id)
-
-    if classe.ecole_id != session['ecole_id']:
+    classe   = Classe.query.get_or_404(classe_id)
+    ecole_id = session['ecole_id']
+ 
+    if classe.ecole_id != ecole_id:
         flash("Accès non autorisé.", "error")
         return redirect(url_for('main.dashboard'))
-
+ 
     if request.method == 'POST':
-        action     = request.form.get('action')
-        matiere_id = request.form.get('matiere_id')
-
-        try:
-            # ── ADD ──────────────────────────────────────
+        action = request.form.get('action')
+ 
+        if action in ['add', 'edit']:
+            nom        = request.form.get('nom', '').strip()
+            # ── Le champ professeur vient maintenant du champ caché ──
+            professeur = request.form.get('professeur', '').strip() or None
+            jour       = request.form.get('jour', '').strip()
+            heure_str  = request.form.get('heure', '').strip()
+            duree      = request.form.get('duree', '1')
+ 
+            if not nom or not jour or not heure_str:
+                flash("Le nom, le jour et l'heure sont obligatoires.", "error")
+                return redirect(url_for('matiere.add_matiere', classe_id=classe_id))
+ 
+            try:
+                from datetime import time as time_type
+                h, m = map(int, heure_str.split(':'))
+                heure = time_type(h, m)
+            except Exception:
+                flash("Format d'heure invalide.", "error")
+                return redirect(url_for('matiere.add_matiere', classe_id=classe_id))
+ 
             if action == 'add':
-                nom        = request.form.get('nom', '').strip()
-                professeur = request.form.get('professeur', '').strip() or None
-                jour       = request.form.get('jour') or None
-                heure_str  = request.form.get('heure')
-                duree      = parse_duree(request.form.get('duree', '1'))
-
-                if not nom:
-                    flash("Le nom de la matière est obligatoire.", "error")
-                    return redirect(url_for('matiere.add_matiere', classe_id=classe_id))
-
-                heure_obj, err = parse_heure(heure_str, None)
-                if err:
-                    flash(err, "error")
-                    return redirect(url_for('matiere.add_matiere', classe_id=classe_id))
-
-                # ✅ Vérification conflit horaire uniquement
-                conflit, mat_conflit = check_horaire_conflict(classe_id, jour, heure_obj, duree)
-                if conflit:
-                    flash(
-                        f"Conflit horaire : '{mat_conflit.nom}' occupe déjà ce créneau "
-                        f"le {jour} à {mat_conflit.heure.strftime('%H:%M')}.",
-                        "warning"
-                    )
-                    return redirect(url_for('matiere.add_matiere', classe_id=classe_id))
-
-                db.session.add(Matiere(
-                    nom=nom, classe_id=classe_id, professeur=professeur,
-                    jour=jour, heure=heure_obj, duree=duree
-                ))
+                matiere = Matiere(
+                    nom=nom,
+                    professeur=professeur,
+                    jour=jour,
+                    heure=heure,
+                    duree=float(duree),
+                    classe_id=classe_id
+                )
+                db.session.add(matiere)
                 db.session.commit()
-                flash(f"Matière '{nom}' ajoutée avec succès.", "success")
-
-            # ── EDIT ─────────────────────────────────────
-            elif action == 'edit' and matiere_id:
-                matiere = Matiere.query.get_or_404(matiere_id)
+                flash(f"Matière '{nom}' ajoutée.", "success")
+ 
+            elif action == 'edit':
+                matiere_id = request.form.get('matiere_id')
+                matiere    = Matiere.query.get_or_404(matiere_id)
 
                 if matiere.classe_id != classe_id:
-                    flash("Action non autorisée.", "error")
-                    return redirect(url_for('matiere.add_matiere', classe_id=classe_id))
+                   flash("Action non autorisée.", "error")
+                   return redirect(url_for('matiere.add_matiere', classe_id=classe_id))
 
-                nom        = request.form.get('nom', '').strip()
-                professeur = request.form.get('professeur', '').strip() or None
-                jour       = request.form.get('jour') or None
-                heure_str  = request.form.get('heure')
-                duree      = parse_duree(request.form.get('duree', '1'))
-
-                if not nom:
-                    flash("Le nom de la matière est obligatoire.", "error")
-                    return redirect(url_for('matiere.add_matiere', classe_id=classe_id))
-
-                heure_obj, err = parse_heure(heure_str, None)
-                if err:
-                    flash(err, "error")
-                    return redirect(url_for('matiere.add_matiere', classe_id=classe_id))
-
-                # ✅ Conflit horaire en excluant la matière en cours d'édition
-                conflit, mat_conflit = check_horaire_conflict(
-                    classe_id, jour, heure_obj, duree, exclude_id=matiere.id
-                )
-                if conflit:
-                    flash(
-                        f"Conflit horaire : '{mat_conflit.nom}' occupe déjà ce créneau "
-                        f"le {jour} à {mat_conflit.heure.strftime('%H:%M')}.",
-                        "warning"
-                    )
-                    return redirect(url_for('matiere.add_matiere', classe_id=classe_id))
+    # ── FIX : supprimer les affectations liées avant modification ──
+                from models import ProfesseurAffectation
+                ProfesseurAffectation.query.filter_by(matiere_id=matiere.id).delete(synchronize_session=False)
 
                 matiere.nom        = nom
                 matiere.professeur = professeur
                 matiere.jour       = jour
-                matiere.heure      = heure_obj
-                matiere.duree      = duree
+                matiere.heure      = heure
+                matiere.duree      = float(duree)
                 db.session.commit()
-                flash(f"Matière '{nom}' modifiée.", "success")
+                flash(f"Matière '{nom}' mise à jour.", "success")
+ 
+        elif action == 'delete':
+            matiere_id = request.form.get('matiere_id')
+            matiere    = Matiere.query.get_or_404(matiere_id)
 
-            # ── DELETE ───────────────────────────────────
-            elif action == 'delete' and matiere_id:
-                matiere = Matiere.query.get_or_404(matiere_id)
-
-                if matiere.classe_id != classe_id:
-                    flash("Action non autorisée.", "error")
-                    return redirect(url_for('matiere.add_matiere', classe_id=classe_id))
-
-                nom      = matiere.nom
-                nb_notes = Note.query.filter_by(matiere_id=matiere.id).count()
-                Note.query.filter_by(matiere_id=matiere_id).delete()
-                db.session.delete(matiere)
-                db.session.commit()
-                flash(f"Matière '{nom}' supprimée avec ses {nb_notes} note(s).", "success")
-
-            return redirect(url_for('matiere.add_matiere', classe_id=classe_id))
-
-        except Exception as e:
-            db.session.rollback()
-            flash("Erreur lors de l'opération.", "error")
-            return redirect(url_for('matiere.add_matiere', classe_id=classe_id))
-
-    # ── GET ──────────────────────────────────────────────
-    matieres = Matiere.query.filter_by(classe_id=classe_id).order_by(Matiere.jour, Matiere.heure).all()
-    for m in matieres:
-        m.nb_notes = Note.query.filter_by(matiere_id=m.id).count()
-
-    jours_semaine = [
-        ('Lundi', 'Lundi'), ('Mardi', 'Mardi'), ('Mercredi', 'Mercredi'),
-        ('Jeudi', 'Jeudi'), ('Vendredi', 'Vendredi'),
-        ('Samedi', 'Samedi'), ('Dimanche', 'Dimanche')
-    ]
-
+            from models import ProfesseurAffectation
+    # ── FIX : supprimer d'abord les affectations ──
+            ProfesseurAffectation.query.filter_by(matiere_id=matiere.id).delete(synchronize_session=False)
+            Note.query.filter_by(matiere_id=matiere.id).delete(synchronize_session=False)
+            db.session.delete(matiere)
+            db.session.commit()
+            flash(f"Matière supprimée.", "success")
+ 
+        return redirect(url_for('matiere.add_matiere', classe_id=classe_id))
+ 
+    # ── GET ──────────────────────────────────────────────────────
+    matieres = Matiere.query.filter_by(classe_id=classe_id)\
+                            .order_by(Matiere.jour, Matiere.heure).all()
+ 
+    # ── Professeurs enregistrés pour cette école ← NOUVEAU ──────
+    professeurs = Professeur.query.filter_by(
+        ecole_id=ecole_id,
+        actif=True
+    ).order_by(Professeur.nom, Professeur.prenom).all()
+ 
+    # Ajouter nom_complet si pas déjà défini comme property
+    for p in professeurs:
+        if not hasattr(p, '_nom_complet_cache'):
+            p._nom_complet = f"{p.prenom} {p.nom}"
+ 
     return render_template(
         'add_matiere.html',
         classe=classe,
         matieres=matieres,
-        jours_semaine=jours_semaine
+        professeurs=professeurs,     # ← NOUVEAU
     )
-
 
 # ─────────────────────────────────────────────
 #  ROUTE FRANCO-ARABE

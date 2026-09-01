@@ -16,7 +16,7 @@ def saisir_notes(classe_id):
         return redirect(url_for('main.dashboard'))
 
     matieres = Matiere.query.filter_by(classe_id=classe_id).order_by(Matiere.nom).all()
-    eleves = Eleve.query.filter_by(classe_id=classe_id).order_by(Eleve.nom, Eleve.prenom).all()
+    eleves = Eleve.query.filter_by(classe_id=classe_id, archive=False).order_by(Eleve.nom, Eleve.prenom).all()
 
     if not matieres:
         flash("Ajoutez d'abord des matières pour cette classe.", "warning")
@@ -111,7 +111,7 @@ def saisir_notes_ar(classe_id):
         return redirect(url_for('main.dashboard_ar'))
 
     matieres = Matiere.query.filter_by(classe_id=classe_id).order_by(Matiere.nom).all()
-    eleves = Eleve.query.filter_by(classe_id=classe_id).order_by(Eleve.nom, Eleve.prenom).all()
+    eleves = Eleve.query.filter_by(classe_id=classe_id, archive=False).order_by(Eleve.nom, Eleve.prenom).all()
 
     if not matieres:
         flash("أضف المواد أولاً لهذا القسم.", "warning")
@@ -286,7 +286,7 @@ def supprimer_toutes_notes():
         classe = Classe.query.get_or_404(classe_id)
         if classe.ecole_id != session['ecole_id']:
             return jsonify({'success': False, 'message': 'غير مصرح به'})
-        eleves_ids = [eleve.id for eleve in Eleve.query.filter_by(classe_id=classe_id).all()]
+        eleves_ids = [eleve.id for eleve in Eleve.query.filter_by(classe_id=classe_id, archive=False).all()]
         if not eleves_ids:
             return jsonify({'success': False, 'message': 'لا يوجد تلاميذ في هذا القسم'})
         count = Note.query.filter(Note.eleve_id.in_(eleves_ids)).count()
@@ -303,7 +303,7 @@ def supprimer_toutes_notes():
         return jsonify({'success': False, 'message': str(e)})
 
 
-# === Route de lecture seule (optionnelle, non dupliquée) ===
+# === Route de lecture seule (optionnelle, non dupliquée) ===#
 @notes_bp.route('/voir_notes/<int:classe_id>')
 @login_required
 def voir_notes(classe_id):

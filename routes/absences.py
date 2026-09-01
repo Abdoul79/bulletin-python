@@ -51,10 +51,10 @@ def feuille_absences(classe_id):
     except ValueError:
         date_sel = date.today()
 
-    eleves = Eleve.query.filter_by(classe_id=classe_id)\
+    eleves = Eleve.query.filter_by(classe_id=classe_id, archive=False)\
                         .order_by(Eleve.nom, Eleve.prenom).all()
 
-    # ── POST : enregistrer les absences ──────────────────
+    # ── POST : enregistrer les absences ──────────────────#
     if request.method == 'POST':
         for eleve in eleves:
             matin      = f'matin_{eleve.id}'      in request.form
@@ -154,7 +154,7 @@ def bilan_absences(classe_id):
     if classe.ecole_id != ecole.id:
         abort(403)
 
-    eleves = Eleve.query.filter_by(classe_id=classe_id)\
+    eleves = Eleve.query.filter_by(classe_id=classe_id, archive=False )\
                         .order_by(Eleve.nom, Eleve.prenom).all()
 
     # Toutes les absences de la classe

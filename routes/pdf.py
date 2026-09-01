@@ -242,7 +242,7 @@ def generer_bulletins_classe(classe_id):
         flash("Acces non autorise.", "error")
         return redirect(url_for('main.dashboard'))
     
-    eleves = Eleve.query.filter_by(classe_id=classe_id).order_by(Eleve.nom, Eleve.prenom).all()
+    eleves = Eleve.query.filter_by(classe_id=classe_id, archive=False).order_by(Eleve.nom, Eleve.prenom).all()
     
     if not eleves:
         flash("Aucun eleve dans cette classe.", "warning")
@@ -256,6 +256,7 @@ def generer_bulletins_classe(classe_id):
                 try:
                     donnees = _preparer_donnees_bulletin(eleve)
                     donnees['appreciation'] = _generer_appreciation(donnees['moyenne'])
+                    
                     
                     html = render_template('bulletin_pdf.html', **donnees)
                     pdf_data = weasyprint.HTML(string=html, base_url=request.url_root).write_pdf()
@@ -300,7 +301,7 @@ def generer_bulletins_classe_classee(classe_id):
         flash("Acces non autorise.", "error")
         return redirect(url_for('main.dashboard'))
     
-    eleves = Eleve.query.filter_by(classe_id=classe_id).all()
+    eleves = Eleve.query.filter_by(classe_id=classe_id, archive=False).all()
     
     if not eleves:
         flash("Aucun eleve dans cette classe.", "warning")
@@ -324,6 +325,7 @@ def generer_bulletins_classe_classee(classe_id):
                     donnees['moyenne'] = moyenne_generale
                     donnees['appreciation'] = _generer_appreciation(moyenne_generale)
                     
+
                     html = render_template('bulletin_pdf.html', **donnees)
                     pdf_data = weasyprint.HTML(string=html, base_url=request.url_root).write_pdf()
                     
@@ -446,7 +448,7 @@ def generer_bulletins_classe_ar(classe_id):
         flash("Acces non autorise.", "error")
         return redirect(url_for('main.dashboard_ar'))
 
-    eleves = Eleve.query.filter_by(classe_id=classe_id).order_by(Eleve.nom, Eleve.prenom).all()
+    eleves = Eleve.query.filter_by(classe_id=classe_id, archive=False).order_by(Eleve.nom, Eleve.prenom).all()
     
     if not eleves:
         flash("Aucun eleve dans cette classe.", "warning")
@@ -513,7 +515,7 @@ def generer_bulletins_classe_classee_ar(classe_id):
         flash("Acces non autorise.", "error")
         return redirect(url_for('main.dashboard_ar'))
 
-    eleves = Eleve.query.filter_by(classe_id=classe_id).all()
+    eleves = Eleve.query.filter_by(classe_id=classe_id, archive=False).all()
     
     if not eleves:
         flash("Aucun eleve dans cette classe.", "warning")
@@ -540,7 +542,7 @@ def generer_bulletins_classe_classee_ar(classe_id):
                     html = render_template('bulletin_pdf_ar.html', **donnees)
                     pdf_data = weasyprint.HTML(string=html, base_url=request.url_root).write_pdf()
                     
-                    # Utiliser un nom ASCII pour les fichiers dans le ZIP
+                    # Utiliser un nom ASCII pour les fichiers dans le ZIP#
                     filename = f"{rang:02d}_bulletin_ar_{eleve.prenom}_{eleve.nom}_({moyenne_generale:.2f}).pdf"
                     filename = filename.replace(' ', '_').replace('/', '_')
                     

@@ -78,7 +78,7 @@ def add_classe():
                 nom = classe.nom
                 
                 # Compter les éléments liés
-                nb_eleves = Eleve.query.filter_by(classe_id=classe.id).count()
+                nb_eleves = Eleve.query.filter_by(classe_id=classe.id, archive=False).count()
                 nb_matieres = Matiere.query.filter_by(classe_id=classe.id).count()
                 
                 if nb_eleves > 0 or nb_matieres > 0:
@@ -99,7 +99,7 @@ def add_classe():
     # Charger les classes avec statistiques
     classes = Classe.query.filter_by(ecole_id=session['ecole_id']).all()
     for classe in classes:
-        classe.nb_eleves = Eleve.query.filter_by(classe_id=classe.id).count()
+        classe.nb_eleves = Eleve.query.filter_by(classe_id=classe.id, archive=False).count()
         classe.nb_matieres = Matiere.query.filter_by(classe_id=classe.id).count()
 
     return render_template('add_classe.html', classes=classes)
@@ -178,7 +178,7 @@ def add_classe_ar():
                     return redirect(url_for('classe.add_classe_ar'))
                 
                 nom = classe.nom
-                nb_eleves = Eleve.query.filter_by(classe_id=classe.id).count()
+                nb_eleves = Eleve.query.filter_by(classe_id=classe.id, archive=False).count()
                 nb_matieres = Matiere.query.filter_by(classe_id=classe.id).count()
                 
                 if nb_eleves > 0 or nb_matieres > 0:
@@ -197,9 +197,10 @@ def add_classe_ar():
             return redirect(url_for('classe.add_classe_ar'))
 
     # Charger les classes avec statistiques
+
     classes = Classe.query.filter_by(ecole_id=session['ecole_id']).all()
     for classe in classes:
-        classe.nb_eleves = Eleve.query.filter_by(classe_id=classe.id).count()
+        classe.nb_eleves = Eleve.query.filter_by(classe_id=classe.id, archive=False).count()
         classe.nb_matieres = Matiere.query.filter_by(classe_id=classe.id).count()
 
     return render_template('add_classe_ar.html', classes=classes)

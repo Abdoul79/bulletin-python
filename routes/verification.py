@@ -141,7 +141,7 @@ def verifier_bulletin(code):
     moyenne = round(sum(toutes_vals) / len(toutes_vals), 2) if toutes_vals else 0.0
 
     # Classement
-    eleves_classe = Eleve.query.filter_by(classe_id=classe.id).all()
+    eleves_classe = Eleve.query.filter_by(classe_id=classe.id, archive=False).all()
     moyennes_classe = []
     for e in eleves_classe:
         notes_e = Note.query.filter_by(eleve_id=e.id).with_entities(Note.note).all()

@@ -21,7 +21,7 @@ def dashboard():
     
     # Enrichir les classes avec des statistiques
     for classe in classes:
-        classe.nb_eleves = Eleve.query.filter_by(classe_id=classe.id).count()
+        classe.nb_eleves = Eleve.query.filter_by(classe_id=classe.id, archive=False).count()
         classe.nb_matieres = Matiere.query.filter_by(classe_id=classe.id).count()
     
     return render_template('ecole_dashboard.html', ecole=ecole, classes=classes)
@@ -38,7 +38,7 @@ def voir_classe(classe_id):
         flash("Accès non autorisé.", "error")
         return redirect(url_for('main.dashboard'))
     
-    eleves = Eleve.query.filter_by(classe_id=classe_id).all()
+    eleves = Eleve.query.filter_by(classe_id=classe_id, archive=False).all()
     matieres = Matiere.query.filter_by(classe_id=classe_id).all()
 
     return render_template(
@@ -61,7 +61,7 @@ def gestion_classe(classe_id):
         flash("Accès non autorisé.", "error")
         return redirect(url_for('main.dashboard'))
     
-    eleves = Eleve.query.filter_by(classe_id=classe_id).all()
+    eleves = Eleve.query.filter_by(classe_id=classe_id, archive=False).all()
     matieres = Matiere.query.filter_by(classe_id=classe_id).all()
 
     return render_template(
@@ -196,12 +196,12 @@ def voir_classe_ar(classe_id):
         flash("Accès non autorisé à cette classe.", "error")
         return redirect(url_for('main.dashboard_ar'))
 
-    eleves = Eleve.query.filter_by(classe_id=classe_id).all()
+    eleves = Eleve.query.filter_by(classe_id=classe_id, archive=False).all()
     matieres = Matiere.query.filter_by(classe_id=classe_id).all()
 
     return render_template(
         'voir_classe_ar.html',
-        ecole=ecole,          # ✅ Ajouté ici
+        ecole=ecole,          # ✅ Ajouté ici#
         classe=classe,
         eleves=eleves,
         matieres=matieres,
@@ -223,7 +223,7 @@ def gestion_classe_ar(classe_id):
         flash("Accès non autorisé à cette classe.", "error")
         return redirect(url_for('main.dashboard_ar'))
 
-    eleves = Eleve.query.filter_by(classe_id=classe_id).all()
+    eleves = Eleve.query.filter_by(classe_id=classe_id, archive=False).all()
     matieres = Matiere.query.filter_by(classe_id=classe_id).all()
 
     return render_template(
